@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="cachet" default="install" xmlns:ivy="antlib:org.apache.ivy.ant">
+  <description>HTTP Reverse Proxy</description>
+  <import file="ant/bootstrap.xml" />
+
+  <target name="launch" depends="compile">
+    <java classname="scala.tools.nsc.MainGenericRunner" fork="true">
+      <classpath>
+        <path refid="test.path" />
+        <pathelement location="${target.dir}" />
+        <pathelement location="${test.target.dir}" />
+      </classpath>
+      <arg line="com.twitter.service.cachet.Main -f src/resources/cachet.conf"/>
+      <jvmarg value="-Dcom.sun.management.jmxremote" />
+      <jvmarg value="-Dconfiggy=src/resources/test/cachet.conf" />
+      <jvmarg value="-Xms256m" />
+      <jvmarg value="-Xmx512m" />
+      <!--
+      <jvmarg value="-verbose:class" />
+      <jvmarg value="-agentlib:hprof=cpu=samples,monitor=y,file=/tmp/cachet.hprof,lineno=y" />
+      -->
+    </java>
+  </target>
+</project>
+
