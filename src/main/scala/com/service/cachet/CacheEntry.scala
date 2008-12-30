@@ -18,7 +18,7 @@ class CacheEntry(response: HttpServletResponse) extends HttpServletResponseWrapp
   }
 
   def getDateHeader(n: String) = {
-    headers(n).asInstanceOf[Long]
+    headers get n map (_.asInstanceOf[Long])
   }
 
   override def addCookie(c: Cookie) {
@@ -33,14 +33,14 @@ class CacheEntry(response: HttpServletResponse) extends HttpServletResponseWrapp
     headers.update(n, v)
   }
 
-  def getHeader(n: String) = headers(n).asInstanceOf[String]
+  def getHeader(n: String) = headers get n map (_.asInstanceOf[String])
 
   override def addIntHeader(n: String, v: Int) {
     super.addIntHeader(n, v)
     headers.update(n, v)
   }
 
-  def getIntHeader(n: String) = headers(n).asInstanceOf[Int]
+  def getIntHeader(n: String) = headers get n map (_.asInstanceOf[Int])
 
   override def sendError(sc: Int) {
     super.sendError(sc)
@@ -53,24 +53,57 @@ class CacheEntry(response: HttpServletResponse) extends HttpServletResponseWrapp
   override def setHeader(n: String, v: String) = addHeader(n, v)
   override def setIntHeader(n: String, v: Int) = addIntHeader(n, v)
   override def setStatus(sc: Int) = sendError(sc)
-  
+
   def noteResponseTime() {
     responseTime = System.currentTimeMillis
   }
   
   def dateValue = getDateHeader("Date")
-  def apparentAge = 0 max (responseTime - dateValue).toInt
+
+  def apparentAge = {
+    for (date <- dateValue)
+      yield 0 max (responseTime - date).toInt
+  }
+
   def ageValue = getIntHeader("Age")
-  def correctedReceivedAge = ageValue max apparentAge
+
+  def correctedReceivedAge = {
+    for (age <- ageValue; apparent <- apparentAge)
+      yield age max apparent
+  }
+
   def responseDelay = responseTime - requestTime
-  def correctedInitialAge = correctedReceivedAge + responseDelay
+
+  def correctedInitialAge = {
+    for (corrected <- correctedReceivedAge)
+      yield corrected + responseDelay
+  }
+
   def residentTime = System.currentTimeMillis - responseTime
-  def currentAge = correctedInitialAge + residentTime
+
+  def currentAge = {
+    for (corrected <- correctedInitialAge)
+      yield corrected + residentTime
+  }
+
+  def expiresValue = getDateHeader("Expires")
   
-  private val CacheControl = """.*(?:(?:s-maxage=(\d+))|(?:max-age=(\d+))).*""".r
-  
-  def maxAgeValue = {
-    val CacheControl(sMaxAge, maxAge) = headers("Cache-Control")
-    (if (sMaxAge != null) sMaxAge else maxAge).toInt
+  val MaxAge = """\b(?:s-maxage|max-age)=(\d+)\b""".r
+
+  def maxAgeValue = { 
+    for (cacheControl <- getHeader("Cache-Control"); maxAge <- MaxAge findFirstMatchIn cacheControl)
+      yield maxAge group(1) toInt
+  }
+
+  def freshnessLifetime = {
+    maxAgeValue orElse (
+      for (expires <- expiresValue; date <- dateValue)
+        yield (expires - date) toInt
+    )
+  }
+
+  def isFresh = {
+    for (f <- freshnessLifetime; a <- currentAge)
+      yield f > a
   }
 }
