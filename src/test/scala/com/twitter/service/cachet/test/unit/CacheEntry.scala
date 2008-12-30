@@ -21,19 +21,35 @@ object CacheEntrySpec extends Specification with JMocker {
       }
       
       "age calculations" >> {
+        "dateValue" >> {
+          "when there is a Date header" >> {
+            "returns the value of the header" >> {
+              val millis = System.currentTimeMillis
+              response.setDateHeader("Date", millis)
+              cacheEntry.dateValue must be_==(millis)
+            }
+          }
+
+          "when there is no Date header" >> {
+            "returns the response time" >> {
+              cacheEntry.dateValue must be_==(cacheEntry.responseTime)
+            }
+          }
+        }
+        
         "apparentAge" >> {
           "when dateValue <= responseTime" >> {
             "returns responseTime - dateValue" >> {
               val delta = 10
               response.setDateHeader("Date", cacheEntry.responseTime - delta)
-              cacheEntry.apparentAge must be_==(Some(delta))
+              cacheEntry.apparentAge must be_==(delta)
             }
           }
           
           "when dateValue > responseTime" >> {
             "returns 0" >> {
               response.setDateHeader("Date", cacheEntry.responseTime + 10)
-              cacheEntry.apparentAge must be_==(Some(0))
+              cacheEntry.apparentAge must be_==(0)
             }
           }
         }
@@ -47,11 +63,18 @@ object CacheEntrySpec extends Specification with JMocker {
             }
           }
           
-          "when apparentAge < AgeValue" >> {
+          "when apparentAge < ageValue" >> {
             "returns ageValue" >> {
               response.setDateHeader("Date", cacheEntry.responseTime)
               response.setIntHeader("Age", 10)
-              cacheEntry.correctedReceivedAge must be_==(response.getIntHeader("Age"))
+              cacheEntry.correctedReceivedAge must be_==(response.getIntHeader("Age").get)
+            }
+          }
+          
+          "when no ageValue" >> {
+            "returns apparentAge" >> {
+              response.setDateHeader("Date", cacheEntry.responseTime)
+              cacheEntry.correctedReceivedAge must be_==(cacheEntry.apparentAge)              
             }
           }
         }
@@ -66,7 +89,7 @@ object CacheEntrySpec extends Specification with JMocker {
           "returning correctedReceivedAge + responseDelay" >> {
             response.setDateHeader("Date", cacheEntry.responseTime)
             response.setIntHeader("Age", 10)
-            cacheEntry.correctedInitialAge must be_==(Some(10 + cacheEntry.responseDelay))
+            cacheEntry.correctedInitialAge must be_==(10 + cacheEntry.responseDelay)
           }
         }
         
@@ -80,7 +103,7 @@ object CacheEntrySpec extends Specification with JMocker {
           "returning correctedInitialAge + residentTime" >> {
             response.setDateHeader("Date", cacheEntry.responseTime)
             response.setIntHeader("Age", 10)
-            cacheEntry.currentAge must be_==(Some(10 + cacheEntry.residentTime))
+            cacheEntry.currentAge must be_==(10 + cacheEntry.residentTime)
           }
         }
         
@@ -123,21 +146,27 @@ object CacheEntrySpec extends Specification with JMocker {
             }
           }
         }
-
-        "isFresh()" >> {
-          "when freshnessLifetime > currentAge" >> {
+        
+        "isFresh" >> {
+          "when freshnessLifetime >= currentAge" >> {
             "returns true" >> {
               response.setHeader("Cache-Control", "s-maxage=100") 
               response.setDateHeader("Date", cacheEntry.responseTime)
-              response.setIntHeader("Age", 1)
-              cacheEntry.isFresh must be_==(Some(true))
+              cacheEntry.isFresh must be_==(true)
             }
+          }
             
+          "when freshnessLifeftime < currentAge" >> {
             "returns false" >> {
               response.setHeader("Cache-Control", "s-maxage=1")
-              response.setDateHeader("Date", cacheEntry.responseTime)
-              response.setIntHeader("Age", 2)
-              cacheEntry.isFresh must be_==(Some(false))
+              response.setDateHeader("Date", cacheEntry.responseTime + 2)
+              cacheEntry.isFresh must be_==(false)
+            }
+          }
+          
+          "when there is no freshnessLifetime" >> {
+            "returns false" >> {
+              cacheEntry.isFresh must be_==(false)
             }
           }
         }

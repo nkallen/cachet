@@ -1,9 +1,10 @@
-Refactor CacheEntry into ResponseWrapper and RFC2616
 Make it so not both Date and Age are necessary for age calculations
 Implement validation schemes:
   last-modified
   etag
 Implement EHCache Cache Store
+Implement Cacheable
+
 Locking
 Grace Period
 Load Balancing

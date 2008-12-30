@@ -10,37 +10,25 @@ class CacheEntry(response: ResponseWrapper) {
     responseTime = System.currentTimeMillis
   }
   
-  def dateValue = response getDateHeader("Date")
+  def dateValue = response getDateHeader("Date") getOrElse responseTime
 
-  def apparentAge = {
-    for (date <- dateValue)
-      yield (responseTime - date) max 0
-  }
+  def apparentAge = (responseTime - dateValue) max 0
 
   def ageValue = response getIntHeader("Age") map (_.toLong)
 
-  def correctedReceivedAge = {
-    for (age <- ageValue; apparent <- apparentAge)
-      yield age max apparent
-  }
+  def correctedReceivedAge = ageValue map (_ max apparentAge) getOrElse apparentAge
 
   def responseDelay = responseTime - requestTime
 
-  def correctedInitialAge = {
-    for (corrected <- correctedReceivedAge)
-      yield corrected + responseDelay
-  }
+  def correctedInitialAge = correctedReceivedAge + responseDelay
 
   def residentTime = System.currentTimeMillis - responseTime
 
-  def currentAge = {
-    for (corrected <- correctedInitialAge)
-      yield corrected + residentTime
-  }
+  def currentAge = correctedInitialAge + residentTime
 
   def expiresValue = response getDateHeader("Expires")
   
-  val MaxAge = """\b(?:s-maxage|max-age)=(\d+)\b""".r
+  private val MaxAge = """\b(?:s-maxage|max-age)=(\d+)\b""".r
 
   def maxAgeValue = { 
     for (cacheControl <- response getHeader("Cache-Control"); maxAge <- MaxAge findFirstMatchIn cacheControl)
@@ -49,13 +37,12 @@ class CacheEntry(response: ResponseWrapper) {
 
   def freshnessLifetime = {
     maxAgeValue orElse (
-      for (expires <- expiresValue; date <- dateValue)
-        yield (expires - date)
+      for (expires <- expiresValue)
+        yield (expires - dateValue)
     )
   }
 
   def isFresh = {
-    for (f <- freshnessLifetime; a <- currentAge)
-      yield f > a
+    freshnessLifetime map (_ > currentAge) getOrElse false
   }
 }
