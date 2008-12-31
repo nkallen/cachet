@@ -1,4 +1,3 @@
-Make it so not both Date and Age are necessary for age calculations
 Implement validation schemes:
   last-modified
   etag

@@ -1,0 +1,23 @@
+<ivysettings>
+  <settings defaultResolver="chain-repos" />
+  <resolvers>
+    <chain name="chain-repos">
+      <url name="scala-tools.org" m2compatible="true">
+        <artifact pattern="http://scala-tools.org/repo-releases/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
+      </url>
+      <url name="scala-tools.org-snapshots" m2compatible="true">
+        <artifact pattern="http://scala-tools.org/repo-snapshots/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
+      </url>
+      <ibiblio name="maven2" m2compatible="true"/>
+      <url name="lag.net" m2compatible="true">
+        <artifact pattern="http://www.lag.net/repo/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
+      </url>
+      <filesystem name="local-libs" m2compatible="true" transactional="false">
+        <artifact pattern="${basedir}/libs/[artifact]-[revision].[ext]" />
+      </filesystem>
+    </chain>
+    <filesystem name="local" m2compatible="true" transactional="false">
+      <artifact pattern="${basedir}/dist/repo/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
+    </filesystem>
+  </resolvers>
+</ivysettings>

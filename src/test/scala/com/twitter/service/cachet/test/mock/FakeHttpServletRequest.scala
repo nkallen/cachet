@@ -1,4 +1,4 @@
-package com.twitter.service.cachet.test.mocks
+package com.twitter.service.cachet.test.mock
 
 import _root_.scala.collection.mutable.HashMap
 import _root_.java.io.PrintWriter
