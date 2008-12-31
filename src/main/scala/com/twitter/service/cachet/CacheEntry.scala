@@ -2,7 +2,7 @@ package com.twitter.service.cachet
 
 import scala.util.matching.Regex
 
-class CacheEntry(response: ResponseWrapper) {
+class CacheEntry(val response: ResponseWrapper) {
   val requestTime = System.currentTimeMillis
   var responseTime = 0.toLong
 

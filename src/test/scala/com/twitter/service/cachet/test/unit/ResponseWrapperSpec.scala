@@ -18,7 +18,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
         response = mock(classOf[HttpServletResponse])
         responseWrapper = new ResponseWrapper(response)
       }
-    
+
       "addDateHeader(x, y) such that" >> {
         val millis = System.currentTimeMillis
 
