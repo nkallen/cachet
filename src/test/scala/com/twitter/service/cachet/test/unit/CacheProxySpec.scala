@@ -17,7 +17,7 @@ object CacheProxySpec extends Specification with JMocker {
     var chain: FilterChain = null
     var request: HttpServletRequest = null
     var response: HttpServletResponse = null
-    
+
     doBefore {
       cache = mock(classOf[Ehcache])
       chain = mock(classOf[FilterChain])
@@ -29,12 +29,12 @@ object CacheProxySpec extends Specification with JMocker {
     "proxy" >> {
       "when there is a cache miss" >> {
         val key = "asdf"
-        expect { one(cache).get(key) willReturn(null: CacheEntry) }
+        expect { one(cache).get(key) willReturn(null: Element) }
         expect { one(chain).doFilter(a[HttpServletRequest], a[ResponseWrapper]) }
         expect { one(cache).put(a[Element]) }
         proxy(request, response, chain) // must be a CacheEntry
       }
-      
+
       "when there is a cache hit" >> {
         val key = "asdf"
         val responseWrapper = new ResponseWrapper(response)
