@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="cachet" default="install" xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="cachet" default="test" xmlns:ivy="antlib:org.apache.ivy.ant">
   <description>HTTP Reverse Proxy</description>
   <import file="ant/bootstrap.xml" />
 
