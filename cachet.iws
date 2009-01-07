@@ -2,14 +2,9 @@
 <project relativePaths="false" version="4">
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cachet.ipr" afterPath="$PROJECT_DIR$/cachet.ipr" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cachet.iws" afterPath="$PROJECT_DIR$/cachet.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/CacheEntrySpec.scala" afterPath="$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/CacheEntrySpec.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/TestRunner.scala" afterPath="$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/TestRunner.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/com/twitter/service/cachet/CacheEntry.scala" afterPath="$PROJECT_DIR$/src/main/scala/com/twitter/service/cachet/CacheEntry.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/com/twitter/service/cachet/CacheProxy.scala" afterPath="$PROJECT_DIR$/src/main/scala/com/twitter/service/cachet/CacheProxy.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ivy/ivy.xml" afterPath="$PROJECT_DIR$/ivy/ivy.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/CacheProxySpec.scala" afterPath="$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/CacheProxySpec.scala" />
     </list>
     <ignored path="cachet.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -63,10 +58,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="CacheProxySpec.scala" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="CacheProxySpec.scala" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/CacheProxySpec.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="42" column="40" selection-start="1366" selection-end="1366" vertical-scroll-proportion="0.6599691">
+            <state line="42" column="40" selection-start="1366" selection-end="1366" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -90,10 +85,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CacheProxy.scala" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="CacheProxy.scala" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/com/twitter/service/cachet/CacheProxy.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="16" column="52" selection-start="629" selection-end="665" vertical-scroll-proportion="0.0">
+            <state line="19" column="9" selection-start="638" selection-end="638" vertical-scroll-proportion="0.4126739">
               <folding />
             </state>
           </provider>
@@ -138,7 +133,7 @@
       <file leaf-file-name="CacheEntry.scala" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/com/twitter/service/cachet/CacheEntry.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="37" column="34" selection-start="1303" selection-end="1303" vertical-scroll-proportion="0.0">
+            <state line="31" column="13" selection-start="1128" selection-end="1128" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -631,20 +626,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/com/twitter/service/cachet/CacheProxy.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="52" selection-start="629" selection-end="665" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/com/twitter/service/cachet/CacheEntry.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="37" column="34" selection-start="1303" selection-end="1303" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/CacheEntrySpec.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state line="175" column="0" selection-start="5989" selection-end="5989" vertical-scroll-proportion="0.0">
@@ -654,7 +635,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/CacheProxySpec.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="42" column="40" selection-start="1366" selection-end="1366" vertical-scroll-proportion="0.6599691">
+        <state line="42" column="40" selection-start="1366" selection-end="1366" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/com/twitter/service/cachet/CacheEntry.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="31" column="13" selection-start="1128" selection-end="1128" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/com/twitter/service/cachet/CacheProxy.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="9" selection-start="638" selection-end="638" vertical-scroll-proportion="0.4126739">
           <folding />
         </state>
       </provider>
