@@ -10,41 +10,72 @@ import org.specs.mock._
 import org.specs.mock.JMocker._
 import com.twitter.service.cachet.test.mock._
 
-object CacheProxySpec extends Specification with JMocker {
+object CacheProxySpec extends Specification with JMocker with ClassMocker {
   "CacheProxy" should {
     var proxy: CacheProxy = null
     var cache: Ehcache = null
     var chain: FilterChain = null
     var request: FakeHttpServletRequest = null
     var response: HttpServletResponse = null
+    var cacheEntry: CacheEntry = null
 
     doBefore {
       cache = mock(classOf[Ehcache])
       chain = mock(classOf[FilterChain])
-      proxy = new CacheProxy(cache)
+      cacheEntry = mock(classOf[CacheEntry])
+      proxy = new CacheProxy(cache, blah => cacheEntry)
       request = new FakeHttpServletRequest
       request.queryString = "/foo"
 
       response = new FakeHttpServletResponse
     }
 
-    "proxy" >> {
+    "apply" >> {
       "when there is a cache miss" >> {
-        "invokes the filter, storing the result" >> {
-          expect { one(cache).get(request.queryString) willReturn(null: Element) }
-          expect { one(chain).doFilter(a[HttpServletRequest], a[ResponseWrapper]) }
-          expect { one(cache).put(a[Element]) }
+        "when the resource is cachable" >> {
+          "invokes the filter, storing the result" >> {
+            expect { one(cacheEntry).isCachable willReturn(true) }
+            expect { one(cache).get(request.queryString) willReturn (null: Element) }
+            expect { one(chain).doFilter(a[HttpServletRequest], a[ResponseWrapper]) }
+            expect { one(cache).put(a[Element]) }
 
-          proxy(request, response, chain) must haveClass(classOf[CacheEntry])
+            proxy(request, response, chain) mustEqual(cacheEntry)
+          }
+        }
+
+        "when the resource is not cachable" >> {
+          "invokes the filter, but does not store the result" >> {
+            expect { one(cacheEntry).isCachable willReturn(false) }
+            expect { one(cache).get(request.queryString) willReturn (null: Element) }
+            expect { one(chain).doFilter(a[HttpServletRequest], a[ResponseWrapper]) }
+            expect { never(cache).put(a[Element]) }
+
+            proxy(request, response, chain) mustEqual(cacheEntry)
+          }
         }
       }
 
       "when there is a cache hit" >> {
-        "returns the response from cache" >> {
-          val responseWrapper = new ResponseWrapper(response)
-          val cacheEntry = new CacheEntry(responseWrapper)
-          expect { one(cache).get(request.queryString) willReturn(new Element(request.queryString, cacheEntry)) }
-          proxy(request, response, chain) must be_==(cacheEntry)
+        "when the cache entry is tranparent" >> {
+          "returns the response from cache" >> {
+            expect { one(cacheEntry).isTransparent willReturn(true) }
+            val responseWrapper = new ResponseWrapper(response)
+            expect { one(cache).get(request.queryString) willReturn (new Element(request.queryString, cacheEntry)) }
+            proxy(request, response, chain) mustEqual(cacheEntry)
+          }
+        }
+
+        "when the cache entry is opaque" >> {
+          "invokes the filter, storing the result" >> {
+            expect { one(cacheEntry).isTransparent willReturn(false) }
+            expect { one(cacheEntry).isCachable willReturn(true) }
+            val responseWrapper = new ResponseWrapper(response)
+            expect { one(cache).get(request.queryString) willReturn (new Element(request.queryString, cacheEntry)) }
+            expect { one(chain).doFilter(a[HttpServletRequest], a[ResponseWrapper]) }
+            expect { one(cache).put(a[Element]) }
+
+            proxy(request, response, chain) mustEqual(cacheEntry)
+          }
         }
       }
     }
