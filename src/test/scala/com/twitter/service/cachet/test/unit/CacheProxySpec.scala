@@ -15,7 +15,7 @@ object CacheProxySpec extends Specification with JMocker {
     var proxy: CacheProxy = null
     var cache: Ehcache = null
     var chain: FilterChain = null
-    var request: HttpServletRequest = null
+    var request: FakeHttpServletRequest = null
     var response: HttpServletResponse = null
 
     doBefore {
@@ -23,24 +23,29 @@ object CacheProxySpec extends Specification with JMocker {
       chain = mock(classOf[FilterChain])
       proxy = new CacheProxy(cache)
       request = new FakeHttpServletRequest
+      request.queryString = "/foo"
+
       response = new FakeHttpServletResponse
     }
 
     "proxy" >> {
       "when there is a cache miss" >> {
-        val key = "asdf"
-        expect { one(cache).get(key) willReturn(null: Element) }
-        expect { one(chain).doFilter(a[HttpServletRequest], a[ResponseWrapper]) }
-        expect { one(cache).put(a[Element]) }
-        proxy(request, response, chain) // must be a CacheEntry
+        "invokes the filter, storing the result" >> {
+          expect { one(cache).get(request.queryString) willReturn(null: Element) }
+          expect { one(chain).doFilter(a[HttpServletRequest], a[ResponseWrapper]) }
+          expect { one(cache).put(a[Element]) }
+
+          proxy(request, response, chain) must haveClass(classOf[CacheEntry])
+        }
       }
 
       "when there is a cache hit" >> {
-        val key = "asdf"
-        val responseWrapper = new ResponseWrapper(response)
-        val cacheEntry = new CacheEntry(responseWrapper)
-        expect { one(cache).get(key) willReturn(new Element(key, cacheEntry)) }
-        proxy(request, response, chain) must be_==(responseWrapper)
+        "returns the response from cache" >> {
+          val responseWrapper = new ResponseWrapper(response)
+          val cacheEntry = new CacheEntry(responseWrapper)
+          expect { one(cache).get(request.queryString) willReturn(new Element(request.queryString, cacheEntry)) }
+          proxy(request, response, chain) must be_==(cacheEntry)
+        }
       }
     }
   }

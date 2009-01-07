@@ -31,6 +31,7 @@
     <dependency org="org.hamcrest" name="hamcrest-all" rev="1.1"  />
     <dependency org="cglib" name="cglib" rev="2.1_3"  />
     <dependency org="asm" name="asm" rev="1.5.3"  />
+    <dependency org="org.scalatest" name="scalatest" rev="0.9.3"  />
     <dependency org="org.objenesis" name="objenesis" rev="1.1"  />
   </dependencies>
 </ivy-module>

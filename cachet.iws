@@ -5,6 +5,11 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cachet.ipr" afterPath="$PROJECT_DIR$/cachet.ipr" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cachet.iws" afterPath="$PROJECT_DIR$/cachet.iws" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/CacheEntrySpec.scala" afterPath="$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/CacheEntrySpec.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/TestRunner.scala" afterPath="$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/TestRunner.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/com/twitter/service/cachet/CacheEntry.scala" afterPath="$PROJECT_DIR$/src/main/scala/com/twitter/service/cachet/CacheEntry.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/com/twitter/service/cachet/CacheProxy.scala" afterPath="$PROJECT_DIR$/src/main/scala/com/twitter/service/cachet/CacheProxy.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ivy/ivy.xml" afterPath="$PROJECT_DIR$/ivy/ivy.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/CacheProxySpec.scala" afterPath="$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/CacheProxySpec.scala" />
     </list>
     <ignored path="cachet.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -58,68 +63,64 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="CacheProxySpec.scala" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="CacheProxySpec.scala" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/CacheProxySpec.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="45" vertical-scroll-proportion="0.0">
-              <folding>
-                <marker date="1231207036000" expanded="true" signature="387:1519" placeholder="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TestRunner.scala" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/TestRunner.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="4" column="0" selection-start="111" selection-end="111" vertical-scroll-proportion="0.0">
+            <state line="42" column="40" selection-start="1366" selection-end="1366" vertical-scroll-proportion="0.6599691">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ant/test.xml">
+      <file leaf-file-name="FakeHttpServletRequest.scala" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/mock/FakeHttpServletRequest.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="22" column="29" selection-start="874" selection-end="874" vertical-scroll-proportion="-8.888889">
+            <state line="132" column="0" selection-start="4835" selection-end="4835" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CacheEntrySpec.scala" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="ResponseWrapper.scala" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/scala/com/twitter/service/cachet/ResponseWrapper.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="52" column="0" selection-start="1408" selection-end="1408" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CacheProxy.scala" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/scala/com/twitter/service/cachet/CacheProxy.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="16" column="52" selection-start="629" selection-end="665" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HttpServletRequest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="jar:///Users/nkallen/.ivy2/cache/javax.servlet/servlet-api/sources/servlet-api-2.5-sources.jar!/javax/servlet/http/HttpServletRequest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="46" column="17" selection-start="1411" selection-end="1411" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CacheEntrySpec.scala" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/CacheEntrySpec.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="12" column="0" selection-start="320" selection-end="320" vertical-scroll-proportion="0.4336493">
+            <state line="175" column="0" selection-start="5989" selection-end="5989" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Goop.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/Goop.java">
+      <file leaf-file-name="TODO" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/TODO">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="11" column="0" selection-start="275" selection-end="275" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Goo.scala" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/Goo.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="6" column="0" selection-start="125" selection-end="125" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ResponseWrapperSpec.scala" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/ResponseWrapperSpec.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="10" column="7" selection-start="240" selection-end="240" vertical-scroll-proportion="0.0">
+            <state line="15" column="18" selection-start="312" selection-end="312" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -128,7 +129,7 @@
       <file leaf-file-name="ivy.xml" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ivy/ivy.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="36" column="0" selection-start="2130" selection-end="2130" vertical-scroll-proportion="0.0">
+            <state line="33" column="4" selection-start="2035" selection-end="2035" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -137,7 +138,7 @@
       <file leaf-file-name="CacheEntry.scala" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/com/twitter/service/cachet/CacheEntry.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="3" column="0" selection-start="69" selection-end="69" vertical-scroll-proportion="0.0">
+            <state line="37" column="34" selection-start="1303" selection-end="1303" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -188,6 +189,76 @@
         <PATH_ELEMENT>
           <option name="myItemId" value="Cachet" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Libraries" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.LibraryGroupNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="cachet" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Cachet" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Libraries" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.LibraryGroupNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="IvyIDEA-resolved" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="cachet" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Cachet" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Libraries" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.LibraryGroupNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="IvyIDEA-resolved" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="ehcache-1.5.0.jar" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="cachet" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Cachet" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Libraries" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.LibraryGroupNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="IvyIDEA-resolved" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="ehcache-1.5.0.jar" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="ehcache" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
       <PATH>
@@ -315,7 +386,7 @@
     <property name="project.structure.proportion" value="0.0" />
     <property name="GoToClass.includeJavaFiles" value="false" />
     <property name="MemberChooser.copyJavadoc" value="false" />
-    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.last.edited" value="JDKs" />
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="MemberChooser.sorted" value="false" />
     <property name="options.searchVisible" value="true" />
@@ -328,7 +399,7 @@
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="RunManagerConfig.showSettingsBeforeRunnig" value="true" />
   </component>
-  <component name="RunManager" selected="JUnit.Suite">
+  <component name="RunManager">
     <configuration default="true" type="Remote" factoryName="Remote">
       <option name="USE_SOCKET_TRANSPORT" value="true" />
       <option name="SERVER_MODE" value="false" />
@@ -440,16 +511,16 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="22" width="1280" height="774" extended-state="0" />
-    <editor active="false" />
+    <frame x="0" y="22" width="1280" height="774" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Dataflow to this" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32961932" sideWeight="0.5" order="6" side_tool="false" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28977272" sideWeight="0.66483516" order="0" side_tool="false" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28896105" sideWeight="0.7706044" order="0" side_tool="false" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3065371" sideWeight="0.5" order="1" side_tool="false" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" />
-      <window_info id="Messages" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32554945" sideWeight="0.5" order="12" side_tool="false" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21927498" sideWeight="0.5" order="12" side_tool="false" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.66431093" order="1" side_tool="false" />
@@ -503,13 +574,6 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar:///Users/nkallen/.ivy2/cache/org.specs/specs/jars/specs-1.3.1.jar!/org/specs/runner/ScalaTest.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ivy/ivysettings.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state line="14" column="0" selection-start="742" selection-end="742" vertical-scroll-proportion="0.0">
@@ -522,69 +586,75 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/CacheProxySpec.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="45" vertical-scroll-proportion="0.0">
-          <folding>
-            <marker date="1231207036000" expanded="true" signature="387:1519" placeholder="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ant/test.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="29" selection-start="874" selection-end="874" vertical-scroll-proportion="-8.888889">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/TestRunner.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="4" column="0" selection-start="111" selection-end="111" vertical-scroll-proportion="0.0">
+        <state line="5" column="0" selection-start="112" selection-end="112" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/ResponseWrapperSpec.scala">
+    <entry file="jar:///Users/nkallen/.ivy2/cache/net.sf.ehcache/ehcache/sources/ehcache-1.5.0-sources.jar!/net/sf/ehcache/Element.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="7" selection-start="240" selection-end="240" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/Goo.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="0" selection-start="125" selection-end="125" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/Goop.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="0" selection-start="275" selection-end="275" vertical-scroll-proportion="0.0">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="docComment;method#getObjectValue#0;class#Element#0" expanded="true" />
+            <element signature="docComment;method#hashCode#0;class#Element#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ivy/ivy.xml">
+    <entry file="jar:///Users/nkallen/.ivy2/cache/javax.servlet/servlet-api/sources/servlet-api-2.5-sources.jar!/javax/servlet/http/HttpServletRequest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="36" column="0" selection-start="2130" selection-end="2130" vertical-scroll-proportion="0.0">
+        <state line="46" column="17" selection-start="1411" selection-end="1411" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/mock/FakeHttpServletRequest.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="132" column="0" selection-start="4835" selection-end="4835" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/com/twitter/service/cachet/ResponseWrapper.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="52" column="0" selection-start="1408" selection-end="1408" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TODO">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="18" selection-start="312" selection-end="312" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/com/twitter/service/cachet/CacheProxy.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="52" selection-start="629" selection-end="665" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/com/twitter/service/cachet/CacheEntry.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="3" column="0" selection-start="69" selection-end="69" vertical-scroll-proportion="0.0">
+        <state line="37" column="34" selection-start="1303" selection-end="1303" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/CacheEntrySpec.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="0" selection-start="320" selection-end="320" vertical-scroll-proportion="0.4336493">
+        <state line="175" column="0" selection-start="5989" selection-end="5989" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/scala/com/twitter/service/cachet/test/unit/CacheProxySpec.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="42" column="40" selection-start="1366" selection-end="1366" vertical-scroll-proportion="0.6599691">
           <folding />
         </state>
       </provider>

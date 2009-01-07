@@ -35,4 +35,5 @@ class CacheEntry(val response: ResponseWrapper) {
   }
 
   def isFresh = freshnessLifetime map (_ > currentAge) getOrElse false
+  def ==(other: CacheEntry) = true
 }

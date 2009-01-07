@@ -7,9 +7,6 @@ import org.specs._
 import org.specs.mock._
 import org.specs.mock.JMocker._
 import com.twitter.service.cachet.test.mock._
-import org.specs.runner.JUnit4
-
-class CacheEntrySpecTest extends JUnit4(CacheEntrySpec)
 
 object CacheEntrySpec extends Specification with JMocker {
   "CacheEntry" should {
