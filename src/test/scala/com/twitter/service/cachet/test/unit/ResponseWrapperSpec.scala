@@ -26,7 +26,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
         "getDateHeader(x) returns y" >> {
           expect { one(response).addDateHeader("Date", millis) }
           responseWrapper.addDateHeader("Date", millis)
-          responseWrapper.getDateHeader("Date") must be_==(Some(millis))
+          responseWrapper.getDateHeader("Date") mustEqual(Some(millis))
         }
       }
 
@@ -37,7 +37,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
         "cookies" >> {
           expect { one(response).addCookie(cookie) }
           responseWrapper.addCookie(cookie)
-          responseWrapper.getCookies.contains(cookie) must be_==(true)
+          responseWrapper.getCookies.contains(cookie) mustEqual(true)
         }
       }
     
@@ -49,7 +49,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
         "getHeader(n) returns v" >> {
           expect { one(response).addHeader(name, value) }
           responseWrapper.addHeader(name, value)
-          responseWrapper.getHeader(name) must be_==(Some(value))
+          responseWrapper.getHeader(name) mustEqual(Some(value))
         }
       }
 
@@ -61,7 +61,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
         "getHeader(n) returns v" >> {
           expect { one(response).addIntHeader(name, value) }
           responseWrapper.addIntHeader(name, value)
-          responseWrapper.getIntHeader(name) must be_==(Some(value))
+          responseWrapper.getIntHeader(name) mustEqual(Some(value))
         }
       }
 
@@ -73,7 +73,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
           "getStatus() returns sc" >> {
             expect { one(response).sendError(sc) }
             responseWrapper.sendError(sc)
-            responseWrapper.getStatus must be_==(sc)
+            responseWrapper.getStatus mustEqual(sc)
           }
         }
 
@@ -84,7 +84,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
           "getStatus() returns sc" >> {
             expect { one(response).sendError(sc) }
             responseWrapper.sendError(sc)
-            responseWrapper.getStatus must be_==(sc)
+            responseWrapper.getStatus mustEqual(sc)
           }
         }
       }

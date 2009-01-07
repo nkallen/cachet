@@ -37,4 +37,8 @@ class CacheEntry(val response: ResponseWrapper) {
   def isFresh = freshnessLifetime map (_ > currentAge) getOrElse false
   def isCachable = true
   def isTransparent = true
+
+  def foo = {
+    dateValue.asInstanceOf
+  }
 }

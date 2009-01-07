@@ -1,16 +1,14 @@
-CacheProxy should compute cache key correctly
+refactor cacheproxy spec
 Rename CacheEntry#response to responseWrapper?
-HTTP Client Servlet
 Validation Servlet
 Implement validation schemes:
   last-modified
   etag
 Implement Cacheable in RFC2616
-Vary
-Vary by cookie
-
 Locking
 Grace Period
+Vary
+Vary by cookie
 
 Strategy is injected into CacheProxy:
 	- compute cacheable request?

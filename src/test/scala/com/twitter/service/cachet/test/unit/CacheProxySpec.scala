@@ -34,8 +34,8 @@ object CacheProxySpec extends Specification with JMocker with ClassMocker {
       "when there is a cache miss" >> {
         "when the resource is cachable" >> {
           "invokes the filter, storing the result" >> {
-            expect { one(cacheEntry).isCachable willReturn(true) }
             expect { one(cache).get(request.queryString) willReturn (null: Element) }
+            expect { one(cacheEntry).isCachable willReturn(true) }
             expect { one(chain).doFilter(a[HttpServletRequest], a[ResponseWrapper]) }
             expect { one(cache).put(a[Element]) }
 
@@ -45,8 +45,8 @@ object CacheProxySpec extends Specification with JMocker with ClassMocker {
 
         "when the resource is not cachable" >> {
           "invokes the filter, but does not store the result" >> {
+            expect { one(cache).get(request.queryString) willReturn (null: Element) }            
             expect { one(cacheEntry).isCachable willReturn(false) }
-            expect { one(cache).get(request.queryString) willReturn (null: Element) }
             expect { one(chain).doFilter(a[HttpServletRequest], a[ResponseWrapper]) }
             expect { never(cache).put(a[Element]) }
 
