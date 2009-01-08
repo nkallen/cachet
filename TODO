@@ -1,17 +1,13 @@
-ResponseWrapper
-  copy(response: ServletHttpResponse)
-
-CacheEntry:
-    Implement isCachable
-    Implement validation schemes:
-      last-modified
-      etag
-
-Validation Servlet
+Load Balancer Servlet
+Cache Proxy Servlet Filter
+ResponseWrapper Implement copy(response: ServletHttpResponse)
+CacheEntry Implement isCachable
 Locking
 Grace Period
-Vary
-Vary by cookie
+
+Implement validation schemes:
+  last-modified
+  etag
 
 Strategy is injected into CacheProxy:
   - compute cacheable request?
@@ -25,3 +21,5 @@ Strategy is injected into CacheProxy:
 	- transform on miss (before going to backend)
 	- transform on fetch (transform before store)
 	- transform on deliver (before sending to user)
+
+Validation Servlet
