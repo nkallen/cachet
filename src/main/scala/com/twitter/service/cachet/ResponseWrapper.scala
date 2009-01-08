@@ -60,5 +60,5 @@ class ResponseWrapper(response: HttpServletResponse) extends HttpServletResponse
     locale = l
   }
 
-  def getLocale = locale
+  override def getLocale = locale
 }
