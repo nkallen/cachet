@@ -1,3 +1,7 @@
+ResponseWrapper
+  unimplemented methods
+  copy(response: ServletHttpResponse)
+
 CacheEntry:
     Implement isCachable
     Implement validation schemes:
