@@ -22,9 +22,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
       "addDateHeader(x, y) such that" >> {
         val millis = System.currentTimeMillis
 
-        "it delegates to the response" +
         "getDateHeader(x) returns y" >> {
-          expect { one(response).addDateHeader("Date", millis) }
           responseWrapper.addDateHeader("Date", millis)
           responseWrapper.getDateHeader("Date") mustEqual(Some(millis))
         }
@@ -33,9 +31,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
       "addCookie(c) such that" >> {
         val cookie = new Cookie("key", "value")
 
-        "it delegates to the response" +
         "cookies" >> {
-          expect { one(response).addCookie(cookie) }
           responseWrapper.addCookie(cookie)
           responseWrapper.getCookies.contains(cookie) mustEqual(true)
         }
@@ -45,9 +41,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
         val name = "name"
         val value = "value"
       
-        "it delegates to the response" +
         "getHeader(n) returns v" >> {
-          expect { one(response).addHeader(name, value) }
           responseWrapper.addHeader(name, value)
           responseWrapper.getHeader(name) mustEqual(Some(value))
         }
@@ -57,9 +51,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
         val name = "name"
         val value = 1
       
-        "it delegates to the response" +
         "getHeader(n) returns v" >> {
-          expect { one(response).addIntHeader(name, value) }
           responseWrapper.addIntHeader(name, value)
           responseWrapper.getIntHeader(name) mustEqual(Some(value))
         }
@@ -69,9 +61,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
         "sendError(sc)" >> {
           val sc = 200
 
-          "delegates to the response" +
           "getStatus() returns sc" >> {
-            expect { one(response).sendError(sc) }
             responseWrapper.sendError(sc)
             responseWrapper.getStatus mustEqual(sc)
           }
@@ -80,9 +70,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
         "sendError(sc)" >> {
           val sc = 200
 
-          "delegates to the response" +
           "getStatus() returns sc" >> {
-            expect { one(response).sendError(sc) }
             responseWrapper.sendError(sc)
             responseWrapper.getStatus mustEqual(sc)
           }
