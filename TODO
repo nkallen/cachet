@@ -1,19 +1,24 @@
-refactor cacheproxy spec
-Rename CacheEntry#response to responseWrapper?
+CacheEntry:
+    Implement isCachable
+    Implement validation schemes:
+      last-modified
+      etag
+
 Validation Servlet
-Implement validation schemes:
-  last-modified
-  etag
-Implement Cacheable in RFC2616
 Locking
 Grace Period
 Vary
 Vary by cookie
 
 Strategy is injected into CacheProxy:
-	- compute cacheable request?
+  - compute cacheable request?
   - compute cache key
 	- compute fresh
 	- compute valid
-	- transform on hit
-	- transform before store
+	- compute hash
+
+	- transform on receive (before going to cache or backend)
+	- transform on hit (before sending to user)
+	- transform on miss (before going to backend)
+	- transform on fetch (transform before store)
+	- transform on deliver (before sending to user)
