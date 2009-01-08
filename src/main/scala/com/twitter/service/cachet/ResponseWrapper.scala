@@ -45,7 +45,6 @@ class ResponseWrapper(response: HttpServletResponse) extends HttpServletResponse
   override def setHeader(n: String, v: String) = addHeader(n, v)
   override def setIntHeader(n: String, v: Int) = addIntHeader(n, v)
   override def setStatus(sc: Int) = sendError(sc)
-  override def setStatusCode(sc: Int) = sendError(sc)
 
   // setContentType(contentType: String)
   // setLocale(locale: Locale)

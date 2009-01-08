@@ -3,8 +3,8 @@
     organisation="com.twitter.service.cachet"
     module="cachet"
     revision="1.0"
-    e:buildpackage="com/twitter/service/cachet"
-    e:jarclassname="com.twitter.service.cachet"
+    e:buildpackage="com.twitter.service.cachet"
+    e:jarclassname="com.twitter.service.cachet.Main"
     e:testclass="com.twitter.service.cachet.test.TestRunner"
     e:stresstestclass="com.twitter.service.cachet.test.StressTestRunner" />
   <configurations>
