@@ -1,5 +1,4 @@
 ResponseWrapper
-  unimplemented methods
   copy(response: ServletHttpResponse)
 
 CacheEntry:

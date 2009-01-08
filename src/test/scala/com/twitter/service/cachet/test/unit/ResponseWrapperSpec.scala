@@ -1,6 +1,8 @@
 package com.twitter.service.cachet.test.unit
 
 import com.twitter.service.cachet._
+import java.lang.String
+import java.util.Locale
 import javax.servlet.http._
 
 import org.specs._
@@ -77,5 +79,23 @@ object ResponseWrapperSpec extends Specification with JMocker {
         }
       }
     }
+
+    "setContentType(ct) such that" >> {
+      val ct = "text/html"
+
+      "getContentType returns ct" >> {
+        responseWrapper.setContentType(ct)
+        responseWrapper.getContentType mustEqual(ct)
+      }
+    }
+
+    "setLocale(l) such that" >> {
+      val l = Locale.CANADA
+
+      "getLocale(l) returns l" >> {
+        responseWrapper.setLocale(l)
+        responseWrapper.getLocale mustEqual(l)
+      }
+    }    
   }
 }

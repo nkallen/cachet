@@ -1,5 +1,7 @@
 package com.twitter.service.cachet
 
+import javax.servlet.ServletOutputStream
+import java.util.Locale
 import javax.servlet.http._
 import scala.collection.mutable._
 import scala.util.matching.Regex
@@ -8,7 +10,9 @@ class ResponseWrapper(response: HttpServletResponse) extends HttpServletResponse
   private val headers: HashMap[String, Any] = new HashMap
   private val cookies: HashSet[Cookie] = new HashSet
   private var statusCode = 0
-
+  private var contentType = ""
+  private var locale: Locale = null
+  
   override def addDateHeader(n: String, v: Long) {
     headers.update(n, v)
   }
@@ -46,7 +50,15 @@ class ResponseWrapper(response: HttpServletResponse) extends HttpServletResponse
   override def setIntHeader(n: String, v: Int) = addIntHeader(n, v)
   override def setStatus(sc: Int) = sendError(sc)
 
-  // setContentType(contentType: String)
-  // setLocale(locale: Locale)
-  // getOutputString() => OutputStream
+  override def setContentType(ct: String) {
+    contentType = ct
+  }
+
+  override def getContentType = contentType
+
+  override def setLocale(l: Locale) {
+    locale = l
+  }
+
+  def getLocale = locale
 }
