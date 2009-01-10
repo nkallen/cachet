@@ -1,4 +1,7 @@
-Load Balancer Servlet
+Proxy Servlet
+  - Async
+  - Request -> Async
+
 Cache Proxy Servlet Filter
 ResponseWrapper Implement copy(response: ServletHttpResponse)
 CacheEntry Implement isCachable

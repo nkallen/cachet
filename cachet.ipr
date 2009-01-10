@@ -10,6 +10,22 @@
       <maximumStackSize value="32" />
       <properties />
       <executeOn event="beforeRun" target="compile" />
+      <executeOn event="beforeRun" target="compile" />
+      <executeOn event="beforeRun" target="compile" />
+      <executeOn event="beforeRun" target="compile" />
+      <executeOn event="beforeRun" target="compile" />
+      <executeOn event="beforeRun" target="compile" />
+      <executeOn event="beforeRun" target="compile" />
+      <executeOn event="beforeRun" target="compile" />
+      <executeOn event="beforeRun" target="compile" />
+      <executeOn event="beforeRun" target="compile" />
+      <executeOn event="beforeRun" target="compile" />
+      <executeOn event="beforeRun" target="compile" />
+      <executeOn event="beforeRun" target="compile" />
+      <executeOn event="beforeRun" target="compile" />
+      <executeOn event="beforeRun" target="compile" />
+      <executeOn event="beforeRun" target="compile" />
+      <executeOn event="beforeRun" target="compile" />
       <executeOn event="beforeRun" target="compile" runConfigurationType="JUnit" runConfigurationName="Suite" />
     </buildFile>
   </component>
