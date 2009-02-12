@@ -11,9 +11,11 @@ object Request {
     client.start()
 
     val exchange = new ContentExchange
-    exchange.setMethod("GET")
-    exchange.setURL("http://www.example.com/")
+    exchange.setMethod(request.getMethod)
+    exchange.setURL("http://localhost:3000" + request.getRequestURI)
     client.send(exchange)
     exchange.waitForDone()
+    response.setStatus(exchange.getStatus)
+    response.getOutputStream.print(exchange.getResponseContent)
   }
 }
