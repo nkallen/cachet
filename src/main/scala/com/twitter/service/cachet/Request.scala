@@ -8,7 +8,6 @@ import org.mortbay.jetty.HttpFields.Field
 
 object Request {
   val client = new HttpClient
-  client.setConnectorType(HttpClient.CONNECTOR_SELECT_CHANNEL)
   client.start()
 
   def apply(request: HttpServletRequest, response: HttpServletResponse) {
