@@ -3,7 +3,7 @@ package com.twitter.service.cachet
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
 import javax.servlet.ServletConfig
 
-class PassThroughProxyServlet extends HttpServlet {
+class ProxyServlet extends HttpServlet {
   var config: ServletConfig = null
 
   override def init(c: ServletConfig) {

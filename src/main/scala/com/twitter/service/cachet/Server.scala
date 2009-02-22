@@ -7,7 +7,7 @@ class Server {
   val server = new org.mortbay.jetty.Server
   val connector = new SocketConnector
   val root = new Context(server, "/", Context.SESSIONS)
-  val servlet = new PassThroughProxyServlet
+  val servlet = new ProxyServlet
 
   connector.setPort(1234)
   server.setConnectors(Array(connector))
