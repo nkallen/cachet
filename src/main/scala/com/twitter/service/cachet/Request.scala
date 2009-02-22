@@ -17,7 +17,6 @@ object Request {
 
       val exchange = new ContentExchange {
         override def onResponseHeader(name: Buffer, value: Buffer) {
-          super.onResponseHeader(name, value)
           response.setHeader(name.toString, value.toString)
         }
 
