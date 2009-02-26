@@ -18,8 +18,8 @@ object ProxyRequestSpec extends Specification with JMocker with ClassMocker {
 
   "ProxyRequest" should {
     doBefore{
-      exchange = mock(classOf[HttpExchange])
-      client = mock(classOf[HttpClient])
+      exchange = mock[HttpExchange]
+      client = mock[HttpClient]
       request = new FakeHttpServletRequest
       response = new FakeHttpServletResponse
 
@@ -38,14 +38,17 @@ object ProxyRequestSpec extends Specification with JMocker with ClassMocker {
         expect{one(exchange).setRequestContentSource(request.getInputStream)}
         expect{one(exchange).setRequestHeader("foo", "bar")}
         expect{one(client).send(exchange)}
+
         proxyRequest(request, response)
       }
     }
 
     "when the request !isInitial" >> {
-      "does nothing" >> {
+      doBefore {
         request.isInitial = false
+      }
 
+      "does nothing" >> {
         expect{never(client).send(exchange)}
         proxyRequest(request, response)
       }

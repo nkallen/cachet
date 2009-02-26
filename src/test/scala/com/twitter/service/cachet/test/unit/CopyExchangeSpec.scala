@@ -13,8 +13,8 @@ object CopyExchangeSpec extends Specification with JMocker with ClassMocker {
 
   "CopyExchange" should {
     doBefore {
-      request = mock(classOf[HttpServletRequest])
-      response = mock(classOf[HttpServletResponse])
+      request = mock[HttpServletRequest]
+      response = mock[HttpServletResponse]
     }
 
     "initialize & onResponseComplete" >> {

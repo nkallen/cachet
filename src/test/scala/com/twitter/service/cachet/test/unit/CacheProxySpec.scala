@@ -20,9 +20,9 @@ object CacheProxySpec extends Specification with JMocker with ClassMocker {
     var cacheEntry: CacheEntry = null
 
     doBefore {
-      cache = mock(classOf[Ehcache])
-      chain = mock(classOf[FilterChain])
-      cacheEntry = mock(classOf[CacheEntry])
+      cache = mock[Ehcache]
+      chain = mock[FilterChain]
+      cacheEntry = mock[CacheEntry]
       proxy = new CacheProxy(cache, blah => cacheEntry)
       request = new FakeHttpServletRequest
       request.queryString = "/foo"

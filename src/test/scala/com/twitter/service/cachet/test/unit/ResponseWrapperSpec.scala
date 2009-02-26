@@ -17,7 +17,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
 
     "have accessors" >> {
       doBefore {
-        response = mock(classOf[HttpServletResponse])
+        response = mock[HttpServletResponse]
         responseWrapper = new ResponseWrapper(response)
       }
 

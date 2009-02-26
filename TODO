@@ -1,5 +1,4 @@
 ProxyRequest
-    - pass request headers
     - request content
     - http version
     - , etc.
