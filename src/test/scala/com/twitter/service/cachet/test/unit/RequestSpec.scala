@@ -32,7 +32,7 @@ object ProxyRequestSpec extends Specification with JMocker with ClassMocker {
         request.path = "/path"
         request.isInitial = true
         request.setHeader("foo", "bar")
-  
+
         expect{one(exchange).setMethod("PUT")}
         expect{one(exchange).setURL("http://localhost:3000" + request.getRequestURI)}
         expect{one(exchange).setRequestContentSource(request.getInputStream)}
