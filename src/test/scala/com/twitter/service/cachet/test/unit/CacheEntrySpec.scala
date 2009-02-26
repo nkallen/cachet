@@ -103,7 +103,7 @@ object CacheEntrySpec extends Specification with JMocker {
           "returning correctedInitialAge + residentTime" >> {
             response.setDateHeader("Date", cacheEntry.responseTime)
             response.setIntHeader("Age", 10)
-            cacheEntry.currentAge mustEqual(10 + cacheEntry.residentTime)
+            cacheEntry.currentAge mustEqual(cacheEntry.correctedInitialAge + cacheEntry.residentTime)
           }
         }
         
@@ -156,10 +156,10 @@ object CacheEntrySpec extends Specification with JMocker {
             }
           }
             
-          "when freshnessLifeftime < currentAge" >> {
+          "when freshnessLifetime < currentAge" >> {
             "returns false" >> {
               response.setHeader("Cache-Control", "s-maxage=1")
-              response.setDateHeader("Date", cacheEntry.responseTime + 2)
+              response.setDateHeader("Date", cacheEntry.responseTime + 100)
               cacheEntry.isFresh mustEqual(false)
             }
           }

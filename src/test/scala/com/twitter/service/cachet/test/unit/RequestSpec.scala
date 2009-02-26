@@ -27,14 +27,16 @@ object ProxyRequestSpec extends Specification with JMocker with ClassMocker {
     }
 
     "when request isInitial" >> {
-      "sets the request's method, url on the exchange, and invokes the client" >> {
+      "sets the request's method, url, headers, etc. on the exchange, and invokes the client" >> {
         request.method = "PUT"
         request.path = "/path"
         request.isInitial = true
-
+        request.setHeader("foo", "bar")
+  
         expect{one(exchange).setMethod("PUT")}
         expect{one(exchange).setURL("http://localhost:3000" + request.getRequestURI)}
         expect{one(exchange).setRequestContentSource(request.getInputStream)}
+        expect{one(exchange).setRequestHeader("foo", "bar")}
         expect{one(client).send(exchange)}
         proxyRequest(request, response)
       }

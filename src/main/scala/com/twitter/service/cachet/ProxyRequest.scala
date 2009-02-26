@@ -9,8 +9,9 @@ class ProxyRequest(client: HttpClient, Exchange: (HttpServletRequest, HttpServle
   def apply(request: HttpServletRequest, response: HttpServletResponse) {
     if (request.isInitial) {
       val exchange = Exchange(request, response)
-      while (request.getHeaderNames.hasMoreElements) {
-        var headerName = request.getHeaderNames.nextElement.asInstanceOf[String]
+      val headers = request.getHeaderNames
+      while (headers.hasMoreElements) {
+        var headerName = headers.nextElement.asInstanceOf[String]
         exchange.setRequestHeader(headerName, request.getHeader(headerName))
       }
       exchange.setMethod(request.getMethod)
