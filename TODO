@@ -1,9 +1,8 @@
-Request
-    - static dependency on HttpExchange
-    - static dependency on HttpClient
-
-
-Request must pass request headers, request content, http version, etc.
+ProxyRequest
+    - pass request headers
+    - request content
+    - http version
+    - , etc.
 
 Cache Proxy Servlet Filter
 ResponseWrapper Implement copy(response: ServletHttpResponse)

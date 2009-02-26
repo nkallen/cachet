@@ -12,31 +12,29 @@ import com.twitter.service.cachet.test.mock._
 object ProxyRequestSpec extends Specification with JMocker with ClassMocker {
   var exchange: HttpExchange = null
   var proxyRequest: ProxyRequest = null
-  var request: HttpServletRequest = null
+  var request: FakeHttpServletRequest = null
   var response: HttpServletResponse = null
   var client: HttpClient = null
 
   "ProxyRequest" should {
     doBefore {
       exchange = mock(classOf[HttpExchange])
-      request = mock(classOf[HttpServletRequest])
-      response = new FakeHttpServletResponse
       client = mock(classOf[HttpClient])
+      request = new FakeHttpServletRequest
+      response = new FakeHttpServletResponse
 
-      proxyRequest = new ProxyRequest(client, (blah, blar) => exchange)      
+      proxyRequest = new ProxyRequest(client, (blah, blar) => exchange)
     }
 
     "when request isInitial" >> {
-      val uri = "/uri"
-      val method = "PUT"
-
       "sets the request's method, url on the exchange, and invokes the client" >> {
-        expect { one(request).isInitial willReturn(true) }
-        expect { one(request).getRequestURI willReturn(uri) }
-        expect { one(request).getMethod willReturn(method) }
+        request.method = "PUT"
+        request.path = "/path"
+        request.isInitial = true
 
-        expect { one(exchange).setMethod(method) }
-        expect { one(exchange).setURL("http://localhost:3000" + uri) }
+        expect { one(exchange).setMethod("PUT") }
+        expect { one(exchange).setURL("http://localhost:3000" + request.getRequestURI) }
+        expect { one(exchange).setRequestContentSource(request.getInputStream) }
         expect { one(client).send(exchange) }
         proxyRequest(request, response)
       }
@@ -44,8 +42,9 @@ object ProxyRequestSpec extends Specification with JMocker with ClassMocker {
 
     "when the request !isInitial" >> {
       "does nothing" >> {
-        expect { one(request).isInitial willReturn(false) }
+        request.isInitial = false
 
+        expect { never(client).send(exchange) }
         proxyRequest(request, response)
       }
     }

@@ -41,6 +41,7 @@ class FakeHttpServletRequest extends HttpServletRequest {
   var remotePort = 0
   var remoteHost = null
   var remoteAddr = null
+  var isInitial = true
   var locale = Locale.getDefault
   var reader: BufferedReader = new BufferedReader(new StringReader(method + " " + path +  "/\r\n\r\n"))
   var serverPort = 0
@@ -54,7 +55,14 @@ class FakeHttpServletRequest extends HttpServletRequest {
   var contentType = null
   var contentLength = 0
   var charEncoding = "ISO-8859-1" // HTTP's default encoding
+  var isTimeout = false
+  var isResumed = false
+  var isSuspended = false
 
+  def complete {}
+  def resume {}
+  def suspend {}
+  def suspend(l: Long) {}
   def isRequestedSessionIdFromURL = false
   def isRequestedSessionIdFromUrl = false
   def isRequestedSessionIdFromCookie = false
@@ -97,6 +105,9 @@ class FakeHttpServletRequest extends HttpServletRequest {
   def setDateHeader(s: String, l: Long) {
     headers += (s -> l.toString)
   }
+  def setHeader(k: String, v: String) {
+    headers += (k -> v)
+  }
   def getCookies = cookies.toArray
   def getAuthType = authType
   def getLocalPort = localPort
@@ -130,4 +141,6 @@ class FakeHttpServletRequest extends HttpServletRequest {
   def setCharacterEncoding(enc: String) = charEncoding = enc
   def getAttributeNames = new Vector[ZZ](attr.underlying.keySet.asInstanceOf[_root_.java.util.Set[ZZ]]).elements
   def getAttribute(key: String) = attr(key).asInstanceOf[Object]
+  def getServletContext = null
+  def getServletResponse = null
 }
