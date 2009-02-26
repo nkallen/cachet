@@ -1,17 +1,8 @@
-ProxyRequest
-    - request content
-    - http version
-    - , etc.
-
 Cache Proxy Servlet Filter
-ResponseWrapper Implement copy(response: ServletHttpResponse)
-CacheEntry Implement isCachable
-Locking
-Grace Period
+CacheEntry implements write/copy onto Response
+CacheEntry Implement isCachable -- HTTP 200, etc.
 
-Implement validation schemes:
-  last-modified
-  etag
+Locking / Grace Period - prevent dog pile by locking around fetch.
 
 Strategy is injected into CacheProxy:
   - compute cacheable request?
@@ -25,5 +16,9 @@ Strategy is injected into CacheProxy:
 	- transform on miss (before going to backend)
 	- transform on fetch (transform before store)
 	- transform on deliver (before sending to user)
+
+Implement validation schemes:
+  last-modified
+  etag
 
 Validation Servlet

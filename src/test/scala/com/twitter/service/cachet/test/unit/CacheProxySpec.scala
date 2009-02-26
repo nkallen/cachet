@@ -4,7 +4,6 @@ import com.twitter.service.cachet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import javax.servlet.FilterChain
 import net.sf.ehcache._
-
 import org.specs._
 import org.specs.mock._
 import org.specs.mock.JMocker._
