@@ -16,7 +16,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
     var responseWrapper: ResponseWrapper = null
 
     "have accessors" >> {
-      doBefore {
+      doBefore{
         response = mock[HttpServletResponse]
         responseWrapper = new ResponseWrapper(response)
       }
@@ -26,7 +26,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
 
         "getDateHeader(x) returns y" >> {
           responseWrapper.addDateHeader("Date", millis)
-          responseWrapper.getDateHeader("Date") mustEqual(Some(millis))
+          responseWrapper.getDateHeader("Date") mustEqual (Some(millis))
         }
       }
 
@@ -35,27 +35,27 @@ object ResponseWrapperSpec extends Specification with JMocker {
 
         "cookies" >> {
           responseWrapper.addCookie(cookie)
-          responseWrapper.getCookies.contains(cookie) mustEqual(true)
+          responseWrapper.getCookies.contains(cookie) mustEqual (true)
         }
       }
-    
+
       "addHeader(n, v) such that" >> {
         val name = "name"
         val value = "value"
-      
+
         "getHeader(n) returns v" >> {
           responseWrapper.addHeader(name, value)
-          responseWrapper.getHeader(name) mustEqual(Some(value))
+          responseWrapper.getHeader(name) mustEqual (Some(value))
         }
       }
 
       "addIntHeader(n, i) such that" >> {
         val name = "name"
         val value = 1
-      
+
         "getHeader(n) returns v" >> {
           responseWrapper.addIntHeader(name, value)
-          responseWrapper.getIntHeader(name) mustEqual(Some(value))
+          responseWrapper.getIntHeader(name) mustEqual (Some(value))
         }
       }
 
@@ -65,7 +65,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
 
           "getStatus() returns sc" >> {
             responseWrapper.sendError(sc)
-            responseWrapper.getStatus mustEqual(sc)
+            responseWrapper.getStatus mustEqual (sc)
           }
         }
 
@@ -74,7 +74,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
 
           "getStatus() returns sc" >> {
             responseWrapper.sendError(sc)
-            responseWrapper.getStatus mustEqual(sc)
+            responseWrapper.getStatus mustEqual (sc)
           }
         }
       }
@@ -85,7 +85,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
 
       "getContentType returns ct" >> {
         responseWrapper.setContentType(ct)
-        responseWrapper.getContentType mustEqual(ct)
+        responseWrapper.getContentType mustEqual (ct)
       }
     }
 
@@ -94,8 +94,8 @@ object ResponseWrapperSpec extends Specification with JMocker {
 
       "getLocale(l) returns l" >> {
         responseWrapper.setLocale(l)
-        responseWrapper.getLocale mustEqual(l)
+        responseWrapper.getLocale mustEqual (l)
       }
-    }    
+    }
   }
 }

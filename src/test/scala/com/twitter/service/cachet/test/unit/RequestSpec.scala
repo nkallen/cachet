@@ -33,18 +33,19 @@ object ProxyRequestSpec extends Specification with JMocker with ClassMocker {
         request.isInitial = true
         request.setHeader("foo", "bar")
 
-        expect{one(exchange).setMethod("PUT")}
-        expect{one(exchange).setURL("http://localhost:3000" + request.getRequestURI)}
-        expect{one(exchange).setRequestContentSource(request.getInputStream)}
-        expect{one(exchange).setRequestHeader("foo", "bar")}
-        expect{one(client).send(exchange)}
-
+        expect{
+          one(exchange).setMethod("PUT")
+          one(exchange).setURL("http://localhost:3000" + request.getRequestURI)
+          one(exchange).setRequestContentSource(request.getInputStream)
+          one(exchange).setRequestHeader("foo", "bar")
+          one(client).send(exchange)
+        }
         proxyRequest(request, response)
       }
     }
 
     "when the request !isInitial" >> {
-      doBefore {
+      doBefore{
         request.isInitial = false
       }
 
