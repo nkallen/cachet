@@ -172,5 +172,11 @@ object CacheEntrySpec extends Specification with JMocker {
         }
       }
     }
+
+    "writeTo" >> {
+      "sets the response's headers, status code, " >> {
+
+      }
+    }
   }
 }
