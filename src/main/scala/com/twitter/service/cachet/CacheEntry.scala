@@ -2,6 +2,12 @@ package com.twitter.service.cachet
 
 import scala.util.matching.Regex
 
+object CacheEntry {
+  def apply(responseWrapper: ResponseWrapper) = {
+    new CacheEntry(responseWrapper)
+  }
+}
+
 class CacheEntry(val responseWrapper: ResponseWrapper) {
   val requestTime = System.currentTimeMillis
   var responseTime = 0.toLong
