@@ -1,8 +1,3 @@
-ResponseWrapper implements
-    - setContentLength
-    - setContentType
-    - getWriter
-    - getOutputStream
 
 CacheEntry implements write/copy onto Response
 CacheEntry Implement isCachable -- HTTP 200, etc.
@@ -26,4 +21,20 @@ Implement validation schemes:
   last-modified
   etag
 
-Validation Servlet
+== Maybe ==
+
+. Validation Servlet
+
+. ResponseWrapper implements
+    - getWriter
+
+        public PrintWriter getWriter() throws IOException {
+        if (writer == null) {
+            writer = new PrintWriter(new OutputStreamWriter(outstr, getCharacterEncoding()), true);
+        }
+        return writer;
+    }
+    - getOutputStream
+
+        final ByteArrayOutputStream outstr = new ByteArrayOutputStream();
+        outstr.toByteArray

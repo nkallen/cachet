@@ -1,6 +1,7 @@
 package com.twitter.service.cachet.test.unit
 
 import com.twitter.service.cachet._
+import java.io.PrintWriter
 import java.lang.String
 import java.util.Locale
 import javax.servlet.http._
@@ -26,7 +27,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
 
         "getDateHeader(x) returns y" >> {
           responseWrapper.addDateHeader("Date", millis)
-          responseWrapper.getDateHeader("Date") mustEqual (Some(millis))
+          responseWrapper.getDateHeader("Date") mustEqual Some(millis)
         }
       }
 
@@ -35,7 +36,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
 
         "cookies" >> {
           responseWrapper.addCookie(cookie)
-          responseWrapper.getCookies.contains(cookie) mustEqual (true)
+          responseWrapper.getCookies.contains(cookie) mustBe true
         }
       }
 
@@ -45,7 +46,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
 
         "getHeader(n) returns v" >> {
           responseWrapper.addHeader(name, value)
-          responseWrapper.getHeader(name) mustEqual (Some(value))
+          responseWrapper.getHeader(name) mustEqual Some(value)
         }
       }
 
@@ -55,7 +56,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
 
         "getHeader(n) returns v" >> {
           responseWrapper.addIntHeader(name, value)
-          responseWrapper.getIntHeader(name) mustEqual (Some(value))
+          responseWrapper.getIntHeader(name) mustEqual Some(value)
         }
       }
 
@@ -65,7 +66,7 @@ object ResponseWrapperSpec extends Specification with JMocker {
 
           "getStatus() returns sc" >> {
             responseWrapper.sendError(sc)
-            responseWrapper.getStatus mustEqual (sc)
+            responseWrapper.getStatus mustEqual sc
           }
         }
 
@@ -74,27 +75,34 @@ object ResponseWrapperSpec extends Specification with JMocker {
 
           "getStatus() returns sc" >> {
             responseWrapper.sendError(sc)
-            responseWrapper.getStatus mustEqual (sc)
+            responseWrapper.getStatus mustEqual sc
           }
         }
       }
-    }
 
-    "setContentType(ct) such that" >> {
-      val ct = "text/html"
+      "setContentType(ct) such that" >> {
+        val ct = "text/html"
 
-      "getContentType returns ct" >> {
-        responseWrapper.setContentType(ct)
-        responseWrapper.getContentType mustEqual (ct)
+        "getContentType returns ct" >> {
+          responseWrapper.setContentType(ct)
+          responseWrapper.getContentType mustEqual ct
+        }
       }
-    }
 
-    "setLocale(l) such that" >> {
-      val l = Locale.CANADA
+      "setLocale(l) such that" >> {
+        val l = Locale.CANADA
 
-      "getLocale(l) returns l" >> {
-        responseWrapper.setLocale(l)
-        responseWrapper.getLocale mustEqual (l)
+        "getLocale returns l" >> {
+          responseWrapper.setLocale(l)
+          responseWrapper.getLocale mustEqual l
+        }
+      }
+
+      "setContentLength(l) such that" >> {
+        "getContentLength returns l" >> {
+          responseWrapper.setContentLength(100)
+          responseWrapper.getContentLength mustEqual 100
+        }
       }
     }
   }

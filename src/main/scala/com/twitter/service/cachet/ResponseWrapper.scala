@@ -1,5 +1,6 @@
 package com.twitter.service.cachet
 
+import java.io.ByteArrayOutputStream
 import javax.servlet.ServletOutputStream
 import java.util.Locale
 import javax.servlet.http._
@@ -12,14 +13,14 @@ class ResponseWrapper(response: HttpServletResponse) extends HttpServletResponse
   private var statusCode = 0
   private var contentType = ""
   private var locale: Locale = null
-  
+  private var contentLength = 0
+
   override def addDateHeader(n: String, v: Long) {
     headers.update(n, v)
   }
 
-  def getDateHeader(n: String) = {
+  def getDateHeader(n: String) =
     headers get n map (_.asInstanceOf[Long])
-  }
 
   override def addCookie(c: Cookie) {
     cookies += c
@@ -46,8 +47,11 @@ class ResponseWrapper(response: HttpServletResponse) extends HttpServletResponse
   def getStatus = statusCode
 
   override def setDateHeader(n: String, v: Long) = addDateHeader(n, v)
+
   override def setHeader(n: String, v: String) = addHeader(n, v)
+
   override def setIntHeader(n: String, v: Int) = addIntHeader(n, v)
+
   override def setStatus(sc: Int) = sendError(sc)
 
   override def setContentType(ct: String) {
@@ -61,4 +65,14 @@ class ResponseWrapper(response: HttpServletResponse) extends HttpServletResponse
   }
 
   override def getLocale = locale
+
+  override def setContentLength(len: Int) {
+    contentLength = len
+  }
+
+  def getContentLength = contentLength
+
+  def writeTo(response: HttpServletResponse) {
+
+  }
 }

@@ -52,6 +52,6 @@ class CacheEntry(val responseWrapper: ResponseWrapper) {
   def isTransparent = isFresh
 
   def writeTo(response: HttpServletResponse) {
-
+    responseWrapper.writeTo(response)
   }
 }
