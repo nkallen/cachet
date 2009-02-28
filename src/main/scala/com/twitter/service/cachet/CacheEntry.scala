@@ -34,17 +34,15 @@ class CacheEntry(val responseWrapper: ResponseWrapper) {
 
   private val MaxAge = """\b(?:s-maxage|max-age)=(\d+)\b""".r
 
-  def maxAgeValue = {
+  def maxAgeValue =
     for (cacheControl <- responseWrapper getHeader ("Cache-Control"); maxAge <- MaxAge findFirstMatchIn cacheControl)
     yield maxAge group (1) toLong
-  }
 
-  def freshnessLifetime = {
+  def freshnessLifetime =
     maxAgeValue orElse (
             for (expires <- expiresValue)
             yield (expires - dateValue)
             )
-  }
 
   def isFresh = freshnessLifetime map (_ > currentAge) getOrElse false
 
