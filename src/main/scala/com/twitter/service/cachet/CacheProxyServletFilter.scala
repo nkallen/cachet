@@ -15,7 +15,7 @@ class CacheProxyServletFilter extends Filter {
   }
 
   def doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
-    proxy(request.asInstanceOf[HttpServletRequest], response.asInstanceOf[HttpServletResponse], chain)    
+    proxy(request.asInstanceOf[HttpServletRequest], response.asInstanceOf[HttpServletResponse], chain)
   }
 
   def destroy {}
