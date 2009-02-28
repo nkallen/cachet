@@ -2,7 +2,7 @@ package com.twitter.service.cachet
 
 import scala.util.matching.Regex
 
-object CacheEntry {
+object CacheEntry extends Function[ResponseWrapper, CacheEntry] {
   def apply(responseWrapper: ResponseWrapper) = {
     new CacheEntry(responseWrapper)
   }

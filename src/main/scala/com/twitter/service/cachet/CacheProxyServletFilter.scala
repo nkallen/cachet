@@ -11,7 +11,7 @@ class CacheProxyServletFilter extends Filter {
   def init(c: FilterConfig) {
     config = c
     val cache = CacheManager.getInstance.getEhcache("Name")
-    proxy = new CacheProxy(cache, CacheEntry(_))
+    proxy = new CacheProxy(cache, CacheEntry)
   }
 
   def doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {

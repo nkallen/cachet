@@ -33,7 +33,7 @@ object CacheProxySpec extends Specification with JMocker with ClassMocker {
       def itFetches {
         expect{one(chain).doFilter(a[HttpServletRequest], a[ResponseWrapper])}
       }
-      def whenTheResourceIsCachable(b: Boolean) {expect{one(cacheEntry).isCachable willReturn (b)}}
+      def whenTheResourceIsCachable(b: Boolean) {expect{one(cacheEntry).isCachable willReturn b}}
 
       "when there is a cache miss" >> {
         def whenThereIsACacheMiss {expect{one(cache).get(request.queryString) willReturn (null: Element)}}
@@ -45,7 +45,7 @@ object CacheProxySpec extends Specification with JMocker with ClassMocker {
             itFetches
             expect{one(cache).put(a[Element])}
 
-            proxy(request, response, chain) mustEqual (cacheEntry)
+            proxy(request, response, chain) mustEqual cacheEntry
           }
         }
 
@@ -56,21 +56,21 @@ object CacheProxySpec extends Specification with JMocker with ClassMocker {
             itFetches
             expect{never(cache).put(a[Element])}
 
-            proxy(request, response, chain) mustEqual (cacheEntry)
+            proxy(request, response, chain) mustEqual cacheEntry
           }
         }
       }
 
       "when there is a cache hit" >> {
         def whenThereIsACacheHit {expect{one(cache).get(request.queryString) willReturn (new Element(request.queryString, cacheEntry))}}
-        def whenTheCacheEntryIsTransparent(b: Boolean) {expect{one(cacheEntry).isTransparent willReturn (b)}}
+        def whenTheCacheEntryIsTransparent(b: Boolean) {expect{one(cacheEntry).isTransparent willReturn b}}
 
         "when the cache entry is tranparent" >> {
           "returns the response from cache" >> {
             whenTheCacheEntryIsTransparent(true)
             whenThereIsACacheHit
 
-            proxy(request, response, chain) mustEqual (cacheEntry)
+            proxy(request, response, chain) mustEqual cacheEntry
           }
         }
 
@@ -82,7 +82,7 @@ object CacheProxySpec extends Specification with JMocker with ClassMocker {
             itFetches
             expect{one(cache).put(a[Element])}
 
-            proxy(request, response, chain) mustEqual (cacheEntry)
+            proxy(request, response, chain) mustEqual cacheEntry
           }
         }
       }
