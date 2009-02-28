@@ -45,7 +45,7 @@ object CacheProxySpec extends Specification with JMocker with ClassMocker {
             itFetches
             expect{one(cache).put(a[Element])}
 
-            proxy(request, response, chain) mustEqual cacheEntry
+            proxy(request, response, chain)
           }
         }
 
@@ -56,7 +56,7 @@ object CacheProxySpec extends Specification with JMocker with ClassMocker {
             itFetches
             expect{never(cache).put(a[Element])}
 
-            proxy(request, response, chain) mustEqual cacheEntry
+            proxy(request, response, chain)
           }
         }
       }
@@ -70,7 +70,8 @@ object CacheProxySpec extends Specification with JMocker with ClassMocker {
             whenTheCacheEntryIsTransparent(true)
             whenThereIsACacheHit
 
-            proxy(request, response, chain) mustEqual cacheEntry
+            expect{one(cacheEntry).writeTo(response)}
+            proxy(request, response, chain)
           }
         }
 
@@ -82,7 +83,7 @@ object CacheProxySpec extends Specification with JMocker with ClassMocker {
             itFetches
             expect{one(cache).put(a[Element])}
 
-            proxy(request, response, chain) mustEqual cacheEntry
+            proxy(request, response, chain)
           }
         }
       }

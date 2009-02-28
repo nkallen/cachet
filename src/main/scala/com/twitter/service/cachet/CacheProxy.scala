@@ -14,20 +14,19 @@ class CacheProxy(cache: Ehcache, CacheEntry: ResponseWrapper => CacheEntry) {
     } else {
       val cacheEntry = element.getObjectValue.asInstanceOf[CacheEntry]
       if (cacheEntry.isTransparent) {
-        cacheEntry
+        cacheEntry.writeTo(response)
       } else {
         fetch(request, response, chain)
       }
     }
   }
 
-  private def fetch(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) = {
+  private def fetch(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
     val responseWrapper = new ResponseWrapper(response)
     chain.doFilter(request, responseWrapper)
     val cacheEntry = CacheEntry(responseWrapper)
     if (cacheEntry.isCachable) {
       cache.put(new Element(request.getQueryString, cacheEntry))
     }
-    cacheEntry
   }
 }

@@ -1,5 +1,6 @@
 package com.twitter.service.cachet
 
+import _root_.javax.servlet.http.HttpServletResponse
 import scala.util.matching.Regex
 
 object CacheEntry extends Function[ResponseWrapper, CacheEntry] {
@@ -49,4 +50,8 @@ class CacheEntry(val responseWrapper: ResponseWrapper) {
   def isCachable = true
 
   def isTransparent = isFresh
+
+  def writeTo(response: HttpServletResponse) {
+
+  }
 }

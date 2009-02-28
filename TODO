@@ -1,4 +1,3 @@
-Cache Proxy Servlet Filter
 CacheEntry implements write/copy onto Response
 CacheEntry Implement isCachable -- HTTP 200, etc.
 
