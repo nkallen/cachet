@@ -16,22 +16,24 @@ object CacheProxySpec extends Specification with JMocker with ClassMocker {
     var chain: FilterChain = null
     var request: FakeHttpServletRequest = null
     var response: HttpServletResponse = null
+    var responseWrapper: ResponseWrapper = null
     var cacheEntry: CacheEntry = null
 
     doBefore{
       cache = mock[Ehcache]
       chain = mock[FilterChain]
       cacheEntry = mock[CacheEntry]
-      proxy = new CacheProxy(cache, blah => cacheEntry)
       request = new FakeHttpServletRequest
       request.queryString = "/foo"
-
       response = new FakeHttpServletResponse
+      responseWrapper = new ResponseWrapper(response)
+
+      proxy = new CacheProxy(cache, blar => responseWrapper, blah => cacheEntry)
     }
 
     "apply" >> {
       def itFetches {
-        expect{one(chain).doFilter(a[HttpServletRequest], a[ResponseWrapper])}
+        expect{one(chain).doFilter(request, responseWrapper)}
       }
       def whenTheResourceIsCachable(b: Boolean) {expect{one(cacheEntry).isCachable willReturn b}}
 
