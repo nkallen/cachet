@@ -1,7 +1,8 @@
-Cache should assume an interface
 Interface-ify anything that I mock
 Audit use of one for allowing
 Extract traits where appropriate
+DI Stream capturer
+In cache proxy, writeToOrFetch (tell don't ask)
 
 Learn . vs ' ' method invocation convention
 

@@ -3,7 +3,7 @@ package com.twitter.service.cachet.test.unit
 import com.twitter.service.cachet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import javax.servlet.FilterChain
-import net.sf.ehcache._
+import net.sf.ehcache.Ehcache
 import org.specs._
 import org.specs.mock._
 import org.specs.mock.JMocker._
@@ -12,7 +12,7 @@ import com.twitter.service.cachet.test.mock._
 object CacheProxySpec extends Specification with JMocker with ClassMocker {
   "CacheProxy" should {
     var proxy: CacheProxy = null
-    var cache: Ehcache = null
+    var cache: Cache = null
     var chain: FilterChain = null
     var request: FakeHttpServletRequest = null
     var response: HttpServletResponse = null
@@ -20,7 +20,7 @@ object CacheProxySpec extends Specification with JMocker with ClassMocker {
     var cacheEntry: CacheEntry = null
 
     doBefore{
-      cache = mock[Ehcache]
+      cache = mock[Cache]
       chain = mock[FilterChain]
       cacheEntry = mock[CacheEntry]
       request = new FakeHttpServletRequest
@@ -38,14 +38,14 @@ object CacheProxySpec extends Specification with JMocker with ClassMocker {
       def whenTheResourceIsCachable(b: Boolean) {expect{allowing(cacheEntry).isCachable willReturn b}}
 
       "when there is a cache miss" >> {
-        def whenThereIsACacheMiss {expect{allowing(cache).get(request.queryString) willReturn (null: Element)}}
+        def whenThereIsACacheMiss {expect{allowing(cache).get(request.queryString) willReturn None}}
 
         "when the resource is cachable" >> {
           "invokes the filter, storing the result" >> {
             whenThereIsACacheMiss
             whenTheResourceIsCachable(true)
             itFetches
-            expect{one(cache).put(a[Element])}
+            expect{one(cache).put(request.queryString, cacheEntry)}
 
             proxy(request, response, chain)
           }
@@ -56,7 +56,7 @@ object CacheProxySpec extends Specification with JMocker with ClassMocker {
             whenThereIsACacheMiss
             whenTheResourceIsCachable(false)
             itFetches
-            expect{never(cache).put(a[Element])}
+            expect{never(cache).put(request.queryString, cacheEntry)}
 
             proxy(request, response, chain)
           }
@@ -64,7 +64,7 @@ object CacheProxySpec extends Specification with JMocker with ClassMocker {
       }
 
       "when there is a cache hit" >> {
-        def whenThereIsACacheHit {expect{allowing(cache).get(request.queryString) willReturn (new Element(request.queryString, cacheEntry))}}
+        def whenThereIsACacheHit {expect{allowing(cache).get(request.queryString) willReturn Some(cacheEntry)}}
         def whenTheCacheEntryIsTransparent(b: Boolean) {expect{allowing(cacheEntry).isTransparent willReturn b}}
 
         "when the cache entry is tranparent" >> {
@@ -83,7 +83,7 @@ object CacheProxySpec extends Specification with JMocker with ClassMocker {
             whenTheCacheEntryIsTransparent(false)
             whenThereIsACacheHit
             itFetches
-            expect{one(cache).put(a[Element])}
+            expect{one(cache).put(request.queryString, cacheEntry)}
 
             proxy(request, response, chain)
           }
