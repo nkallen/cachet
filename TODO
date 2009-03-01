@@ -1,9 +1,8 @@
-Fix ReceiveSpec
-DI Clock into FreshResponseCacheEntry
-Learn . vs ' ' method invocation convention
-
 CacheEntry Implement isCachable -- HTTP 200, etc.
 The various DateHeader/IntHeaders in CacheEntry are vulnerable to header fragmentation
+
+DI Clock into FreshResponseCacheEntry
+Learn . vs ' ' method invocation convention
 
 ResponseTime stuff is weird
 
