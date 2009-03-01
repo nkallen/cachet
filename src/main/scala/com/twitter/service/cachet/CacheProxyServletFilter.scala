@@ -5,11 +5,11 @@ import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
 
 class CacheProxyServletFilter extends Filter {
   var config: FilterConfig = null
-  var get: Get = null
+  var get: Receive = null
 
   def init(c: FilterConfig) {
     config = c
-    get = new Get(Ehcache, Fetch(Ehcache, ResponseCapturer, CacheEntry))
+    get = new Receive(Ehcache, Fetch(Ehcache, ResponseCapturer, CacheEntry))
   }
 
   def doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {

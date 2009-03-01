@@ -8,9 +8,9 @@ import org.specs.mock._
 import org.specs.mock.JMocker._
 import com.twitter.service.cachet.test.mock._
 
-object GetSpec extends Specification with JMocker with ClassMocker {
-  "Get" should {
-    var get: Get = null
+object ReceiveSpec extends Specification with JMocker with ClassMocker {
+  "Receive" should {
+    var receive: Receive = null
     var cache: Cache = null
     var chain: FilterChain = null
     var request: HttpServletRequest = null
@@ -24,7 +24,7 @@ object GetSpec extends Specification with JMocker with ClassMocker {
       request = mock[HttpServletRequest]
       response = mock[HttpServletResponse]
 
-      get = new Get(cache, (request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) => cacheEntry)
+      receive = new Receive(cache, (request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) => cacheEntry)
     }
 
     "apply" >> {
@@ -36,7 +36,7 @@ object GetSpec extends Specification with JMocker with ClassMocker {
           }
 
           //          expect{one(cacheEntry).writeTo(response)}
-          //          get(request, response, chain)
+          //          receive(request, response, chain)
         }
       }
     }
