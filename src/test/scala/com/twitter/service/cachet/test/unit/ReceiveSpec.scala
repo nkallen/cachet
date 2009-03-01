@@ -17,28 +17,37 @@ object ReceiveSpec extends Specification with JMocker with ClassMocker {
     var chain = null: FilterChain
     var request = null: HttpServletRequest
     var response = null: HttpServletResponse
-    var cacheEntry = null: CacheEntry
+    var hitCacheEntry = null: CacheEntry
+    var missCacheEntry = null: CacheEntry
 
     doBefore{
-      cache = mock[Cache]
       chain = mock[FilterChain]
-      cacheEntry = mock[CacheEntry]
+      hitCacheEntry = mock[CacheEntry]
+      missCacheEntry = mock[CacheEntry]
       request = mock[HttpServletRequest]
       response = mock[HttpServletResponse]
-
-      receive = new Receive(cache, (request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) => cacheEntry)
     }
 
     "apply" >> {
       "when there is a cache hit" >> {
-        "returns the response from cache" >> {
-          expect{
-            allowing(request).getQueryString willReturn "foo"
-            allowing(cache).get("foo"){cacheEntry} willReturn cacheEntry
-          }
+        "invokes hitCacheEntry.writeTo(response)" >> {
+          expect{allowing(request).getQueryString}
+          cache = new AlwaysHitCache(hitCacheEntry)
+          receive = new Receive(cache, (request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) => missCacheEntry)
 
-          //          expect{one(cacheEntry).writeTo(response)}
-          //          receive(request, response, chain)
+          expect{one(hitCacheEntry).writeTo(response)}
+          receive(request, response, chain)
+        }
+      }
+
+      "when there is a cache miss" >> {
+        "invokes missCacheEntry.writeTo(response)" >> {
+          expect{allowing(request).getQueryString}
+          cache = new AlwaysMissCache
+          receive = new Receive(cache, (request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) => missCacheEntry)
+
+          expect{one(missCacheEntry).writeTo(response)}
+          receive(request, response, chain)
         }
       }
     }

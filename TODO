@@ -1,8 +1,5 @@
-Cache needs to check freshness
-Fix GetSpec
-Interface-ify anything that I mock / Extract traits where appropriate
+Fix ReceiveSpec
 DI Clock into FreshResponseCacheEntry
-
 Learn . vs ' ' method invocation convention
 
 CacheEntry Implement isCachable -- HTTP 200, etc.
