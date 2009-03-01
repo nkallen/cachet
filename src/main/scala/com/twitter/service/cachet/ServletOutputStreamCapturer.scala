@@ -1,3 +1,16 @@
 package com.twitter.service.cachet
 
-class ServletOutputStreamCapturer
+import _root_.javax.servlet.http.HttpServletResponse
+import _root_.javax.servlet.ServletOutputStream
+import java.io.{OutputStream, ByteArrayOutputStream}
+
+class ServletOutputStreamCapturer extends ServletOutputStream {
+  protected val outputStream = new ByteArrayOutputStream
+
+  def write(b: Int) {outputStream.write(b)}
+
+  def writeTo(response: HttpServletResponse) {
+    if (outputStream.size > 0)
+      outputStream.writeTo(response.getOutputStream)
+  }
+}

@@ -5,7 +5,6 @@ import java.lang.String
 import javax.servlet.ServletOutputStream
 import java.util.Locale
 import javax.servlet.http._
-import net.sf.ehcache.constructs.web.filter.FilterServletOutputStream
 import scala.collection.mutable._
 import scala.util.matching.Regex
 
@@ -14,8 +13,7 @@ class ResponseCapturer(response: HttpServletResponse) extends HttpServletRespons
   private val stringHeaders = new HashMap[String, String]
   private val intHeaders = new HashMap[String, Int]
   private val cookies = new HashSet[Cookie]
-  private val outputStream = new ByteArrayOutputStream
-  private val servletOutputStream = new FilterServletOutputStream(outputStream)
+  private val servletOutputStreamCapturer = new ServletOutputStreamCapturer
   private var characterEncoding = None: Option[String]
   private var writer = None: Option[PrintWriter]
   private var statusCode = None: Option[Int]
@@ -95,13 +93,13 @@ class ResponseCapturer(response: HttpServletResponse) extends HttpServletRespons
 
   override def getWriter = {
     writer getOrElse {
-      val printWriter = new PrintWriter(new OutputStreamWriter(outputStream, getCharacterEncoding), true)
+      val printWriter = new PrintWriter(new OutputStreamWriter(servletOutputStreamCapturer, getCharacterEncoding), true)
       writer = Some(printWriter)
       printWriter
     }
   }
 
-  override def getOutputStream = servletOutputStream
+  override def getOutputStream = servletOutputStreamCapturer
 
   override def setCharacterEncoding(charset: String) = {
     characterEncoding = Some(charset)
@@ -146,13 +144,11 @@ class ResponseCapturer(response: HttpServletResponse) extends HttpServletRespons
     for (ce <- characterEncoding)
       response.setCharacterEncoding(ce)
 
-    this.flush()
-    if (outputStream.size > 0)
-      outputStream.writeTo(response.getOutputStream)
+    flush()
+    servletOutputStreamCapturer.writeTo(response)
   }
 
   private def flush() {
-    writer map (_.flush)
-    outputStream.flush
+    writer map (_.flush())
   }
 }

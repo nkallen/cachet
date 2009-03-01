@@ -127,27 +127,36 @@ object ResponseCapturerSpec extends Specification with JMocker with ClassMocker 
 
       }
 
-      "getWriter such that" >> {
-        "writeTo(r) writes to r.getOutputStream" >> {
-          val outputStream = new ByteArrayOutputStream
-          val servletOutputStream = new FilterServletOutputStream(outputStream)
-          expect{one(response).getOutputStream willReturn servletOutputStream}
+      "Response Body" >> {
+        var servletOutputStream = null: ServletOutputStream
+        var os = null: ByteArrayOutputStream
 
-          responseCapturer.getWriter.print(1)
-          responseCapturer.writeTo(response)
-          outputStream.toString
+        "getWriter such that" >> {
+          "writeTo(r) writes to r.getOutputStream" >> {
+            os = new ByteArrayOutputStream
+            servletOutputStream = new ServletOutputStreamCapturer {
+              override val outputStream = os
+            }
+            expect{allowing(response).getOutputStream willReturn servletOutputStream}
+
+            responseCapturer.getWriter.print('1')
+            responseCapturer.writeTo(response)
+            os.toByteArray.apply(0) mustEqual '1'.toByte
+          }
         }
-      }
 
-      "getOutputStream such that" >> {
-        "writeTo(r) writes to r.getOutputStream" >> {
-          val outputStream = new ByteArrayOutputStream
-          val servletOutputStream = new FilterServletOutputStream(outputStream)
-          expect{one(response).getOutputStream willReturn servletOutputStream}
+        "getOutputStream such that" >> {
+          "writeTo(r) writes to r.getOutputStream" >> {
+            os = new ByteArrayOutputStream
+            servletOutputStream = new ServletOutputStreamCapturer {
+              override val outputStream = os
+            }
+            expect{allowing(response).getOutputStream willReturn servletOutputStream}
 
-          responseCapturer.getOutputStream.write(1)
-          responseCapturer.writeTo(response)
-          outputStream.toByteArray.apply(0) mustEqual 1
+            responseCapturer.getOutputStream.write(1)
+            responseCapturer.writeTo(response)
+            os.toByteArray.apply(0) mustEqual 1
+          }
         }
       }
     }
