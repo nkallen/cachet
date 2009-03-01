@@ -1,13 +1,13 @@
-package com.twitter.service.cachet
+package com.twitter.service.cachet.cache
 
 import _root_.javax.servlet.http.HttpServletResponse
 import scala.util.matching.Regex
 
-object CacheEntry extends Function[ResponseCapturer, FreshResponseCacheEntry] {
+object FreshResponseCacheEntry extends Function[ResponseCapturer, FreshResponseCacheEntry] {
   def apply(responseCapturer: ResponseCapturer) = new FreshResponseCacheEntry(responseCapturer)
 }
 
-class FreshResponseCacheEntry(val responseCapturer: ResponseCapturer) {
+class FreshResponseCacheEntry(val responseCapturer: ResponseCapturer) extends CacheEntry {
   val requestTime = System.currentTimeMillis
   var responseTime = 0.toLong
 
@@ -49,11 +49,5 @@ class FreshResponseCacheEntry(val responseCapturer: ResponseCapturer) {
 
   def writeTo(response: HttpServletResponse) {
     responseCapturer.writeTo(response)
-  }
-
-  def store(cache: Cache, key: String) {
-    if (isCachable) {
-      cache.put(key, this)
-    }
   }
 }

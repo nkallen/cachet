@@ -1,5 +1,6 @@
 package com.twitter.service.cachet.test.unit
 
+import cache.{Cache, CacheEntry}
 import com.twitter.service.cachet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import javax.servlet.FilterChain
@@ -17,12 +18,12 @@ object FetchSpec extends Specification with JMocker with ClassMocker {
     var request = null: HttpServletRequest
     var response = null: HttpServletResponse
     var responseCapturer = null: ResponseCapturer
-    var cacheEntry = null: FreshResponseCacheEntry
+    var cacheEntry = null: CacheEntry
 
     doBefore{
       cache = mock[Cache]
       chain = mock[FilterChain]
-      cacheEntry = mock[FreshResponseCacheEntry]
+      cacheEntry = mock[CacheEntry]
       request = mock[HttpServletRequest]
       response = mock[HttpServletResponse]
       responseCapturer = mock[ResponseCapturer]

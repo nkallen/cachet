@@ -1,9 +1,9 @@
-package com.twitter.service.cachet
+package com.twitter.service.cachet.cache
 
 trait Cache {
-  def get(key: String)(miss: => FreshResponseCacheEntry) = fetch(key) getOrElse miss
+  def get(key: String)(miss: => CacheEntry) = fetch(key) getOrElse miss
 
-  def put(key: String, value: FreshResponseCacheEntry)
+  def put(key: String, value: CacheEntry)
 
-  protected def fetch(key: String): Option[FreshResponseCacheEntry]
+  protected def fetch(key: String): Option[CacheEntry]
 }

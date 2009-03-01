@@ -1,6 +1,7 @@
+Cache needs to check freshness
 Fix GetSpec
-
 Interface-ify anything that I mock / Extract traits where appropriate
+DI Clock into FreshResponseCacheEntry
 
 Learn . vs ' ' method invocation convention
 
