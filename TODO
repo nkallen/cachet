@@ -2,6 +2,7 @@ CacheEntry implements write/copy onto Response
 My own implementation of FilterServletOutputStream
 CacheEntry Implement isCachable -- HTTP 200, etc.
 Cache should assume an interface
+Interface-ify anything that I mock
 The various DateHeader/IntHeaders in CacheEntry are vulnerable to header fragmentation
 
 Locking / Grace Period - prevent dog pile by locking around fetch.
@@ -26,17 +27,3 @@ Implement validation schemes:
 == Maybe ==
 
 . Validation Servlet
-
-. ResponseWrapper implements
-    - getWriter
-
-        public PrintWriter getWriter() throws IOException {
-        if (writer == null) {
-            writer = new PrintWriter(new OutputStreamWriter(outstr, getCharacterEncoding()), true);
-        }
-        return writer;
-    }
-    - getOutputStream
-
-        final ByteArrayOutputStream outstr = new ByteArrayOutputStream();
-        outstr.toByteArray

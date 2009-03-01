@@ -15,7 +15,7 @@ class CacheEntry(val responseWrapper: ResponseWrapper) {
     responseTime = System.currentTimeMillis
   }
 
-  def dateValue = responseWrapper.getDateHeader("Date") getOrElse responseTime
+  def dateValue = responseWrapper.date getOrElse responseTime
 
   def apparentAge = (responseTime - dateValue) max 0
 

@@ -32,6 +32,8 @@ class ResponseWrapper(response: HttpServletResponse) extends HttpServletResponse
   def getDateHeader(n: String) =
     dateHeaders get n
 
+  def date = getDateHeader("Date")
+
   override def addCookie(c: Cookie) {
     cookies += c
   }
