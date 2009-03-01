@@ -1,5 +1,5 @@
-In cache proxy, writeToOrFetch (tell don't ask); Cache get/fetch
-Remove blah
+Fix GetSpec
+Rename Get/Receive
 DI Stream capturer
 
 Interface-ify anything that I mock / Extract traits where appropriate

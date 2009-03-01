@@ -3,7 +3,7 @@ package com.twitter.service.cachet
 import _root_.javax.servlet.http.HttpServletResponse
 import scala.util.matching.Regex
 
-object CacheEntry extends Function[ResponseCapturer, CacheEntry] {
+object CacheEntry {
   def apply(responseCapturer: ResponseCapturer) = new CacheEntry(responseCapturer)
 }
 

@@ -5,15 +5,15 @@ import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
 
 class CacheProxyServletFilter extends Filter {
   var config: FilterConfig = null
-  var proxy: Get = null
+  var get: Get = null
 
   def init(c: FilterConfig) {
     config = c
-    //    proxy = new Get(Ehcache, ResponseCapturer, CacheEntry)
+    get = new Get(Ehcache, Fetch(Ehcache, ResponseCapturer, CacheEntry))
   }
 
   def doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
-    //    proxy(request.asInstanceOf[HttpServletRequest], response.asInstanceOf[HttpServletResponse], chain)
+    get(request.asInstanceOf[HttpServletRequest], response.asInstanceOf[HttpServletResponse], chain)
   }
 
   def destroy {}
