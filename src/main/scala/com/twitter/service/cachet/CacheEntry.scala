@@ -50,4 +50,10 @@ class CacheEntry(val responseCapturer: ResponseCapturer) {
   def writeTo(response: HttpServletResponse) {
     responseCapturer.writeTo(response)
   }
+
+  def store(cache: Cache, key: String) {
+    if (isCachable) {
+      cache.put(key, this)
+    }
+  }
 }

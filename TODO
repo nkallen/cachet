@@ -1,8 +1,8 @@
-Interface-ify anything that I mock
-Audit use of one for allowing
-Extract traits where appropriate
+In cache proxy, writeToOrFetch (tell don't ask); Cache get/fetch
+Remove blah
 DI Stream capturer
-In cache proxy, writeToOrFetch (tell don't ask)
+
+Interface-ify anything that I mock / Extract traits where appropriate
 
 Learn . vs ' ' method invocation convention
 
