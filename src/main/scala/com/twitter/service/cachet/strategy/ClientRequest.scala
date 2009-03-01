@@ -5,7 +5,7 @@ import org.mortbay.io.Buffer
 import org.mortbay.jetty.client.{HttpExchange, HttpClient}
 import org.mortbay.jetty.HttpFields.Field
 
-class ProxyRequest(client: HttpClient, Exchange: (HttpServletRequest, HttpServletResponse) => HttpExchange) {
+class ClientRequest(client: HttpClient, Exchange: (HttpServletRequest, HttpServletResponse) => HttpExchange) {
   def apply(request: HttpServletRequest, response: HttpServletResponse) {
     if (request.isInitial) {
       val exchange = Exchange(request, response)

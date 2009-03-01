@@ -8,21 +8,21 @@ import org.specs.mock._
 import org.specs.mock.JMocker._
 import com.twitter.service.cachet.test.mock._
 
-object ProxyRequestSpec extends Specification with JMocker with ClassMocker {
+object ClientRequestSpec extends Specification with JMocker with ClassMocker {
   var exchange = null: HttpExchange
-  var proxyRequest = null: ProxyRequest
+  var clientRequest = null: ClientRequest
   var request = null: FakeHttpServletRequest
   var response = null: HttpServletResponse
   var client = null: HttpClient
 
-  "ProxyRequest" should {
+  "ClientRequest" should {
     doBefore{
       exchange = mock[HttpExchange]
       client = mock[HttpClient]
       request = new FakeHttpServletRequest
       response = mock[HttpServletResponse]
 
-      proxyRequest = new ProxyRequest(client, (blah, blar) => exchange)
+      clientRequest = new ClientRequest(client, (blah, blar) => exchange)
     }
 
     "when request isInitial" >> {
@@ -39,7 +39,7 @@ object ProxyRequestSpec extends Specification with JMocker with ClassMocker {
           one(exchange).setRequestHeader("foo", "bar")
           one(client).send(exchange)
         }
-        proxyRequest(request, response)
+        clientRequest(request, response)
       }
     }
 
@@ -50,7 +50,7 @@ object ProxyRequestSpec extends Specification with JMocker with ClassMocker {
 
       "does nothing" >> {
         expect{never(client).send(exchange)}
-        proxyRequest(request, response)
+        clientRequest(request, response)
       }
     }
   }

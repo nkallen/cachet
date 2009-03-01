@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest
 import org.mortbay.jetty.client.{HttpClient, HttpExchange}
 import javax.servlet.http.HttpServletResponse
 
-class ProxyRequest(client: HttpClient, Exchange: (HttpServletRequest, HttpServletResponse) => HttpExchange) {
+class ClientRequest(client: HttpClient, Exchange: (HttpServletRequest, HttpServletResponse) => HttpExchange) {
   def apply(request: HttpServletRequest, response: HttpServletResponse) {
     if (request.isInitial) {
       val exchange = Exchange(request, response)
