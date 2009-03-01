@@ -1,8 +1,8 @@
-package com.twitter.service.cachet
+package com.twitter.service.cachet.client
 
 import _root_.javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import org.mortbay.io.Buffer
-import org.mortbay.jetty.client.HttpExchange
+import org.mortbay.jetty.client.{HttpClient, HttpExchange}
 
 class CopyExchange(request: HttpServletRequest, response: HttpServletResponse) extends HttpExchange {
   request.suspend()

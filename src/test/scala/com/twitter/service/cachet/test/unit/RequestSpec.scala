@@ -2,7 +2,6 @@ package com.twitter.service.cachet.test.unit
 
 import com.twitter.service.cachet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
-import javax.servlet.FilterChain
 import org.mortbay.jetty.client.{HttpClient, HttpExchange}
 import org.specs._
 import org.specs.mock._

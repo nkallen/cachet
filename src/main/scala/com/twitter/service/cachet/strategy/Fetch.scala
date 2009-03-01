@@ -1,20 +1,12 @@
-package com.twitter.service.cachet
+package com.twitter.service.cachet.strategy
 
 import _root_.javax.servlet.FilterChain
 import _root_.javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 
-object Fetch {
-  def apply(cache: Cache,
-           ResponseCapturer: HttpServletResponse => ResponseCapturer,
-           CacheEntry: ResponseCapturer => CacheEntry) = {
-    new Fetch(cache, ResponseCapturer, CacheEntry)
-  }
-}
-
 class Fetch(cache: Cache,
            ResponseCapturer: HttpServletResponse => ResponseCapturer,
            CacheEntry: ResponseCapturer => CacheEntry) {
-  def apply(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) = {
+  def apply(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain): CacheEntry = {
     val responseCapturer = ResponseCapturer(response)
     chain.doFilter(request, responseCapturer)
     val cacheEntry = CacheEntry(responseCapturer)

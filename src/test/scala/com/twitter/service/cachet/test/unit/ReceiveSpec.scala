@@ -7,6 +7,7 @@ import org.specs._
 import org.specs.mock._
 import org.specs.mock.JMocker._
 import com.twitter.service.cachet.test.mock._
+import strategy.Receive
 
 object ReceiveSpec extends Specification with JMocker with ClassMocker {
   "Receive" should {

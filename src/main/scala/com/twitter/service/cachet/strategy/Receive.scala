@@ -1,4 +1,4 @@
-package com.twitter.service.cachet
+package com.twitter.service.cachet.strategy
 
 import java.lang.String
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}

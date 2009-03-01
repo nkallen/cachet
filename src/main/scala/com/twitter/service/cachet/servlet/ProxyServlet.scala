@@ -1,7 +1,8 @@
-package com.twitter.service.cachet
+package com.twitter.service.cachet.servlet
 
+import _root_.javax.servlet._
+import client.CopyExchange
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
-import javax.servlet.ServletConfig
 import org.mortbay.jetty.client.HttpClient
 
 class ProxyServlet extends HttpServlet {

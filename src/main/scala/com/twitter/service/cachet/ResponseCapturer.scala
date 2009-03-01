@@ -8,7 +8,7 @@ import javax.servlet.http._
 import scala.collection.mutable._
 import scala.util.matching.Regex
 
-object ResponseCapturer {
+object ResponseCapturer extends Function[HttpServletResponse, ResponseCapturer] {
   def apply(response: HttpServletResponse) = {
     new ResponseCapturer(response)
   }
