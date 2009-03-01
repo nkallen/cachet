@@ -10,12 +10,12 @@ import com.twitter.service.cachet.test.mock._
 
 object CacheEntrySpec extends Specification with JMocker {
   "CacheEntry" should {
-    var responseWrapper: ResponseWrapper = null
+    var responseWrapper: ResponseBuffer = null
     var cacheEntry: CacheEntry = null
 
     "implement RFC 2616" >> {
       doBefore{
-        responseWrapper = new ResponseWrapper(new FakeHttpServletResponse)
+        responseWrapper = new ResponseBuffer(new FakeHttpServletResponse)
         cacheEntry = new CacheEntry(responseWrapper)
         cacheEntry.noteResponseTime()
       }

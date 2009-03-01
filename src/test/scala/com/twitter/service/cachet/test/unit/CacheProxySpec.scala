@@ -16,7 +16,7 @@ object CacheProxySpec extends Specification with JMocker with ClassMocker {
     var chain: FilterChain = null
     var request: FakeHttpServletRequest = null
     var response: HttpServletResponse = null
-    var responseWrapper: ResponseWrapper = null
+    var responseWrapper: ResponseBuffer = null
     var cacheEntry: CacheEntry = null
 
     doBefore{
@@ -26,7 +26,7 @@ object CacheProxySpec extends Specification with JMocker with ClassMocker {
       request = new FakeHttpServletRequest
       request.queryString = "/foo"
       response = new FakeHttpServletResponse
-      responseWrapper = new ResponseWrapper(response)
+      responseWrapper = new ResponseBuffer(response)
 
       proxy = new CacheProxy(cache, blar => responseWrapper, blah => cacheEntry)
     }

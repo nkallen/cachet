@@ -11,23 +11,29 @@ import org.specs.mock._
 import org.specs.mock.JMocker._
 import com.twitter.service.cachet.test.mock._
 
-object ResponseWrapperSpec extends Specification with JMocker {
-  "ResponseWrapper" should {
+object ResponseBufferSpec extends Specification with JMocker {
+  "ResponseBuffer" should {
     var response: HttpServletResponse = null
-    var responseWrapper: ResponseWrapper = null
+    var responseBuffer: ResponseBuffer = null
 
     "have accessors" >> {
       doBefore{
         response = mock[HttpServletResponse]
-        responseWrapper = new ResponseWrapper(response)
+        responseBuffer = new ResponseBuffer(response)
       }
 
       "addDateHeader(x, y) such that" >> {
         val millis = System.currentTimeMillis
 
         "getDateHeader(x) returns y" >> {
-          responseWrapper.addDateHeader("Date", millis)
-          responseWrapper.getDateHeader("Date") mustEqual Some(millis)
+          responseBuffer.addDateHeader("Date", millis)
+          responseBuffer.getDateHeader("Date") mustEqual Some(millis)
+        }
+
+        "writeTo(r) invokes r.addDateHeader(x, y)" >> {
+          responseBuffer.addDateHeader("Date", millis)
+          expect{one(response).addDateHeader("Date", millis)}
+          responseBuffer.writeTo(response)
         }
       }
 
@@ -35,8 +41,8 @@ object ResponseWrapperSpec extends Specification with JMocker {
         val cookie = new Cookie("key", "value")
 
         "cookies" >> {
-          responseWrapper.addCookie(cookie)
-          responseWrapper.getCookies.contains(cookie) mustBe true
+          responseBuffer.addCookie(cookie)
+          responseBuffer.getCookies.contains(cookie) mustBe true
         }
       }
 
@@ -45,8 +51,8 @@ object ResponseWrapperSpec extends Specification with JMocker {
         val value = "value"
 
         "getHeader(n) returns v" >> {
-          responseWrapper.addHeader(name, value)
-          responseWrapper.getHeader(name) mustEqual Some(value)
+          responseBuffer.addHeader(name, value)
+          responseBuffer.getHeader(name) mustEqual Some(value)
         }
       }
 
@@ -55,8 +61,8 @@ object ResponseWrapperSpec extends Specification with JMocker {
         val value = 1
 
         "getHeader(n) returns v" >> {
-          responseWrapper.addIntHeader(name, value)
-          responseWrapper.getIntHeader(name) mustEqual Some(value)
+          responseBuffer.addIntHeader(name, value)
+          responseBuffer.getIntHeader(name) mustEqual Some(value)
         }
       }
 
@@ -65,8 +71,8 @@ object ResponseWrapperSpec extends Specification with JMocker {
           val sc = 200
 
           "getStatus() returns sc" >> {
-            responseWrapper.sendError(sc)
-            responseWrapper.getStatus mustEqual sc
+            responseBuffer.sendError(sc)
+            responseBuffer.getStatus mustEqual sc
           }
         }
 
@@ -74,8 +80,8 @@ object ResponseWrapperSpec extends Specification with JMocker {
           val sc = 200
 
           "getStatus() returns sc" >> {
-            responseWrapper.sendError(sc)
-            responseWrapper.getStatus mustEqual sc
+            responseBuffer.sendError(sc)
+            responseBuffer.getStatus mustEqual sc
           }
         }
       }
@@ -84,8 +90,8 @@ object ResponseWrapperSpec extends Specification with JMocker {
         val ct = "text/html"
 
         "getContentType returns ct" >> {
-          responseWrapper.setContentType(ct)
-          responseWrapper.getContentType mustEqual ct
+          responseBuffer.setContentType(ct)
+          responseBuffer.getContentType mustEqual ct
         }
       }
 
@@ -93,16 +99,24 @@ object ResponseWrapperSpec extends Specification with JMocker {
         val l = Locale.CANADA
 
         "getLocale returns l" >> {
-          responseWrapper.setLocale(l)
-          responseWrapper.getLocale mustEqual l
+          responseBuffer.setLocale(l)
+          responseBuffer.getLocale mustEqual l
         }
       }
 
       "setContentLength(l) such that" >> {
         "getContentLength returns l" >> {
-          responseWrapper.setContentLength(100)
-          responseWrapper.getContentLength mustEqual 100
+          responseBuffer.setContentLength(100)
+          responseBuffer.getContentLength mustEqual 100
         }
+      }
+
+      "getWriter such that" >> {
+
+      }
+
+      "getOutputStream such that" >> {
+
       }
     }
   }

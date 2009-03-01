@@ -7,20 +7,21 @@ import javax.servlet.http._
 import scala.collection.mutable._
 import scala.util.matching.Regex
 
-class ResponseWrapper(response: HttpServletResponse) extends HttpServletResponseWrapper(response) {
-  private val headers: HashMap[String, Any] = new HashMap
-  private val cookies: HashSet[Cookie] = new HashSet
+class ResponseBuffer(response: HttpServletResponse) extends HttpServletResponseWrapper(response) {
+  private val dateHeaders = new HashMap[String, Long]
+  private val headers = new HashMap[String, Any]
+  private val cookies = new HashSet[Cookie]
   private var statusCode = 0
   private var contentType = ""
   private var locale: Locale = null
   private var contentLength = 0
 
   override def addDateHeader(n: String, v: Long) {
-    headers.update(n, v)
+    dateHeaders.update(n, v)
   }
 
   def getDateHeader(n: String) =
-    headers get n map (_.asInstanceOf[Long])
+    dateHeaders get n
 
   override def addCookie(c: Cookie) {
     cookies += c
@@ -73,6 +74,7 @@ class ResponseWrapper(response: HttpServletResponse) extends HttpServletResponse
   def getContentLength = contentLength
 
   def writeTo(response: HttpServletResponse) {
-
+    for ((key, value) <- dateHeaders)
+      response.addDateHeader(key, value)
   }
 }

@@ -1,5 +1,5 @@
-
 CacheEntry implements write/copy onto Response
+    - ResponseWrapper should not be a wrapper.
 CacheEntry Implement isCachable -- HTTP 200, etc.
 
 Locking / Grace Period - prevent dog pile by locking around fetch.
