@@ -11,7 +11,7 @@ class Fetch(cache: Cache,
     val responseCapturer = ResponseCapturer(response)
     chain.doFilter(request, responseCapturer)
     val cacheEntry = CacheEntry(responseCapturer)
-    cacheEntry.store(cache, request.getQueryString)
+    cache.put(request.getQueryString, cacheEntry)
     cacheEntry
   }
 }

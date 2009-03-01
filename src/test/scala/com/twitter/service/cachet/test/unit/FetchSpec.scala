@@ -36,7 +36,7 @@ object FetchSpec extends Specification with JMocker with ClassMocker {
         expect{
           allowing(request).getQueryString willReturn "foo"
           one(chain).doFilter(request, responseCapturer)
-          one(cacheEntry).store(cache, "foo")
+          one(cache).put("foo", cacheEntry)
         }
         fetch(request, response, chain)
       }

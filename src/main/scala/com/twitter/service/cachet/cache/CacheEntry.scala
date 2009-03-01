@@ -8,10 +8,4 @@ trait CacheEntry {
   def isCachable: Boolean
 
   def writeTo(response: HttpServletResponse)
-
-  def store(cache: Cache, key: String) {
-    if (isCachable) {
-      cache.put(key, this)
-    }
-  }
 }
