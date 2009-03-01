@@ -79,32 +79,43 @@ object ResponseBufferSpec extends Specification with JMocker {
         }
       }
 
-      "sendError(...) such that" >> {
-        "sendError(sc)" >> {
-          val sc = 200
+      "sendError(sc) such that" >> {
+        val sc = 200
 
-          "getStatus() returns sc" >> {
-            responseBuffer.sendError(sc)
-            responseBuffer.getStatus mustEqual sc
-          }
+        "getStatus() returns sc" >> {
+          responseBuffer.sendError(sc)
+          responseBuffer.getStatus mustEqual sc
         }
 
-        "sendError(sc)" >> {
-          val sc = 200
+        "writeTo(r) invokes r.setStatus(sc)" >> {
+          responseBuffer.sendError(sc)
+          expect{one(response).setStatus(sc)}
+          responseBuffer.writeTo(response)
+        }
+      }
 
-          "getStatus() returns sc" >> {
-            responseBuffer.sendError(sc)
-            responseBuffer.getStatus mustEqual sc
-          }
+      "setStatus(sc) such that" >> {
+        val sc = 200
+
+        "getStatus returns sc" >> {
+          responseBuffer.setStatus(sc)
+          responseBuffer.getStatus mustEqual sc
+        }
+
+        "writeTo(r) invokes r.setStatus(sc)" >> {
+          responseBuffer.setStatus(sc)
+          expect{one(response).setStatus(sc)}
+          responseBuffer.writeTo(response)
         }
       }
 
       "setContentType(ct) such that" >> {
         val ct = "text/html"
 
-        "getContentType returns ct" >> {
+        "writeTo(r) invokes r.setContentType(sc)" >> {
           responseBuffer.setContentType(ct)
-          responseBuffer.getContentType mustEqual ct
+          expect{one(response).setContentType(ct)}
+          responseBuffer.writeTo(response)
         }
       }
 
@@ -115,13 +126,21 @@ object ResponseBufferSpec extends Specification with JMocker {
           responseBuffer.setLocale(l)
           responseBuffer.getLocale mustEqual l
         }
+
+        "writeTo(r) invokes r.setLocale(l)" >> {
+          responseBuffer.setLocale(l)
+          expect{one(response).setLocale(l)}
+          responseBuffer.writeTo(response)
+        }
       }
 
       "setContentLength(l) such that" >> {
-        "getContentLength returns l" >> {
+        "writeTo(r) invokes r.setContentLength(l)" >> {
           responseBuffer.setContentLength(100)
-          responseBuffer.getContentLength mustEqual 100
+          expect{one(response).setContentLength(100)}
+          responseBuffer.writeTo(response)
         }
+
       }
 
       "getWriter such that" >> {
