@@ -19,7 +19,7 @@ class ResponseCapturer(response: HttpServletResponse) extends HttpServletRespons
   private val stringHeaders = new HashMap[String, String]
   private val intHeaders = new HashMap[String, Int]
   private val cookies = new HashSet[Cookie]
-  private val servletOutputStreamCapturer = new ByteArrayServletOutputStreamCapturer
+  private val servletOutputStreamCapturer = new ServletOutputStreamCapturer
   private var characterEncoding = None: Option[String]
   private var writer = None: Option[PrintWriter]
   private var statusCode = None: Option[Int]

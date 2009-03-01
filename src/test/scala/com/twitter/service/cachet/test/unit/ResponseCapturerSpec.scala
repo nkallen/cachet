@@ -12,7 +12,7 @@ import org.specs.mock._
 import org.specs.mock.JMocker._
 import com.twitter.service.cachet.test.mock._
 
-object ResponseCapturerSpec extends Specification with JMocker {
+object ResponseCapturerSpec extends Specification with JMocker with ClassMocker {
   "ResponseCapturer" should {
     var response: HttpServletResponse = null
     var responseCapturer: ResponseCapturer = null
@@ -134,7 +134,7 @@ object ResponseCapturerSpec extends Specification with JMocker {
         "getWriter such that" >> {
           "writeTo(r) writes to r.getOutputStream" >> {
             os = new ByteArrayOutputStream
-            servletOutputStream = new ByteArrayServletOutputStreamCapturer {
+            servletOutputStream = new ServletOutputStreamCapturer {
               override val outputStream = os
             }
             expect{allowing(response).getOutputStream willReturn servletOutputStream}
@@ -148,7 +148,7 @@ object ResponseCapturerSpec extends Specification with JMocker {
         "getOutputStream such that" >> {
           "writeTo(r) writes to r.getOutputStream" >> {
             os = new ByteArrayOutputStream
-            servletOutputStream = new ByteArrayServletOutputStreamCapturer {
+            servletOutputStream = new ServletOutputStreamCapturer {
               override val outputStream = os
             }
             expect{allowing(response).getOutputStream willReturn servletOutputStream}
