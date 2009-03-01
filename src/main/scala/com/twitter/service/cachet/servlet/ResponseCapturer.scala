@@ -8,9 +8,12 @@ import javax.servlet.http._
 import scala.collection.mutable._
 import scala.util.matching.Regex
 
-object ResponseCapturer extends Function[HttpServletResponse, ResponseCapturer] {
-  def apply(response: HttpServletResponse) = {
-    new ResponseCapturer(response, new ServletOutputStreamCapturer)
+object ResponseCapturer extends Function2[HttpServletResponse, (HttpServletResponse => Unit), ResponseCapturer] {
+  def apply(response: HttpServletResponse, responder: HttpServletResponse => Unit) = {
+    val responseCapturer = new ResponseCapturer(response, new ServletOutputStreamCapturer)
+    responder(responseCapturer)
+    responseCapturer.noteResponseTime()
+    responseCapturer
   }
 }
 
@@ -25,6 +28,13 @@ class ResponseCapturer(response: HttpServletResponse, servletOutputStreamCapture
   private var contentType = None: Option[String]
   private var locale = None: Option[Locale]
   private var contentLength = None: Option[Int]
+
+  val requestTime = System.currentTimeMillis
+  var responseTime = 0.toLong
+
+  def noteResponseTime() {
+    responseTime = System.currentTimeMillis
+  }
 
   def getStatusCode = statusCode getOrElse 0
 

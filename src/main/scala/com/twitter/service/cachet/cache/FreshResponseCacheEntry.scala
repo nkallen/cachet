@@ -8,12 +8,8 @@ object FreshResponseCacheEntry extends Function[ResponseCapturer, FreshResponseC
 }
 
 class FreshResponseCacheEntry(val responseCapturer: ResponseCapturer) extends CacheEntry {
-  val requestTime = System.currentTimeMillis
-  var responseTime = 0.toLong
-
-  def noteResponseTime() {
-    responseTime = System.currentTimeMillis
-  }
+  val requestTime = responseCapturer.requestTime
+  var responseTime = responseCapturer.responseTime
 
   def dateValue = responseCapturer.date getOrElse responseTime
 

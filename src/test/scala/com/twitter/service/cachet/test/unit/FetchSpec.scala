@@ -28,7 +28,9 @@ object FetchSpec extends Specification with JMocker with ClassMocker {
       response = mock[HttpServletResponse]
       responseCapturer = mock[ResponseCapturer]
 
-      fetch = new Fetch(cache, response => responseCapturer, responseCapturer => cacheEntry)
+      fetch = new Fetch(cache,
+        (response, responder) => {responder(responseCapturer); responseCapturer},
+        responseCapturer => cacheEntry)
     }
 
     "apply" >> {
