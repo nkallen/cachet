@@ -3,6 +3,7 @@ package com.twitter.service.cachet.test.unit
 import com.twitter.service.cachet._
 import javax.servlet.http._
 
+import org.jmock.core.Stub
 import org.specs._
 import org.specs.mock._
 import org.specs.mock.JMocker._
@@ -28,13 +29,13 @@ object CacheEntrySpec extends Specification with JMocker {
             "returns the value of the header" >> {
               val millis = System.currentTimeMillis
               responseWrapper.setDateHeader("Date", millis)
-              cacheEntry.dateValue mustEqual (millis)
+              cacheEntry.dateValue mustEqual millis
             }
           }
 
           "when there is no Date header" >> {
             "returns the response time" >> {
-              cacheEntry.dateValue mustEqual (cacheEntry.responseTime)
+              cacheEntry.dateValue mustEqual cacheEntry.responseTime
             }
           }
         }
@@ -44,7 +45,7 @@ object CacheEntrySpec extends Specification with JMocker {
             "returns responseTime - dateValue" >> {
               val delta = 10
               responseWrapper.setDateHeader("Date", cacheEntry.responseTime - delta)
-              cacheEntry.apparentAge mustEqual (delta)
+              cacheEntry.apparentAge mustEqual delta
             }
           }
 
@@ -61,7 +62,7 @@ object CacheEntrySpec extends Specification with JMocker {
             "returns apparentAge" >> {
               responseWrapper.setDateHeader("Date", cacheEntry.responseTime + 1)
               responseWrapper.setIntHeader("Age", 0)
-              cacheEntry.correctedReceivedAge mustEqual (cacheEntry.apparentAge)
+              cacheEntry.correctedReceivedAge mustEqual cacheEntry.apparentAge
             }
           }
 
@@ -69,21 +70,21 @@ object CacheEntrySpec extends Specification with JMocker {
             "returns ageValue" >> {
               responseWrapper.setDateHeader("Date", cacheEntry.responseTime)
               responseWrapper.setIntHeader("Age", 10)
-              cacheEntry.correctedReceivedAge mustEqual (responseWrapper.getIntHeader("Age").get)
+              cacheEntry.correctedReceivedAge mustEqual responseWrapper.getIntHeader("Age").get
             }
           }
 
           "when no ageValue" >> {
             "returns apparentAge" >> {
               responseWrapper.setDateHeader("Date", cacheEntry.responseTime)
-              cacheEntry.correctedReceivedAge mustEqual (cacheEntry.apparentAge)
+              cacheEntry.correctedReceivedAge mustEqual cacheEntry.apparentAge
             }
           }
         }
 
         "responseDelay" >> {
           "returning responseTime - requestTime" >> {
-            cacheEntry.responseDelay mustEqual (cacheEntry.responseTime - cacheEntry.requestTime)
+            cacheEntry.responseDelay mustEqual cacheEntry.responseTime - cacheEntry.requestTime
           }
         }
 
@@ -178,7 +179,8 @@ object CacheEntrySpec extends Specification with JMocker {
     "writeTo" >> {
       "delegates to the responseWrapper" >> {
         val response = new FakeHttpServletResponse
-        responseWrapper.writeTo(response)
+        //        expect{one(responseWrapper).writeTo(response)}
+        cacheEntry.writeTo(response)
       }
     }
   }
