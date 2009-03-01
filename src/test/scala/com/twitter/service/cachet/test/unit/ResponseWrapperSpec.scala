@@ -17,7 +17,7 @@ object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
     var response: HttpServletResponse = null
     var responseWrapper: ResponseWrapper = null
 
-    "have accessors" >> {
+    "Servlet Mutators" >> {
       doBefore{
         response = mock[HttpServletResponse]
         responseWrapper = new ResponseWrapper(response)
@@ -25,11 +25,6 @@ object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
 
       "addDateHeader(x, y) such that" >> {
         val millis = System.currentTimeMillis
-
-        "getDateHeader(x) returns y" >> {
-          responseWrapper.addDateHeader("Date", millis)
-          responseWrapper.getDateHeader("Date") mustEqual Some(millis)
-        }
 
         "writeTo(r) invokes r.addDateHeader(x, y)" >> {
           responseWrapper.addDateHeader("Date", millis)
@@ -60,11 +55,6 @@ object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
         val name = "name"
         val value = "value"
 
-        "getHeader(n) returns v" >> {
-          responseWrapper.addHeader(name, value)
-          responseWrapper.getHeader(name) mustEqual Some(value)
-        }
-
         "writeTo(r) invokes r.addHeader(n, v)" >> {
           responseWrapper.addHeader(name, value)
           expect{one(response).addHeader(name, value)}
@@ -91,11 +81,6 @@ object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
       "sendError(sc) such that" >> {
         val sc = 200
 
-        "getStatus() returns sc" >> {
-          responseWrapper.sendError(sc)
-          responseWrapper.getStatus mustEqual sc
-        }
-
         "writeTo(r) invokes r.setStatus(sc)" >> {
           responseWrapper.sendError(sc)
           expect{one(response).setStatus(sc)}
@@ -105,11 +90,6 @@ object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
 
       "setStatus(sc) such that" >> {
         val sc = 200
-
-        "getStatus returns sc" >> {
-          responseWrapper.setStatus(sc)
-          responseWrapper.getStatus mustEqual sc
-        }
 
         "writeTo(r) invokes r.setStatus(sc)" >> {
           responseWrapper.setStatus(sc)
@@ -130,11 +110,6 @@ object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
 
       "setLocale(l) such that" >> {
         val l = Locale.CANADA
-
-        "getLocale returns l" >> {
-          responseWrapper.setLocale(l)
-          responseWrapper.getLocale mustEqual l
-        }
 
         "writeTo(r) invokes r.setLocale(l)" >> {
           responseWrapper.setLocale(l)
@@ -174,6 +149,39 @@ object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
           responseWrapper.writeTo(response)
           outputStream.toByteArray.apply(0) mustEqual 1
         }
+      }
+    }
+
+    "Freshness Information" >> {
+      "maxAge" >> {
+        "when there is a max-age control" >> {
+          responseWrapper.setHeader("Cache-Control", "max-age=100")
+          responseWrapper.maxAge mustEqual Some(100)
+        }
+
+        "when there is a s-maxage control" >> {
+          responseWrapper.setHeader("Cache-Control", "s-maxage=100")
+          responseWrapper.maxAge mustEqual Some(100)
+        }
+
+        "when both a max-age and s-maxage are present" >> {
+          "returns s-maxage" >> {
+            responseWrapper.setHeader("Cache-Control", "s-maxage=1, max-age=2")
+            responseWrapper.maxAge mustEqual Some(1)
+          }
+        }
+      }
+
+      "age" >> {
+        true
+      }
+
+      "expires" >> {
+        true
+      }
+
+      "date" >> {
+        true
       }
     }
 

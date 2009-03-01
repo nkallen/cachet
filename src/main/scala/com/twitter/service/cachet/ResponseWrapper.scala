@@ -36,7 +36,12 @@ class ResponseWrapper(response: HttpServletResponse) extends HttpServletResponse
 
   def expires = getDateHeader("Expires")
 
-  def maxAge: Option[Long] = Some(1.toLong)
+  private val MaxAge = """\b(?:s-maxage|max-age)=(\d+)\b""".r
+
+  def maxAge =
+    for (cacheControl <- stringHeaders.get("Cache-Control");
+         maxAge <- MaxAge findFirstMatchIn cacheControl)
+    yield maxAge group (1) toLong
 
   def age = getIntHeader("Age") map (_.toLong)
 
