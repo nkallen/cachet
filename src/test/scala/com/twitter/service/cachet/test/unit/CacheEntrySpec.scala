@@ -15,7 +15,7 @@ object CacheEntrySpec extends Specification with JMocker {
 
     "implement RFC 2616" >> {
       doBefore{
-        responseWrapper = new ResponseBuffer(new FakeHttpServletResponse)
+        responseWrapper = new ResponseBuffer
         cacheEntry = new CacheEntry(responseWrapper)
         cacheEntry.noteResponseTime()
       }

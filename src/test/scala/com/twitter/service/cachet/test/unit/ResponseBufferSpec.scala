@@ -19,7 +19,7 @@ object ResponseBufferSpec extends Specification with JMocker {
     "have accessors" >> {
       doBefore{
         response = mock[HttpServletResponse]
-        responseBuffer = new ResponseBuffer(response)
+        responseBuffer = new ResponseBuffer
       }
 
       "addDateHeader(x, y) such that" >> {
