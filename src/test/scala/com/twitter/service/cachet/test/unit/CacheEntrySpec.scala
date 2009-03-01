@@ -57,31 +57,38 @@ object CacheEntrySpec extends Specification with JMocker with ClassMocker {
             }
           }
         }
-        //
-        //        "correctedReceivedAge" >> {
-        //          "when apparentAge > ageValue" >> {
-        //            "returns apparentAge" >> {
-        //              responseWrapper.setDateHeader("Date", cacheEntry.responseTime + 1)
-        //              responseWrapper.setIntHeader("Age", 0)
-        //              cacheEntry.correctedReceivedAge mustEqual cacheEntry.apparentAge
-        //            }
-        //          }
-        //
-        //          "when apparentAge < ageValue" >> {
-        //            "returns ageValue" >> {
-        //              responseWrapper.setDateHeader("Date", cacheEntry.responseTime)
-        //              responseWrapper.setIntHeader("Age", 10)
-        //              cacheEntry.correctedReceivedAge mustEqual responseWrapper.getIntHeader("Age").get
-        //            }
-        //          }
-        //
-        //          "when no ageValue" >> {
-        //            "returns apparentAge" >> {
-        //              responseWrapper.setDateHeader("Date", cacheEntry.responseTime)
-        //              cacheEntry.correctedReceivedAge mustEqual cacheEntry.apparentAge
-        //            }
-        //          }
-        //        }
+
+        "correctedReceivedAge" >> {
+          "when apparentAge > ageValue" >> {
+            "returns apparentAge" >> {
+              expect{
+                allowing(responseWrapper).date willReturn Some(cacheEntry.responseTime + 1)
+                allowing(responseWrapper).age willReturn Some(0)
+              }
+              cacheEntry.correctedReceivedAge mustEqual cacheEntry.apparentAge
+            }
+          }
+
+          "when apparentAge < ageValue" >> {
+            "returns ageValue" >> {
+              expect{
+                allowing(responseWrapper).date willReturn Some(cacheEntry.responseTime)
+                allowing(responseWrapper).age willReturn Some(1)
+              }
+              cacheEntry.correctedReceivedAge mustEqual 1
+            }
+          }
+
+          "when no ageValue" >> {
+            "returns apparentAge" >> {
+              expect{
+                allowing(responseWrapper).date willReturn Some(cacheEntry.responseTime)
+                allowing(responseWrapper).age willReturn None
+              }
+              cacheEntry.correctedReceivedAge mustEqual cacheEntry.apparentAge
+            }
+          }
+        }
         //
         //        "responseDelay" >> {
         //          "returning responseTime - requestTime" >> {

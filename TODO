@@ -1,8 +1,11 @@
 CacheEntry implements write/copy onto Response
 My own implementation of FilterServletOutputStream
-CacheEntry Implement isCachable -- HTTP 200, etc.
 Cache should assume an interface
 Interface-ify anything that I mock
+Audit use of one for allowing
+Extract traits where appropriate
+
+CacheEntry Implement isCachable -- HTTP 200, etc.
 The various DateHeader/IntHeaders in CacheEntry are vulnerable to header fragmentation
 
 Locking / Grace Period - prevent dog pile by locking around fetch.

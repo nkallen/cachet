@@ -19,7 +19,7 @@ class CacheEntry(val responseWrapper: ResponseWrapper) {
 
   def apparentAge = (responseTime - dateValue) max 0
 
-  def ageValue = responseWrapper.getIntHeader("Age") map (_.toLong)
+  def ageValue = responseWrapper.age map (_.toLong)
 
   def correctedReceivedAge = ageValue map (_ max apparentAge) getOrElse apparentAge
 
