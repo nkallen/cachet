@@ -12,7 +12,7 @@ import org.specs.mock._
 import org.specs.mock.JMocker._
 import com.twitter.service.cachet.test.mock._
 
-object ResponseCapturerSpec extends Specification with JMocker with ClassMocker {
+object getIResponseCapturerSpec extends Specification with JMocker with ClassMocker {
   "ResponseCapturer" should {
     var response = null: HttpServletResponse
     var responseCapturer = null: ResponseCapturer
@@ -69,12 +69,7 @@ object ResponseCapturerSpec extends Specification with JMocker with ClassMocker 
         val name = "name"
         val value = 1
 
-        "getHeader(n) returns v" >> {
-          responseCapturer.addIntHeader(name, value)
-          responseCapturer.getIntHeader(name) mustEqual Some(value)
-        }
-
-        "writeTo(r) invokes r.addHeader(n, v)" >> {
+        "writeTo(r) invokes r.addIntHeader(n, v)" >> {
           responseCapturer.addIntHeader(name, value)
           expect{one(response).addIntHeader(name, value)}
           responseCapturer.writeTo(response)

@@ -34,12 +34,9 @@ class ResponseCapturer(response: HttpServletResponse, servletOutputStreamCapture
 
   override def setDateHeader(n: String, v: Long) = addDateHeader(n, v)
 
-  def getDateHeader(n: String) =
-    dateHeaders get n
+  def date = dateHeaders get "Date"
 
-  def date = getDateHeader("Date")
-
-  def expires = getDateHeader("Expires")
+  def expires = dateHeaders get "Expires"
 
   private val MaxAge = """\b(?:s-maxage|max-age)=(\d+)\b""".r
 
@@ -48,7 +45,7 @@ class ResponseCapturer(response: HttpServletResponse, servletOutputStreamCapture
          maxAge <- MaxAge findFirstMatchIn cacheControl)
     yield maxAge group (1) toLong
 
-  def age = getIntHeader("Age") map (_.toLong)
+  def age = intHeaders get "Age" map (_.toLong)
 
   override def addCookie(c: Cookie) {
     cookies += c
@@ -60,15 +57,11 @@ class ResponseCapturer(response: HttpServletResponse, servletOutputStreamCapture
 
   override def setHeader(n: String, v: String) = addHeader(n, v)
 
-  def getHeader(n: String) = stringHeaders get n
-
   override def addIntHeader(n: String, v: Int) {
     intHeaders.update(n, v)
   }
 
   override def setIntHeader(n: String, v: Int) = addIntHeader(n, v)
-
-  def getIntHeader(n: String) = intHeaders get n
 
   override def sendError(sc: Int) {
     statusCode = Some(sc)
