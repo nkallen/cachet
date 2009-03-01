@@ -3,7 +3,7 @@ package com.twitter.service.cachet.servlet
 import javax.servlet._
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-import strategy.Receive
+import strategy.{Receive, Fetch}
 
 class CacheProxyServletFilter extends Filter {
   var config: FilterConfig = null
@@ -11,7 +11,7 @@ class CacheProxyServletFilter extends Filter {
 
   def init(c: FilterConfig) {
     config = c
-    get = new Receive(Ehcache, new Fetch(Ehcache, ResponseCapturer, CacheEntry)(_, _, _))
+    get = new Receive(Ehcache, new Fetch(Ehcache, ResponseCapturer, CacheEntry))
   }
 
   def doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
