@@ -9,7 +9,7 @@ import net.sf.ehcache.constructs.web.filter.FilterServletOutputStream
 import scala.collection.mutable._
 import scala.util.matching.Regex
 
-class ResponseWrapper(response: HttpServletResponse) extends HttpServletResponseWrapper(response) {
+class ResponseCapturer(response: HttpServletResponse) extends HttpServletResponseWrapper(response) {
   private val dateHeaders = new HashMap[String, Long]
   private val stringHeaders = new HashMap[String, String]
   private val intHeaders = new HashMap[String, Int]

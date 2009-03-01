@@ -1,4 +1,3 @@
-CacheEntry implements write/copy onto Response
 My own implementation of FilterServletOutputStream
 Cache should assume an interface
 Interface-ify anything that I mock

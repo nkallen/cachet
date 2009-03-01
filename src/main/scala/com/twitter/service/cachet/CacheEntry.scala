@@ -3,11 +3,11 @@ package com.twitter.service.cachet
 import _root_.javax.servlet.http.HttpServletResponse
 import scala.util.matching.Regex
 
-object CacheEntry extends Function[ResponseWrapper, CacheEntry] {
-  def apply(responseWrapper: ResponseWrapper) = new CacheEntry(responseWrapper)
+object CacheEntry extends Function[ResponseCapturer, CacheEntry] {
+  def apply(responseCapturer: ResponseCapturer) = new CacheEntry(responseCapturer)
 }
 
-class CacheEntry(val responseWrapper: ResponseWrapper) {
+class CacheEntry(val responseCapturer: ResponseCapturer) {
   val requestTime = System.currentTimeMillis
   var responseTime = 0.toLong
 
@@ -15,11 +15,11 @@ class CacheEntry(val responseWrapper: ResponseWrapper) {
     responseTime = System.currentTimeMillis
   }
 
-  def dateValue = responseWrapper.date getOrElse responseTime
+  def dateValue = responseCapturer.date getOrElse responseTime
 
   def apparentAge = (responseTime - dateValue) max 0
 
-  def ageValue = responseWrapper.age
+  def ageValue = responseCapturer.age
 
   def correctedReceivedAge = ageValue map (_ max apparentAge) getOrElse apparentAge
 
@@ -31,9 +31,9 @@ class CacheEntry(val responseWrapper: ResponseWrapper) {
 
   def currentAge = correctedInitialAge + residentTime
 
-  def expiresValue = responseWrapper.expires
+  def expiresValue = responseCapturer.expires
 
-  def maxAgeValue = responseWrapper.maxAge
+  def maxAgeValue = responseCapturer.maxAge
 
   def freshnessLifetime =
     maxAgeValue orElse (
@@ -48,6 +48,6 @@ class CacheEntry(val responseWrapper: ResponseWrapper) {
   def isTransparent = isFresh
 
   def writeTo(response: HttpServletResponse) {
-    responseWrapper.writeTo(response)
+    responseCapturer.writeTo(response)
   }
 }

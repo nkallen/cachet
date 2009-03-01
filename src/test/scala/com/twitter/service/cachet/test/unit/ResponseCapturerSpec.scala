@@ -12,24 +12,24 @@ import org.specs.mock._
 import org.specs.mock.JMocker._
 import com.twitter.service.cachet.test.mock._
 
-object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
-  "ResponseWrapper" should {
+object ResponseCapturerSpec extends Specification with JMocker with ClassMocker {
+  "ResponseCapturer" should {
     var response: HttpServletResponse = null
-    var responseWrapper: ResponseWrapper = null
+    var responseCapturer: ResponseCapturer = null
 
     "Servlet Mutators" >> {
       doBefore{
         response = mock[HttpServletResponse]
-        responseWrapper = new ResponseWrapper(response)
+        responseCapturer = new ResponseCapturer(response)
       }
 
       "addDateHeader(x, y) such that" >> {
         val millis = System.currentTimeMillis
 
         "writeTo(r) invokes r.addDateHeader(x, y)" >> {
-          responseWrapper.addDateHeader("Date", millis)
+          responseCapturer.addDateHeader("Date", millis)
           expect{one(response).addDateHeader("Date", millis)}
-          responseWrapper.writeTo(response)
+          responseCapturer.writeTo(response)
         }
       }
 
@@ -37,17 +37,17 @@ object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
         val cookie = new Cookie("key", "value")
 
         "writeTo(r) invokes r.addCookie(c)" >> {
-          responseWrapper.addCookie(cookie)
+          responseCapturer.addCookie(cookie)
           expect{one(response).addCookie(cookie)}
-          responseWrapper.writeTo(response)
+          responseCapturer.writeTo(response)
         }
       }
 
       "setCharacterEncoding(e) such that" >> {
         "writeTo(r) invokes r.setCharacterEncoding(e)" >> {
-          responseWrapper.setCharacterEncoding("UTF-8")
+          responseCapturer.setCharacterEncoding("UTF-8")
           expect{one(response).setCharacterEncoding("UTF-8")}
-          responseWrapper.writeTo(response)
+          responseCapturer.writeTo(response)
         }
       }
 
@@ -56,9 +56,9 @@ object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
         val value = "value"
 
         "writeTo(r) invokes r.addHeader(n, v)" >> {
-          responseWrapper.addHeader(name, value)
+          responseCapturer.addHeader(name, value)
           expect{one(response).addHeader(name, value)}
-          responseWrapper.writeTo(response)
+          responseCapturer.writeTo(response)
         }
       }
 
@@ -67,14 +67,14 @@ object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
         val value = 1
 
         "getHeader(n) returns v" >> {
-          responseWrapper.addIntHeader(name, value)
-          responseWrapper.getIntHeader(name) mustEqual Some(value)
+          responseCapturer.addIntHeader(name, value)
+          responseCapturer.getIntHeader(name) mustEqual Some(value)
         }
 
         "writeTo(r) invokes r.addHeader(n, v)" >> {
-          responseWrapper.addIntHeader(name, value)
+          responseCapturer.addIntHeader(name, value)
           expect{one(response).addIntHeader(name, value)}
-          responseWrapper.writeTo(response)
+          responseCapturer.writeTo(response)
         }
       }
 
@@ -82,9 +82,9 @@ object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
         val sc = 200
 
         "writeTo(r) invokes r.setStatus(sc)" >> {
-          responseWrapper.sendError(sc)
+          responseCapturer.sendError(sc)
           expect{one(response).setStatus(sc)}
-          responseWrapper.writeTo(response)
+          responseCapturer.writeTo(response)
         }
       }
 
@@ -92,9 +92,9 @@ object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
         val sc = 200
 
         "writeTo(r) invokes r.setStatus(sc)" >> {
-          responseWrapper.setStatus(sc)
+          responseCapturer.setStatus(sc)
           expect{one(response).setStatus(sc)}
-          responseWrapper.writeTo(response)
+          responseCapturer.writeTo(response)
         }
       }
 
@@ -102,9 +102,9 @@ object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
         val ct = "text/html"
 
         "writeTo(r) invokes r.setContentType(sc)" >> {
-          responseWrapper.setContentType(ct)
+          responseCapturer.setContentType(ct)
           expect{one(response).setContentType(ct)}
-          responseWrapper.writeTo(response)
+          responseCapturer.writeTo(response)
         }
       }
 
@@ -112,17 +112,17 @@ object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
         val l = Locale.CANADA
 
         "writeTo(r) invokes r.setLocale(l)" >> {
-          responseWrapper.setLocale(l)
+          responseCapturer.setLocale(l)
           expect{one(response).setLocale(l)}
-          responseWrapper.writeTo(response)
+          responseCapturer.writeTo(response)
         }
       }
 
       "setContentLength(l) such that" >> {
         "writeTo(r) invokes r.setContentLength(l)" >> {
-          responseWrapper.setContentLength(100)
+          responseCapturer.setContentLength(100)
           expect{one(response).setContentLength(100)}
-          responseWrapper.writeTo(response)
+          responseCapturer.writeTo(response)
         }
 
       }
@@ -133,8 +133,8 @@ object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
           val servletOutputStream = new FilterServletOutputStream(outputStream)
           expect{one(response).getOutputStream willReturn servletOutputStream}
 
-          responseWrapper.getWriter.print(1)
-          responseWrapper.writeTo(response)
+          responseCapturer.getWriter.print(1)
+          responseCapturer.writeTo(response)
           outputStream.toString
         }
       }
@@ -145,8 +145,8 @@ object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
           val servletOutputStream = new FilterServletOutputStream(outputStream)
           expect{one(response).getOutputStream willReturn servletOutputStream}
 
-          responseWrapper.getOutputStream.write(1)
-          responseWrapper.writeTo(response)
+          responseCapturer.getOutputStream.write(1)
+          responseCapturer.writeTo(response)
           outputStream.toByteArray.apply(0) mustEqual 1
         }
       }
@@ -155,19 +155,19 @@ object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
     "Freshness Information" >> {
       "maxAge" >> {
         "when there is a max-age control" >> {
-          responseWrapper.setHeader("Cache-Control", "max-age=100")
-          responseWrapper.maxAge mustEqual Some(100)
+          responseCapturer.setHeader("Cache-Control", "max-age=100")
+          responseCapturer.maxAge mustEqual Some(100)
         }
 
         "when there is a s-maxage control" >> {
-          responseWrapper.setHeader("Cache-Control", "s-maxage=100")
-          responseWrapper.maxAge mustEqual Some(100)
+          responseCapturer.setHeader("Cache-Control", "s-maxage=100")
+          responseCapturer.maxAge mustEqual Some(100)
         }
 
         "when both a max-age and s-maxage are present" >> {
           "returns s-maxage" >> {
-            responseWrapper.setHeader("Cache-Control", "s-maxage=1, max-age=2")
-            responseWrapper.maxAge mustEqual Some(1)
+            responseCapturer.setHeader("Cache-Control", "s-maxage=1, max-age=2")
+            responseCapturer.maxAge mustEqual Some(1)
           }
         }
       }
@@ -193,13 +193,13 @@ object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
         never(response).setBufferSize(an[Int])
       }
 
-      responseWrapper.flushBuffer
-      responseWrapper.reset
-      responseWrapper.resetBuffer
-      responseWrapper.setBufferSize(100)
+      responseCapturer.flushBuffer
+      responseCapturer.reset
+      responseCapturer.resetBuffer
+      responseCapturer.setBufferSize(100)
 
-      responseWrapper.isCommitted mustBe false
-      responseWrapper.getBufferSize mustEqual 0
+      responseCapturer.isCommitted mustBe false
+      responseCapturer.getBufferSize mustEqual 0
     }
   }
 }
