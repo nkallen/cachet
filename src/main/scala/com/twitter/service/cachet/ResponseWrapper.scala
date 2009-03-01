@@ -1,6 +1,5 @@
 package com.twitter.service.cachet
 
-
 import java.io.{OutputStreamWriter, PrintWriter, ByteArrayOutputStream}
 import java.lang.String
 import javax.servlet.ServletOutputStream
@@ -17,6 +16,7 @@ class ResponseWrapper(response: HttpServletResponse) extends HttpServletResponse
   private val cookies = new HashSet[Cookie]
   private val outputStream = new ByteArrayOutputStream
   private val servletOutputStream = new FilterServletOutputStream(outputStream)
+  private var characterEncoding = None: Option[String]
   private var writer = None: Option[PrintWriter]
   private var statusCode = None: Option[Int]
   private var contentType = None: Option[String]
@@ -90,11 +90,17 @@ class ResponseWrapper(response: HttpServletResponse) extends HttpServletResponse
 
   override def getOutputStream = servletOutputStream
 
-  override def setCharacterEncoding(charset: String) = {}
-
-  override def getCharacterEncoding = ""
+  override def setCharacterEncoding(charset: String) = {
+    characterEncoding = Some(charset)
+  }
 
   /* FIXME - implement these: */
+  override def getCharacterEncoding = characterEncoding getOrElse "ISO-8859-1" // this needs to consider contentType and locale
+  override def sendRedirect(location: String) = {}
+
+  override def containsHeader(name: String) = false
+  /* */
+
   override def flushBuffer = {}
 
   override def reset = {}
@@ -103,14 +109,9 @@ class ResponseWrapper(response: HttpServletResponse) extends HttpServletResponse
 
   override def isCommitted = false
 
-  override def sendRedirect(location: String) = {}
-
-  override def containsHeader(name: String) = false
+  override def getBufferSize = 0
 
   override def setBufferSize(size: Int) = {}
-
-  override def getBufferSize = 0
-  /* */
 
   def writeTo(response: HttpServletResponse) {
     for ((key, value) <- dateHeaders)
@@ -129,7 +130,16 @@ class ResponseWrapper(response: HttpServletResponse) extends HttpServletResponse
       response.setContentLength(l)
     for (l <- locale)
       response.setLocale(l)
+    for (ce <- characterEncoding)
+      response.setCharacterEncoding(ce)
+
+    this.flush()
     if (outputStream.size > 0)
       outputStream.writeTo(response.getOutputStream)
+  }
+
+  private def flush() {
+    writer map (_.flush)
+    outputStream.flush
   }
 }

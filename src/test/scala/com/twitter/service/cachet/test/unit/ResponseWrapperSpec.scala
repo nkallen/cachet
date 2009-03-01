@@ -48,6 +48,14 @@ object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
         }
       }
 
+      "setCharacterEncoding(e) such that" >> {
+        "writeTo(r) invokes r.setCharacterEncoding(e)" >> {
+          responseWrapper.setCharacterEncoding("UTF-8")
+          expect{one(response).setCharacterEncoding("UTF-8")}
+          responseWrapper.writeTo(response)
+        }
+      }
+
       "addHeader(n, v) such that" >> {
         val name = "name"
         val value = "value"
@@ -145,22 +153,45 @@ object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
       }
 
       "getWriter such that" >> {
-        "" >> {
-          //          responseWrapper.getWriter.print("foo")
-          //          responseWrapper.writeTo(response)
+        "writeTo(r) writes to r.getOutputStream" >> {
+          val outputStream = new ByteArrayOutputStream
+          val servletOutputStream = new FilterServletOutputStream(outputStream)
+          expect{one(response).getOutputStream willReturn servletOutputStream}
+
+          responseWrapper.getWriter.print(1)
+          responseWrapper.writeTo(response)
+          outputStream.toString
         }
       }
 
       "getOutputStream such that" >> {
-        "writeTo(r) writes any data written to the output stream" >> {
+        "writeTo(r) writes to r.getOutputStream" >> {
           val outputStream = new ByteArrayOutputStream
           val servletOutputStream = new FilterServletOutputStream(outputStream)
           expect{one(response).getOutputStream willReturn servletOutputStream}
+
           responseWrapper.getOutputStream.write(1)
           responseWrapper.writeTo(response)
           outputStream.toByteArray.apply(0) mustEqual 1
         }
       }
+    }
+
+    "not delegate buffering commands to the response" >> {
+      expect{
+        never(response).flushBuffer
+        never(response).reset
+        never(response).resetBuffer
+        never(response).setBufferSize(an[Int])
+      }
+
+      responseWrapper.flushBuffer
+      responseWrapper.reset
+      responseWrapper.resetBuffer
+      responseWrapper.setBufferSize(100)
+
+      responseWrapper.isCommitted mustBe false
+      responseWrapper.getBufferSize mustEqual 0
     }
   }
 }
