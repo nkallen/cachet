@@ -9,18 +9,18 @@ import org.specs.mock.JMocker._
 import com.twitter.service.cachet.test.mock._
 
 object ProxyRequestSpec extends Specification with JMocker with ClassMocker {
-  var exchange: HttpExchange = null
-  var proxyRequest: ProxyRequest = null
-  var request: FakeHttpServletRequest = null
-  var response: HttpServletResponse = null
-  var client: HttpClient = null
+  var exchange = null: HttpExchange
+  var proxyRequest = null: ProxyRequest
+  var request = null: FakeHttpServletRequest
+  var response = null: HttpServletResponse
+  var client = null: HttpClient
 
   "ProxyRequest" should {
     doBefore{
       exchange = mock[HttpExchange]
       client = mock[HttpClient]
       request = new FakeHttpServletRequest
-      response = new FakeHttpServletResponse
+      response = mock[HttpServletResponse]
 
       proxyRequest = new ProxyRequest(client, (blah, blar) => exchange)
     }

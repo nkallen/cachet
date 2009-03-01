@@ -6,8 +6,8 @@ import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
 import org.mortbay.jetty.client.HttpClient
 
 class ProxyServlet extends HttpServlet {
-  var config: ServletConfig = null
-  var proxyRequest: ProxyRequest = null
+  var config = null: ServletConfig
+  var proxyRequest = null: ProxyRequest
 
   override def init(c: ServletConfig) {
     config = c

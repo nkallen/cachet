@@ -14,8 +14,8 @@ import com.twitter.service.cachet.test.mock._
 
 object ResponseCapturerSpec extends Specification with JMocker with ClassMocker {
   "ResponseCapturer" should {
-    var response: HttpServletResponse = null
-    var responseCapturer: ResponseCapturer = null
+    var response = null: HttpServletResponse
+    var responseCapturer = null: ResponseCapturer
 
     "Servlet Mutators" >> {
       doBefore{

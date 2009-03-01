@@ -1,10 +1,12 @@
 package com.twitter.service.cachet
 
+import org.mortbay.jetty
 import org.mortbay.jetty.bio.SocketConnector
 import org.mortbay.jetty.servlet.{ServletHolder, Context}
+import servlet.ProxyServlet
 
 class Server {
-  val server = new org.mortbay.jetty.Server
+  val server = new jetty.Server
   val connector = new SocketConnector
   val root = new Context(server, "/", Context.SESSIONS)
   val servlet = new ProxyServlet

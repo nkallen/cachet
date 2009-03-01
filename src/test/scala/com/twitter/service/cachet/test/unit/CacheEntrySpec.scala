@@ -11,16 +11,16 @@ import com.twitter.service.cachet.test.mock._
 
 object CacheEntrySpec extends Specification with JMocker with ClassMocker {
   "CacheEntry" should {
-    var responseCapturer: ResponseCapturer = null
-    var cacheEntry: CacheEntry = null
-    var response: HttpServletResponse = null
+    var responseCapturer = null: ResponseCapturer
+    var cacheEntry = null: CacheEntry
+    var response = null: HttpServletResponse
 
     "implement RFC 2616" >> {
       doBefore{
-        response = new FakeHttpServletResponse
+        response = mock[HttpServletResponse]
         responseCapturer = mock[ResponseCapturer]
         cacheEntry = new CacheEntry(responseCapturer)
-        cacheEntry.noteResponseTime() // FIXME - this feels wrong?
+        cacheEntry.noteResponseTime() // FIXME - this feels wrong
       }
 
       "age calculations" >> {

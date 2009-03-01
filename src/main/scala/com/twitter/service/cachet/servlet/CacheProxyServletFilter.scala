@@ -6,8 +6,8 @@ import javax.servlet.http.HttpServletResponse
 import strategy.{Receive, Fetch}
 
 class CacheProxyServletFilter extends Filter {
-  var config: FilterConfig = null
-  var get: Receive = null
+  var config = null: FilterConfig
+  var get = null: Receive
 
   def init(c: FilterConfig) {
     config = c

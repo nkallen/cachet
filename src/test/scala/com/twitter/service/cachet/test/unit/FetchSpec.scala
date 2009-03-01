@@ -7,16 +7,17 @@ import org.specs._
 import org.specs.mock._
 import org.specs.mock.JMocker._
 import com.twitter.service.cachet.test.mock._
+import strategy.Fetch
 
 object FetchSpec extends Specification with JMocker with ClassMocker {
   "Fetch" should {
-    var fetch: Fetch = null
-    var cache: Cache = null
-    var chain: FilterChain = null
-    var request: HttpServletRequest = null
-    var response: HttpServletResponse = null
-    var responseCapturer: ResponseCapturer = null
-    var cacheEntry: CacheEntry = null
+    var fetch = null: Fetch
+    var cache = null: Cache
+    var chain = null: FilterChain
+    var request = null: HttpServletRequest
+    var response = null: HttpServletResponse
+    var responseCapturer = null: ResponseCapturer
+    var cacheEntry = null: CacheEntry
 
     doBefore{
       cache = mock[Cache]
@@ -24,7 +25,7 @@ object FetchSpec extends Specification with JMocker with ClassMocker {
       cacheEntry = mock[CacheEntry]
       request = mock[HttpServletRequest]
       response = mock[HttpServletResponse]
-      responseCapturer = new ResponseCapturer(response)
+      responseCapturer = mock[ResponseCapturer]
 
       fetch = new Fetch(cache, response => responseCapturer, responseCapturer => cacheEntry)
     }

@@ -11,12 +11,12 @@ import strategy.Receive
 
 object ReceiveSpec extends Specification with JMocker with ClassMocker {
   "Receive" should {
-    var receive: Receive = null
-    var cache: Cache = null
-    var chain: FilterChain = null
-    var request: HttpServletRequest = null
-    var response: HttpServletResponse = null
-    var cacheEntry: CacheEntry = null
+    var receive = null: Receive
+    var cache = null: Cache
+    var chain = null: FilterChain
+    var request = null: HttpServletRequest
+    var response = null: HttpServletResponse
+    var cacheEntry = null: CacheEntry
 
     doBefore{
       cache = mock[Cache]
