@@ -20,7 +20,7 @@ object CacheEntrySpec extends Specification with JMocker with ClassMocker {
         response = new FakeHttpServletResponse
         responseWrapper = mock[ResponseWrapper]
         cacheEntry = new CacheEntry(responseWrapper)
-        cacheEntry.noteResponseTime()
+        cacheEntry.noteResponseTime() // FIXME - this feels wrong?
       }
 
       "age calculations" >> {
@@ -44,9 +44,8 @@ object CacheEntrySpec extends Specification with JMocker with ClassMocker {
         "apparentAge" >> {
           "when dateValue <= responseTime" >> {
             "returns responseTime - dateValue" >> {
-              val delta = 10
-              expect{allowing(responseWrapper).date willReturn Some(cacheEntry.responseTime - delta)}
-              cacheEntry.apparentAge mustEqual delta
+              expect{allowing(responseWrapper).date willReturn Some(cacheEntry.responseTime - 10)}
+              cacheEntry.apparentAge mustEqual 10
             }
           }
 
@@ -63,7 +62,7 @@ object CacheEntrySpec extends Specification with JMocker with ClassMocker {
             "returns apparentAge" >> {
               expect{
                 allowing(responseWrapper).date willReturn Some(cacheEntry.responseTime + 1)
-                allowing(responseWrapper).age willReturn Some(0)
+                allowing(responseWrapper).age willReturn Some(0.toLong)
               }
               cacheEntry.correctedReceivedAge mustEqual cacheEntry.apparentAge
             }
@@ -73,7 +72,7 @@ object CacheEntrySpec extends Specification with JMocker with ClassMocker {
             "returns ageValue" >> {
               expect{
                 allowing(responseWrapper).date willReturn Some(cacheEntry.responseTime)
-                allowing(responseWrapper).age willReturn Some(1)
+                allowing(responseWrapper).age willReturn Some(1.toLong)
               }
               cacheEntry.correctedReceivedAge mustEqual 1
             }
@@ -89,107 +88,104 @@ object CacheEntrySpec extends Specification with JMocker with ClassMocker {
             }
           }
         }
-        //
-        //        "responseDelay" >> {
-        //          "returning responseTime - requestTime" >> {
-        //            cacheEntry.responseDelay mustEqual cacheEntry.responseTime - cacheEntry.requestTime
-        //          }
-        //        }
-        //
-        //        "correctedInitialAge" >> {
-        //          "returning correctedReceivedAge + responseDelay" >> {
-        //            responseWrapper.setDateHeader("Date", cacheEntry.responseTime)
-        //            responseWrapper.setIntHeader("Age", 10)
-        //            cacheEntry.correctedInitialAge mustEqual (10 + cacheEntry.responseDelay)
-        //          }
-        //        }
-        //
-        //        "residentTime" >> {
-        //          "returning now - responseTime" >> {
-        //            cacheEntry.residentTime mustEqual (System.currentTimeMillis - cacheEntry.responseTime)
-        //          }
-        //        }
-        //
-        //        "currentAge" >> {
-        //          "returning correctedInitialAge + residentTime" >> {
-        //            responseWrapper.setDateHeader("Date", cacheEntry.responseTime)
-        //            responseWrapper.setIntHeader("Age", 10)
-        //            cacheEntry.currentAge mustEqual (cacheEntry.correctedInitialAge + cacheEntry.residentTime)
-        //          }
-        //        }
-        //
-        //        "maxAgeValue" >> {
-        //          "when there is a max-age control" >> {
-        //            responseWrapper.setHeader("Cache-Control", "max-age=100")
-        //            cacheEntry.maxAgeValue mustEqual Some(100)
-        //          }
-        //
-        //          "when there is a s-maxage control" >> {
-        //            responseWrapper.setHeader("Cache-Control", "s-maxage=100")
-        //            cacheEntry.maxAgeValue mustEqual Some(100)
-        //          }
-        //
-        //          "when both a max-age and s-maxage are present" >> {
-        //            "returns s-maxage" >> {
-        //              responseWrapper.setHeader("Cache-Control", "s-maxage=1, max-age=2")
-        //              cacheEntry.maxAgeValue mustEqual Some(1)
-        //            }
-        //          }
-        //        }
-        //      }
-        //
-        //      "expiration calculations" >> {
-        //        "when there is a max-age directive" >> {
-        //          "freshnessLifetime" >> {
-        //            "returns maxAgeValue" >> {
-        //              responseWrapper.setHeader("Cache-Control", "s-maxage=1")
-        //              cacheEntry.freshnessLifetime mustEqual Some(1)
-        //            }
-        //          }
-        //        }
-        //
-        //        "when there is no max-age directive" >> {
-        //          "when there is an Expires header" >> {
-        //            "returns expiresValue - dateValue" >> {
-        //              responseWrapper.setDateHeader("Date", cacheEntry.responseTime)
-        //              responseWrapper.setDateHeader("Expires", cacheEntry.responseTime + 10)
-        //              cacheEntry.freshnessLifetime mustEqual Some(10)
-        //            }
-        //          }
-        //        }
-        //
-        //        "isFresh" >> {
-        //          "when freshnessLifetime >= currentAge" >> {
-        //            "returns true" >> {
-        //              responseWrapper.setHeader("Cache-Control", "s-maxage=100")
-        //              responseWrapper.setDateHeader("Date", cacheEntry.responseTime)
-        //              cacheEntry.isFresh must beTrue
-        //            }
-        //          }
-        //
-        //          "when freshnessLifetime < currentAge" >> {
-        //            "returns false" >> {
-        //              responseWrapper.setHeader("Cache-Control", "s-maxage=1")
-        //              responseWrapper.setDateHeader("Date", cacheEntry.responseTime - 100)
-        //              cacheEntry.isFresh must beFalse
-        //            }
-        //          }
-        //
-        //          "when there is no freshnessLifetime" >> {
-        //            "returns false" >> {
-        //              cacheEntry.isFresh must beFalse
-        //            }
-        //          }
-        //        }
-        //      }
+
+        "responseDelay" >> {
+          "returning responseTime - requestTime" >> {
+            cacheEntry.responseDelay mustEqual cacheEntry.responseTime - cacheEntry.requestTime
+          }
+        }
+
+        "correctedInitialAge" >> {
+          "returning correctedReceivedAge + responseDelay" >> {
+            expect{
+              allowing(responseWrapper).date willReturn Some(cacheEntry.responseTime)
+              allowing(responseWrapper).age willReturn Some(10.toLong)
+            }
+            cacheEntry.correctedInitialAge mustEqual (10 + cacheEntry.responseDelay)
+          }
+        }
+
+        "residentTime" >> {
+          "returning now - responseTime" >> {
+            cacheEntry.residentTime mustEqual (System.currentTimeMillis - cacheEntry.responseTime)
+          }
+        }
+
+        "currentAge" >> {
+          "returning correctedInitialAge + residentTime" >> {
+            expect{
+              allowing(responseWrapper).date willReturn Some(cacheEntry.responseTime)
+              allowing(responseWrapper).age willReturn Some(10.toLong)
+            }
+            cacheEntry.currentAge mustEqual (cacheEntry.correctedInitialAge + cacheEntry.residentTime)
+          }
+        }
       }
-      //
-      //    "writeTo" >> {
-      //      "delegates to the responseWrapper" >> {
-      //        val response = new FakeHttpServletResponse
-      //        //        expect{one(responseWrapper).writeTo(response)}
-      //        cacheEntry.writeTo(response)
-      //      }
+
+      "expiration calculations" >> {
+        "when there is a max-age directive" >> {
+          "freshnessLifetime" >> {
+            "returns maxAgeValue" >> {
+              expect{allowing(responseWrapper).maxAge willReturn Some(1)}
+              cacheEntry.freshnessLifetime mustEqual Some(1)
+            }
+          }
+        }
+
+        "when there is no max-age directive" >> {
+          "when there is an Expires header" >> {
+            "returns expiresValue - dateValue" >> {
+              expect{
+                allowing(responseWrapper).maxAge willReturn None
+                allowing(responseWrapper).date willReturn Some(cacheEntry.responseTime)
+                allowing(responseWrapper).expires willReturn Some(cacheEntry.responseTime + 10)
+              }
+              cacheEntry.freshnessLifetime mustEqual Some(10)
+            }
+          }
+        }
+
+        "isFresh" >> {
+          "when freshnessLifetime >= currentAge" >> {
+            "returns true" >> {
+              expect{
+                allowing(responseWrapper).maxAge willReturn Some(100.toLong)
+                allowing(responseWrapper).age willReturn Some(1.toLong)
+                allowing(responseWrapper).date willReturn None
+              }
+              cacheEntry.isFresh must beTrue
+            }
+          }
+
+          "when freshnessLifetime < currentAge" >> {
+            "returns false" >> {
+              expect{
+                allowing(responseWrapper).maxAge willReturn Some(1.toLong)
+                allowing(responseWrapper).age willReturn Some(100.toLong)
+                allowing(responseWrapper).date willReturn None
+              }
+              cacheEntry.isFresh must beFalse
+            }
+          }
+
+          "when there is no freshnessLifetime" >> {
+            "returns false" >> {
+              expect{
+                allowing(responseWrapper).maxAge willReturn None
+                allowing(responseWrapper).expires willReturn None
+              }
+              cacheEntry.isFresh must beFalse
+            }
+          }
+        }
+      }
+
+      "writeTo" >> {
+        "delegates to the responseWrapper" >> {
+          expect{one(responseWrapper).writeTo(response)}
+          cacheEntry.writeTo(response)
+        }
+      }
     }
   }
 }

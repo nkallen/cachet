@@ -19,7 +19,7 @@ class CacheEntry(val responseWrapper: ResponseWrapper) {
 
   def apparentAge = (responseTime - dateValue) max 0
 
-  def ageValue = responseWrapper.age map (_.toLong)
+  def ageValue = responseWrapper.age
 
   def correctedReceivedAge = ageValue map (_ max apparentAge) getOrElse apparentAge
 
@@ -31,13 +31,9 @@ class CacheEntry(val responseWrapper: ResponseWrapper) {
 
   def currentAge = correctedInitialAge + residentTime
 
-  def expiresValue = responseWrapper.getDateHeader("Expires")
+  def expiresValue = responseWrapper.expires
 
-  private val MaxAge = """\b(?:s-maxage|max-age)=(\d+)\b""".r
-
-  def maxAgeValue =
-    for (cacheControl <- responseWrapper.getHeader("Cache-Control"); maxAge <- MaxAge findFirstMatchIn cacheControl)
-    yield maxAge group (1) toLong
+  def maxAgeValue = responseWrapper.maxAge
 
   def freshnessLifetime =
     maxAgeValue orElse (

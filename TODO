@@ -4,6 +4,7 @@ Cache should assume an interface
 Interface-ify anything that I mock
 Audit use of one for allowing
 Extract traits where appropriate
+ResponseTime stuff is weird
 
 CacheEntry Implement isCachable -- HTTP 200, etc.
 The various DateHeader/IntHeaders in CacheEntry are vulnerable to header fragmentation
@@ -30,3 +31,33 @@ Implement validation schemes:
 == Maybe ==
 
 . Validation Servlet
+
+
+== Notes ==
+
+  private val MaxAge = """\b(?:s-maxage|max-age)=(\d+)\b""".r
+
+  def maxAgeValue =
+    for (cacheControl <- responseWrapper.getHeader("Cache-Control");
+         maxAge <- MaxAge findFirstMatchIn cacheControl)
+    yield maxAge group (1) toLong
+
+
+        "maxAgeValue" >> {
+          "when there is a max-age control" >> {
+            responseWrapper.setHeader("Cache-Control", "max-age=100")
+            cacheEntry.maxAgeValue mustEqual Some(100)
+          }
+
+          "when there is a s-maxage control" >> {
+            responseWrapper.setHeader("Cache-Control", "s-maxage=100")
+            cacheEntry.maxAgeValue mustEqual Some(100)
+          }
+
+          "when both a max-age and s-maxage are present" >> {
+            "returns s-maxage" >> {
+              responseWrapper.setHeader("Cache-Control", "s-maxage=1, max-age=2")
+              cacheEntry.maxAgeValue mustEqual Some(1)
+            }
+          }
+        }

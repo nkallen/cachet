@@ -34,7 +34,11 @@ class ResponseWrapper(response: HttpServletResponse) extends HttpServletResponse
 
   def date = getDateHeader("Date")
 
-  def age = getIntHeader("Age")
+  def expires = getDateHeader("Expires")
+
+  def maxAge: Option[Long] = Some(1.toLong)
+
+  def age = getIntHeader("Age") map (_.toLong)
 
   override def addCookie(c: Cookie) {
     cookies += c
