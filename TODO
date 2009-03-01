@@ -2,8 +2,8 @@ Cache should assume an interface
 Interface-ify anything that I mock
 Audit use of one for allowing
 Extract traits where appropriate
+
 Learn . vs ' ' method invocation convention
-unify mustBe true / must beTrue / etc.
 
 CacheEntry Implement isCachable -- HTTP 200, etc.
 The various DateHeader/IntHeaders in CacheEntry are vulnerable to header fragmentation

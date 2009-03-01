@@ -207,7 +207,7 @@ object ResponseCapturerSpec extends Specification with JMocker with ClassMocker 
       responseCapturer.resetBuffer
       responseCapturer.setBufferSize(100)
 
-      responseCapturer.isCommitted mustBe false
+      responseCapturer.isCommitted must beFalse
       responseCapturer.getBufferSize mustEqual 0
     }
   }
