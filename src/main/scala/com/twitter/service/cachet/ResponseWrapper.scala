@@ -1,10 +1,12 @@
 package com.twitter.service.cachet
 
-import java.io.ByteArrayOutputStream
+
+import java.io.{OutputStreamWriter, PrintWriter, ByteArrayOutputStream}
 import java.lang.String
 import javax.servlet.ServletOutputStream
 import java.util.Locale
 import javax.servlet.http._
+import net.sf.ehcache.constructs.web.filter.FilterServletOutputStream
 import scala.collection.mutable._
 import scala.util.matching.Regex
 
@@ -13,6 +15,9 @@ class ResponseWrapper(response: HttpServletResponse) extends HttpServletResponse
   private val stringHeaders = new HashMap[String, String]
   private val intHeaders = new HashMap[String, Int]
   private val cookies = new HashSet[Cookie]
+  private val outputStream = new ByteArrayOutputStream
+  private val servletOutputStream = new FilterServletOutputStream(outputStream)
+  private var writer = None: Option[PrintWriter]
   private var statusCode = None: Option[Int]
   private var contentType = None: Option[String]
   private var locale = None: Option[Locale]
@@ -75,9 +80,15 @@ class ResponseWrapper(response: HttpServletResponse) extends HttpServletResponse
     contentLength = Some(len)
   }
 
-  override def getWriter = null
+  override def getWriter = {
+    writer getOrElse {
+      val printWriter = new PrintWriter(new OutputStreamWriter(outputStream, getCharacterEncoding), true)
+      writer = Some(printWriter)
+      printWriter
+    }
+  }
 
-  override def getOutputStream = null
+  override def getOutputStream = servletOutputStream
 
   override def setCharacterEncoding(charset: String) = {}
 
@@ -118,5 +129,7 @@ class ResponseWrapper(response: HttpServletResponse) extends HttpServletResponse
       response.setContentLength(l)
     for (l <- locale)
       response.setLocale(l)
+    if (outputStream.size > 0)
+      outputStream.writeTo(response.getOutputStream)
   }
 }

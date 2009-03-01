@@ -1,17 +1,18 @@
 package com.twitter.service.cachet.test.unit
 
+import _root_.javax.servlet.ServletOutputStream
 import com.twitter.service.cachet._
-import java.io.PrintWriter
+import java.io.{PrintWriter, OutputStream, ByteArrayOutputStream}
 import java.lang.String
 import java.util.Locale
 import javax.servlet.http._
-
+import net.sf.ehcache.constructs.web.filter.FilterServletOutputStream
 import org.specs._
 import org.specs.mock._
 import org.specs.mock.JMocker._
 import com.twitter.service.cachet.test.mock._
 
-object ResponseWrapperSpec extends Specification with JMocker {
+object ResponseWrapperSpec extends Specification with JMocker with ClassMocker {
   "ResponseWrapper" should {
     var response: HttpServletResponse = null
     var responseWrapper: ResponseWrapper = null
@@ -144,11 +145,21 @@ object ResponseWrapperSpec extends Specification with JMocker {
       }
 
       "getWriter such that" >> {
-
+        "" >> {
+          //          responseWrapper.getWriter.print("foo")
+          //          responseWrapper.writeTo(response)
+        }
       }
 
       "getOutputStream such that" >> {
-
+        "writeTo(r) writes any data written to the output stream" >> {
+          val outputStream = new ByteArrayOutputStream
+          val servletOutputStream = new FilterServletOutputStream(outputStream)
+          expect{one(response).getOutputStream willReturn servletOutputStream}
+          responseWrapper.getOutputStream.write(1)
+          responseWrapper.writeTo(response)
+          outputStream.toByteArray.apply(0) mustEqual 1
+        }
       }
     }
   }
