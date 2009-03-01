@@ -16,12 +16,12 @@ object ReceiveSpec extends Specification with JMocker with ClassMocker {
     var chain = null: FilterChain
     var request = null: HttpServletRequest
     var response = null: HttpServletResponse
-    var cacheEntry = null: CacheEntry
+    var cacheEntry = null: FreshResponseCacheEntry
 
     doBefore{
       cache = mock[Cache]
       chain = mock[FilterChain]
-      cacheEntry = mock[CacheEntry]
+      cacheEntry = mock[FreshResponseCacheEntry]
       request = mock[HttpServletRequest]
       response = mock[HttpServletResponse]
 

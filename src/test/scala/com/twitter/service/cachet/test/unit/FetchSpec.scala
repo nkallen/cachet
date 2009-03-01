@@ -17,12 +17,12 @@ object FetchSpec extends Specification with JMocker with ClassMocker {
     var request = null: HttpServletRequest
     var response = null: HttpServletResponse
     var responseCapturer = null: ResponseCapturer
-    var cacheEntry = null: CacheEntry
+    var cacheEntry = null: FreshResponseCacheEntry
 
     doBefore{
       cache = mock[Cache]
       chain = mock[FilterChain]
-      cacheEntry = mock[CacheEntry]
+      cacheEntry = mock[FreshResponseCacheEntry]
       request = mock[HttpServletRequest]
       response = mock[HttpServletResponse]
       responseCapturer = mock[ResponseCapturer]

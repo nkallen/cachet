@@ -8,13 +8,13 @@ object Ehcache extends Cache {
   def fetch(key: String) = {
     val element = cache.get(key)
     if (element != null) {
-      Some(element.getObjectValue.asInstanceOf[CacheEntry])
+      Some(element.getObjectValue.asInstanceOf[FreshResponseCacheEntry])
     } else {
       None
     }
   }
 
-  def put(key: String, value: CacheEntry) {
+  def put(key: String, value: FreshResponseCacheEntry) {
     cache.put(new Element(key, value))
   }
 }

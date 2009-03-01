@@ -1,4 +1,3 @@
-DI Stream capturer
 Fix GetSpec
 
 Interface-ify anything that I mock / Extract traits where appropriate
