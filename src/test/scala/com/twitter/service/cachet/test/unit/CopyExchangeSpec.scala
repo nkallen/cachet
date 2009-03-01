@@ -49,7 +49,7 @@ object CopyExchangeSpec extends Specification with JMocker with ClassMocker {
         "copies the content to the response" >> {
           val content = mock[Buffer]
           val outputStream = mock[ServletOutputStream]
-          expect{one(response).getOutputStream willReturn (outputStream)}
+          expect{allowing(response).getOutputStream willReturn (outputStream)}
           expect{one(content).writeTo(outputStream)}
           exchange.onResponseContent(content)
         }

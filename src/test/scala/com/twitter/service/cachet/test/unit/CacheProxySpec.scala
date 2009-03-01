@@ -35,10 +35,10 @@ object CacheProxySpec extends Specification with JMocker with ClassMocker {
       def itFetches {
         expect{one(chain).doFilter(request, responseCapturer)}
       }
-      def whenTheResourceIsCachable(b: Boolean) {expect{one(cacheEntry).isCachable willReturn b}}
+      def whenTheResourceIsCachable(b: Boolean) {expect{allowing(cacheEntry).isCachable willReturn b}}
 
       "when there is a cache miss" >> {
-        def whenThereIsACacheMiss {expect{one(cache).get(request.queryString) willReturn (null: Element)}}
+        def whenThereIsACacheMiss {expect{allowing(cache).get(request.queryString) willReturn (null: Element)}}
 
         "when the resource is cachable" >> {
           "invokes the filter, storing the result" >> {
@@ -64,8 +64,8 @@ object CacheProxySpec extends Specification with JMocker with ClassMocker {
       }
 
       "when there is a cache hit" >> {
-        def whenThereIsACacheHit {expect{one(cache).get(request.queryString) willReturn (new Element(request.queryString, cacheEntry))}}
-        def whenTheCacheEntryIsTransparent(b: Boolean) {expect{one(cacheEntry).isTransparent willReturn b}}
+        def whenThereIsACacheHit {expect{allowing(cache).get(request.queryString) willReturn (new Element(request.queryString, cacheEntry))}}
+        def whenTheCacheEntryIsTransparent(b: Boolean) {expect{allowing(cacheEntry).isTransparent willReturn b}}
 
         "when the cache entry is tranparent" >> {
           "returns the response from cache" >> {

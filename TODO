@@ -1,4 +1,3 @@
-My own implementation of FilterServletOutputStream
 Cache should assume an interface
 Interface-ify anything that I mock
 Audit use of one for allowing
