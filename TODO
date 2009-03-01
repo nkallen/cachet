@@ -1,5 +1,4 @@
 DI Stream capturer
-Unify whether : appears before or after =
 Fix GetSpec
 
 Interface-ify anything that I mock / Extract traits where appropriate
