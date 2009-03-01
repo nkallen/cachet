@@ -16,11 +16,14 @@ object ResponseCapturerSpec extends Specification with JMocker with ClassMocker 
   "ResponseCapturer" should {
     var response = null: HttpServletResponse
     var responseCapturer = null: ResponseCapturer
+    var streamCapturer = null: ServletOutputStreamCapturer
 
     "Servlet Mutators" >> {
       doBefore{
         response = mock[HttpServletResponse]
-        responseCapturer = new ResponseCapturer(response)
+        streamCapturer = mock[ServletOutputStreamCapturer]
+        expect{allowing(streamCapturer).writeTo(response)}
+        responseCapturer = new ResponseCapturer(response, streamCapturer)
       }
 
       "addDateHeader(x, y) such that" >> {
@@ -128,35 +131,29 @@ object ResponseCapturerSpec extends Specification with JMocker with ClassMocker 
       }
 
       "Response Body" >> {
-        var servletOutputStream = null: ServletOutputStream
-        var os = null: ByteArrayOutputStream
-
         "getWriter such that" >> {
-          "writeTo(r) writes to r.getOutputStream" >> {
-            os = new ByteArrayOutputStream
-            servletOutputStream = new ServletOutputStreamCapturer {
-              override val outputStream = os
+          "getWriter.print(c) writes to streamCapturer" >> {
+            expect{
+              one(streamCapturer).write(a[Array[Byte]], a[Int], a[Int]) then
+                      one(streamCapturer).flush
             }
-            expect{allowing(response).getOutputStream willReturn servletOutputStream}
-
             responseCapturer.getWriter.print('1')
-            responseCapturer.writeTo(response)
-            os.toByteArray.apply(0) mustEqual '1'.toByte
+            responseCapturer.getWriter.flush
           }
         }
 
-        "getOutputStream such that" >> {
-          "writeTo(r) writes to r.getOutputStream" >> {
-            os = new ByteArrayOutputStream
-            servletOutputStream = new ServletOutputStreamCapturer {
-              override val outputStream = os
-            }
-            expect{allowing(response).getOutputStream willReturn servletOutputStream}
-
-            responseCapturer.getOutputStream.write(1)
-            responseCapturer.writeTo(response)
-            os.toByteArray.apply(0) mustEqual 1
+        "getOutputStream" >> {
+          "returns streamCapturer" >> {
+            responseCapturer.getOutputStream mustEqual streamCapturer
           }
+        }
+
+        "writeTo(r) invokes streamCapture.writeTo(r)" >> {
+          streamCapturer = mock[ServletOutputStreamCapturer]
+          expect{one(streamCapturer).writeTo(response)}
+          responseCapturer = new ResponseCapturer(response, streamCapturer)
+
+          responseCapturer.writeTo(response)
         }
       }
     }

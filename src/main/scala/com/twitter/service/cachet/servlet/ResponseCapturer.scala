@@ -10,16 +10,15 @@ import scala.util.matching.Regex
 
 object ResponseCapturer extends Function[HttpServletResponse, ResponseCapturer] {
   def apply(response: HttpServletResponse) = {
-    new ResponseCapturer(response)
+    new ResponseCapturer(response, new ServletOutputStreamCapturer)
   }
 }
 
-class ResponseCapturer(response: HttpServletResponse) extends HttpServletResponseWrapper(response) {
+class ResponseCapturer(response: HttpServletResponse, servletOutputStreamCapturer: ServletOutputStreamCapturer) extends HttpServletResponseWrapper(response) {
   private val dateHeaders = new HashMap[String, Long]
   private val stringHeaders = new HashMap[String, String]
   private val intHeaders = new HashMap[String, Int]
   private val cookies = new HashSet[Cookie]
-  private val servletOutputStreamCapturer = new ServletOutputStreamCapturer
   private var characterEncoding = None: Option[String]
   private var writer = None: Option[PrintWriter]
   private var statusCode = None: Option[Int]

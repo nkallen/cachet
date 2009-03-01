@@ -10,7 +10,6 @@ class ServletOutputStreamCapturer extends ServletOutputStream {
   def write(b: Int) {outputStream.write(b)}
 
   def writeTo(response: HttpServletResponse) {
-    if (outputStream.size > 0)
-      outputStream.writeTo(response.getOutputStream)
+    outputStream.writeTo(response.getOutputStream)
   }
 }
