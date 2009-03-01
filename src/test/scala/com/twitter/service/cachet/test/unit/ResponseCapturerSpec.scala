@@ -134,7 +134,7 @@ object ResponseCapturerSpec extends Specification with JMocker {
         "getWriter such that" >> {
           "writeTo(r) writes to r.getOutputStream" >> {
             os = new ByteArrayOutputStream
-            servletOutputStream = new ServletOutputStreamCapturer {
+            servletOutputStream = new ByteArrayServletOutputStreamCapturer {
               override val outputStream = os
             }
             expect{allowing(response).getOutputStream willReturn servletOutputStream}
@@ -148,7 +148,7 @@ object ResponseCapturerSpec extends Specification with JMocker {
         "getOutputStream such that" >> {
           "writeTo(r) writes to r.getOutputStream" >> {
             os = new ByteArrayOutputStream
-            servletOutputStream = new ServletOutputStreamCapturer {
+            servletOutputStream = new ByteArrayServletOutputStreamCapturer {
               override val outputStream = os
             }
             expect{allowing(response).getOutputStream willReturn servletOutputStream}
