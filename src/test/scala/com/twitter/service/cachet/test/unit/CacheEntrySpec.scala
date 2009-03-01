@@ -41,22 +41,22 @@ object CacheEntrySpec extends Specification with JMocker with ClassMocker {
           }
         }
 
-        //        "apparentAge" >> {
-        //          "when dateValue <= responseTime" >> {
-        //            "returns responseTime - dateValue" >> {
-        //              val delta = 10
-        //              responseWrapper.setDateHeader("Date", cacheEntry.responseTime - delta)
-        //              cacheEntry.apparentAge mustEqual delta
-        //            }
-        //          }
-        //
-        //          "when dateValue > responseTime" >> {
-        //            "returns 0" >> {
-        //              responseWrapper.setDateHeader("Date", cacheEntry.responseTime + 10)
-        //              cacheEntry.apparentAge mustEqual 0
-        //            }
-        //          }
-        //        }
+        "apparentAge" >> {
+          "when dateValue <= responseTime" >> {
+            "returns responseTime - dateValue" >> {
+              val delta = 10
+              expect{allowing(responseWrapper).date willReturn Some(cacheEntry.responseTime - delta)}
+              cacheEntry.apparentAge mustEqual delta
+            }
+          }
+
+          "when dateValue > responseTime" >> {
+            "returns 0" >> {
+              expect{allowing(responseWrapper).date willReturn Some(cacheEntry.responseTime + 10)}
+              cacheEntry.apparentAge mustEqual 0
+            }
+          }
+        }
         //
         //        "correctedReceivedAge" >> {
         //          "when apparentAge > ageValue" >> {
