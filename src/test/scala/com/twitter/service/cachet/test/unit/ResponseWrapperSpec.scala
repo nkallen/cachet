@@ -11,29 +11,29 @@ import org.specs.mock._
 import org.specs.mock.JMocker._
 import com.twitter.service.cachet.test.mock._
 
-object ResponseBufferSpec extends Specification with JMocker {
-  "ResponseBuffer" should {
+object ResponseWrapperSpec extends Specification with JMocker {
+  "ResponseWrapper" should {
     var response: HttpServletResponse = null
-    var responseBuffer: ResponseBuffer = null
+    var responseWrapper: ResponseWrapper = null
 
     "have accessors" >> {
       doBefore{
         response = mock[HttpServletResponse]
-        responseBuffer = new ResponseBuffer
+        responseWrapper = new ResponseWrapper(response)
       }
 
       "addDateHeader(x, y) such that" >> {
         val millis = System.currentTimeMillis
 
         "getDateHeader(x) returns y" >> {
-          responseBuffer.addDateHeader("Date", millis)
-          responseBuffer.getDateHeader("Date") mustEqual Some(millis)
+          responseWrapper.addDateHeader("Date", millis)
+          responseWrapper.getDateHeader("Date") mustEqual Some(millis)
         }
 
         "writeTo(r) invokes r.addDateHeader(x, y)" >> {
-          responseBuffer.addDateHeader("Date", millis)
+          responseWrapper.addDateHeader("Date", millis)
           expect{one(response).addDateHeader("Date", millis)}
-          responseBuffer.writeTo(response)
+          responseWrapper.writeTo(response)
         }
       }
 
@@ -41,9 +41,9 @@ object ResponseBufferSpec extends Specification with JMocker {
         val cookie = new Cookie("key", "value")
 
         "writeTo(r) invokes r.addCookie(c)" >> {
-          responseBuffer.addCookie(cookie)
+          responseWrapper.addCookie(cookie)
           expect{one(response).addCookie(cookie)}
-          responseBuffer.writeTo(response)
+          responseWrapper.writeTo(response)
         }
       }
 
@@ -52,14 +52,14 @@ object ResponseBufferSpec extends Specification with JMocker {
         val value = "value"
 
         "getHeader(n) returns v" >> {
-          responseBuffer.addHeader(name, value)
-          responseBuffer.getHeader(name) mustEqual Some(value)
+          responseWrapper.addHeader(name, value)
+          responseWrapper.getHeader(name) mustEqual Some(value)
         }
 
         "writeTo(r) invokes r.addHeader(n, v)" >> {
-          responseBuffer.addHeader(name, value)
+          responseWrapper.addHeader(name, value)
           expect{one(response).addHeader(name, value)}
-          responseBuffer.writeTo(response)
+          responseWrapper.writeTo(response)
         }
       }
 
@@ -68,14 +68,14 @@ object ResponseBufferSpec extends Specification with JMocker {
         val value = 1
 
         "getHeader(n) returns v" >> {
-          responseBuffer.addIntHeader(name, value)
-          responseBuffer.getIntHeader(name) mustEqual Some(value)
+          responseWrapper.addIntHeader(name, value)
+          responseWrapper.getIntHeader(name) mustEqual Some(value)
         }
 
         "writeTo(r) invokes r.addHeader(n, v)" >> {
-          responseBuffer.addIntHeader(name, value)
+          responseWrapper.addIntHeader(name, value)
           expect{one(response).addIntHeader(name, value)}
-          responseBuffer.writeTo(response)
+          responseWrapper.writeTo(response)
         }
       }
 
@@ -83,14 +83,14 @@ object ResponseBufferSpec extends Specification with JMocker {
         val sc = 200
 
         "getStatus() returns sc" >> {
-          responseBuffer.sendError(sc)
-          responseBuffer.getStatus mustEqual sc
+          responseWrapper.sendError(sc)
+          responseWrapper.getStatus mustEqual sc
         }
 
         "writeTo(r) invokes r.setStatus(sc)" >> {
-          responseBuffer.sendError(sc)
+          responseWrapper.sendError(sc)
           expect{one(response).setStatus(sc)}
-          responseBuffer.writeTo(response)
+          responseWrapper.writeTo(response)
         }
       }
 
@@ -98,14 +98,14 @@ object ResponseBufferSpec extends Specification with JMocker {
         val sc = 200
 
         "getStatus returns sc" >> {
-          responseBuffer.setStatus(sc)
-          responseBuffer.getStatus mustEqual sc
+          responseWrapper.setStatus(sc)
+          responseWrapper.getStatus mustEqual sc
         }
 
         "writeTo(r) invokes r.setStatus(sc)" >> {
-          responseBuffer.setStatus(sc)
+          responseWrapper.setStatus(sc)
           expect{one(response).setStatus(sc)}
-          responseBuffer.writeTo(response)
+          responseWrapper.writeTo(response)
         }
       }
 
@@ -113,9 +113,9 @@ object ResponseBufferSpec extends Specification with JMocker {
         val ct = "text/html"
 
         "writeTo(r) invokes r.setContentType(sc)" >> {
-          responseBuffer.setContentType(ct)
+          responseWrapper.setContentType(ct)
           expect{one(response).setContentType(ct)}
-          responseBuffer.writeTo(response)
+          responseWrapper.writeTo(response)
         }
       }
 
@@ -123,22 +123,22 @@ object ResponseBufferSpec extends Specification with JMocker {
         val l = Locale.CANADA
 
         "getLocale returns l" >> {
-          responseBuffer.setLocale(l)
-          responseBuffer.getLocale mustEqual l
+          responseWrapper.setLocale(l)
+          responseWrapper.getLocale mustEqual l
         }
 
         "writeTo(r) invokes r.setLocale(l)" >> {
-          responseBuffer.setLocale(l)
+          responseWrapper.setLocale(l)
           expect{one(response).setLocale(l)}
-          responseBuffer.writeTo(response)
+          responseWrapper.writeTo(response)
         }
       }
 
       "setContentLength(l) such that" >> {
         "writeTo(r) invokes r.setContentLength(l)" >> {
-          responseBuffer.setContentLength(100)
+          responseWrapper.setContentLength(100)
           expect{one(response).setContentLength(100)}
-          responseBuffer.writeTo(response)
+          responseWrapper.writeTo(response)
         }
 
       }

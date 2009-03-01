@@ -5,7 +5,7 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import javax.servlet.FilterChain
 import net.sf.ehcache._
 
-class CacheProxy(cache: Ehcache, ResponseWrapper: HttpServletResponse => ResponseBuffer, CacheEntry: ResponseBuffer => CacheEntry) {
+class CacheProxy(cache: Ehcache, ResponseWrapper: HttpServletResponse => ResponseWrapper, CacheEntry: ResponseWrapper => CacheEntry) {
   def apply(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) = {
     val element = cache.get(request.getQueryString)
 
