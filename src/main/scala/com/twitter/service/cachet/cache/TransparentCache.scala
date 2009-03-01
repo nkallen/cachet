@@ -5,6 +5,6 @@ class TransparentCache(cache: Cache) extends Cache {
     cache.fetch(key) filter (_.isTransparent)
 
   def put(key: String, value: CacheEntry) = {
-    cache.put(key, value)
+    if (value.isCachable) cache.put(key, value)
   }
 }

@@ -59,13 +59,17 @@ object TransparentCacheSpec extends Specification with JMocker with ClassMocker 
     "put(k,v)" >> {
       "when v.isCachable" >> {
         "it stores the object" >> {
-
+          expect{allowing(hitCacheEntry).isCachable willReturn true}
+          expect{one(cache).put("foo", hitCacheEntry)}
+          transparentCache.put("foo", hitCacheEntry)
         }
       }
 
       "when !v.isCachable" >> {
         "it does not store the object" >> {
-
+          expect{allowing(hitCacheEntry).isCachable willReturn false}
+          expect{never(cache).put("foo", hitCacheEntry)}
+          transparentCache.put("foo", hitCacheEntry)
         }
       }
     }
