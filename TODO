@@ -1,4 +1,5 @@
 CacheEntry Implement isCachable -- HTTP 200, etc.
+Remove getters from ResponseCapturer
 The various DateHeader/IntHeaders in CacheEntry are vulnerable to header fragmentation
 
 DI Clock into FreshResponseCacheEntry

@@ -43,7 +43,7 @@ class FreshResponseCacheEntry(val responseCapturer: ResponseCapturer) extends Ca
 
   def isFresh = freshnessLifetime map (_ > currentAge) getOrElse false
 
-  def isCachable = true
+  def isCachable = isFresh && Array(200, 203, 300, 301, 302, 307, 410).contains(responseCapturer.getStatusCode)
 
   def isTransparent = isFresh
 

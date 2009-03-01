@@ -26,6 +26,8 @@ class ResponseCapturer(response: HttpServletResponse, servletOutputStreamCapture
   private var locale = None: Option[Locale]
   private var contentLength = None: Option[Int]
 
+  def getStatusCode = statusCode getOrElse 0
+
   override def addDateHeader(n: String, v: Long) {
     dateHeaders.update(n, v)
   }
