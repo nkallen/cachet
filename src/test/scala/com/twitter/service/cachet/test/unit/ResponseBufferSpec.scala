@@ -40,9 +40,10 @@ object ResponseBufferSpec extends Specification with JMocker {
       "addCookie(c) such that" >> {
         val cookie = new Cookie("key", "value")
 
-        "cookies" >> {
+        "writeTo(r) invokes r.addCookie(c)" >> {
           responseBuffer.addCookie(cookie)
-          responseBuffer.getCookies.contains(cookie) mustBe true
+          expect{one(response).addCookie(cookie)}
+          responseBuffer.writeTo(response)
         }
       }
 
@@ -54,6 +55,12 @@ object ResponseBufferSpec extends Specification with JMocker {
           responseBuffer.addHeader(name, value)
           responseBuffer.getHeader(name) mustEqual Some(value)
         }
+
+        "writeTo(r) invokes r.addHeader(n, v)" >> {
+          responseBuffer.addHeader(name, value)
+          expect{one(response).addHeader(name, value)}
+          responseBuffer.writeTo(response)
+        }
       }
 
       "addIntHeader(n, i) such that" >> {
@@ -63,6 +70,12 @@ object ResponseBufferSpec extends Specification with JMocker {
         "getHeader(n) returns v" >> {
           responseBuffer.addIntHeader(name, value)
           responseBuffer.getIntHeader(name) mustEqual Some(value)
+        }
+
+        "writeTo(r) invokes r.addHeader(n, v)" >> {
+          responseBuffer.addIntHeader(name, value)
+          expect{one(response).addIntHeader(name, value)}
+          responseBuffer.writeTo(response)
         }
       }
 

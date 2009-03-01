@@ -1,6 +1,7 @@
 CacheEntry implements write/copy onto Response
-    - ResponseWrapper should not be a wrapper.
 CacheEntry Implement isCachable -- HTTP 200, etc.
+Cache should assume an interface
+The various DateHeader/IntHeaders in CacheEntry are vulnerable to header fragmentation
 
 Locking / Grace Period - prevent dog pile by locking around fetch.
 

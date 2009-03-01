@@ -10,7 +10,8 @@ import scala.util.matching.Regex
 
 class ResponseBuffer extends HttpServletResponse {
   private val dateHeaders = new HashMap[String, Long]
-  private val headers = new HashMap[String, Any]
+  private val stringHeaders = new HashMap[String, String]
+  private val intHeaders = new HashMap[String, Int]
   private val cookies = new HashSet[Cookie]
   private var statusCode = 0
   private var contentType = ""
@@ -28,19 +29,17 @@ class ResponseBuffer extends HttpServletResponse {
     cookies += c
   }
 
-  def getCookies = cookies
-
   def addHeader(n: String, v: String) {
-    headers.update(n, v)
+    stringHeaders.update(n, v)
   }
 
-  def getHeader(n: String) = headers get n map (_.asInstanceOf[String])
+  def getHeader(n: String) = stringHeaders get n
 
   def addIntHeader(n: String, v: Int) {
-    headers.update(n, v)
+    intHeaders.update(n, v)
   }
 
-  def getIntHeader(n: String) = headers get n map (_.asInstanceOf[Int])
+  def getIntHeader(n: String) = intHeaders get n
 
   def sendError(sc: Int) {
     statusCode = sc
@@ -97,7 +96,9 @@ class ResponseBuffer extends HttpServletResponse {
   }
 
   def isDisabled = false
+
   def enable {}
+
   def disable {}
 
   def getContentType = contentType
@@ -117,5 +118,11 @@ class ResponseBuffer extends HttpServletResponse {
   def writeTo(response: HttpServletResponse) {
     for ((key, value) <- dateHeaders)
       response.addDateHeader(key, value)
+    for ((key, value) <- stringHeaders)
+      response.addHeader(key, value)
+    for ((key, value) <- intHeaders)
+      response.addIntHeader(key, value)
+    for (cookie <- cookies)
+      response.addCookie(cookie)
   }
 }
