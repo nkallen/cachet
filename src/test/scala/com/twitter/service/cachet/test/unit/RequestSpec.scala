@@ -1,5 +1,6 @@
 package com.twitter.service.cachet.test.unit
 
+import _root_.com.twitter.service.cache.client.ClientRequest
 import com.twitter.service.cachet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.mortbay.jetty.client.{HttpClient, HttpExchange}
@@ -37,7 +38,8 @@ object ClientRequestSpec extends Specification with JMocker with ClassMocker {
           one(exchange).setURL("http://localhost:3000" + request.getRequestURI)
           one(exchange).setRequestContentSource(request.getInputStream)
           one(exchange).setRequestHeader("foo", "bar")
-          one(client).send(exchange)
+          one(client).send(exchange) then
+                  one(exchange).waitForDone()
         }
         clientRequest(request, response)
       }
