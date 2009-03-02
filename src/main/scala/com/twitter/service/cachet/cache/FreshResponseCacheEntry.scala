@@ -4,10 +4,10 @@ import _root_.javax.servlet.http.HttpServletResponse
 import scala.util.matching.Regex
 
 object FreshResponseCacheEntry extends Function[ResponseCapturer, FreshResponseCacheEntry] {
-  def apply(responseCapturer: ResponseCapturer) = new FreshResponseCacheEntry(responseCapturer)
+  def apply(responseCapturer: ResponseCapturer) = new FreshResponseCacheEntry(responseCapturer, () => System.currentTimeMillis)
 }
 
-class FreshResponseCacheEntry(val responseCapturer: ResponseCapturer) extends CacheEntry {
+class FreshResponseCacheEntry(val responseCapturer: ResponseCapturer, now: () => Long) extends CacheEntry {
   val requestTime = responseCapturer.requestTime
   var responseTime = responseCapturer.responseTime
 
@@ -23,7 +23,7 @@ class FreshResponseCacheEntry(val responseCapturer: ResponseCapturer) extends Ca
 
   def correctedInitialAge = correctedReceivedAge + responseDelay
 
-  def residentTime = System.currentTimeMillis - responseTime
+  def residentTime = now() - responseTime
 
   def currentAge = correctedInitialAge + residentTime
 

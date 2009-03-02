@@ -12,7 +12,7 @@ import org.specs.mock._
 import org.specs.mock.JMocker._
 import com.twitter.service.cachet.test.mock._
 
-object getIResponseCapturerSpec extends Specification with JMocker with ClassMocker {
+object ResponseCapturerSpec extends Specification with JMocker with ClassMocker {
   "ResponseCapturer" should {
     var response = null: HttpServletResponse
     var responseCapturer = null: ResponseCapturer

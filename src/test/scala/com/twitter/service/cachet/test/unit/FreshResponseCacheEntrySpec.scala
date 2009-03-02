@@ -1,8 +1,8 @@
 package com.twitter.service.cachet.test.unit
 
+import _root_.com.twitter.service.cachet.cache.FreshResponseCacheEntry
 import com.twitter.service.cachet._
 import javax.servlet.http._
-
 import org.jmock.core.Stub
 import org.specs._
 import org.specs.mock._
@@ -19,8 +19,12 @@ object FreshResponseCacheEntrySpec extends Specification with JMocker with Class
       doBefore{
         response = mock[HttpServletResponse]
         responseCapturer = mock[ResponseCapturer]
-        freshResponseCacheEntry = new FreshResponseCacheEntry(responseCapturer)
-        freshResponseCacheEntry.noteResponseTime() // FIXME - this feels wrong
+        val millis = System.currentTimeMillis
+        expect{
+          allowing(responseCapturer).requestTime willReturn millis
+          allowing(responseCapturer).responseTime willReturn millis
+        }
+        freshResponseCacheEntry = new FreshResponseCacheEntry(responseCapturer, () => millis)
       }
 
       "age calculations" >> {
