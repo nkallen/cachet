@@ -14,12 +14,12 @@ object FreshResponseCacheEntrySpec extends Specification with JMocker with Class
     var responseCapturer = null: ResponseCapturer
     var freshResponseCacheEntry = null: FreshResponseCacheEntry
     var response = null: HttpServletResponse
+    val millis = System.currentTimeMillis
 
     "implement RFC 2616" >> {
       doBefore{
         response = mock[HttpServletResponse]
         responseCapturer = mock[ResponseCapturer]
-        val millis = System.currentTimeMillis
         expect{
           allowing(responseCapturer).requestTime willReturn millis
           allowing(responseCapturer).responseTime willReturn millis
@@ -111,7 +111,7 @@ object FreshResponseCacheEntrySpec extends Specification with JMocker with Class
 
         "residentTime" >> {
           "returning now - responseTime" >> {
-            freshResponseCacheEntry.residentTime mustEqual (System.currentTimeMillis - freshResponseCacheEntry.responseTime)
+            freshResponseCacheEntry.residentTime mustEqual (millis - freshResponseCacheEntry.responseTime)
           }
         }
 

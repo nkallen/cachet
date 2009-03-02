@@ -174,15 +174,37 @@ object ResponseCapturerSpec extends Specification with JMocker with ClassMocker 
       }
 
       "age" >> {
-        true
+        "when the age is set by setIntHeader" >> {
+          responseCapturer.setIntHeader("Age", 10)
+          responseCapturer.age mustEqual Some(10)
+        }
+
+        "when the age is set by setHeader" >> {
+
+        }
       }
 
       "expires" >> {
-        true
+        "when the expires is set by setDateHeader" >> {
+          responseCapturer.setDateHeader("Expires", 10)
+          responseCapturer.expires mustEqual Some(10)
+        }
+
+        "when the expires is set by setHeader" >> {
+
+        }
+
       }
 
       "date" >> {
-        true
+        "when the date is set by setDateHeader" >> {
+          responseCapturer.setDateHeader("Date", 10)
+          responseCapturer.date mustEqual Some(10)
+        }
+
+        "when the date is set by setHeader" >> {
+
+        }
       }
     }
 

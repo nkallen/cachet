@@ -2,7 +2,6 @@ The various DateHeader/IntHeaders in CacheEntry are vulnerable to header fragmen
 
 The responseWrapper object is untested and still a little janky when mocked out in tests
 
-DI Clock into FreshResponseCacheEntry
 Learn . vs ' ' method invocation convention
 
 ResponseTime stuff is weird
