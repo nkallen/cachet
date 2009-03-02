@@ -26,9 +26,9 @@ import _root_.javax.servlet.http._
  *
  * @author Steve Jenson (stevej@pobox.com)
  */
-class FakeHttpServletResponse extends HttpServletResponse {
-  var statusCode : Int = 200
-  var statusString : String = "OK"
+abstract class FakeHttpServletResponse extends HttpServletResponse {
+  var statusCode: Int = 200
+  var statusString: String = "OK"
   var contentType = "text/html"
   var contentLength = 0
   val headers: HashMap[String, String] = new HashMap[String, String]
@@ -49,12 +49,15 @@ class FakeHttpServletResponse extends HttpServletResponse {
   def addIntHeader(s: String, i: Int) {
     headers += (s -> i.toString)
   }
+
   def setIntHeader(s: String, i: Int) {
     headers += (s -> i.toString)
   }
+
   def addHeader(s1: String, s2: String) {
     headers += (s1 -> s2)
   }
+
   def setHeader(s1: String, s2: String) {
     headers += (s1 -> s2)
   }
@@ -62,6 +65,7 @@ class FakeHttpServletResponse extends HttpServletResponse {
   def addDateHeader(s: String, l: Long) {
     headers += (s -> (new Date(l)).toString)
   }
+
   def setDateHeader(s: String, l: Long) {
     addDateHeader(s, l)
   }
@@ -82,40 +86,60 @@ class FakeHttpServletResponse extends HttpServletResponse {
   }
 
   def encodeRedirectURL(url: String): String = encodeRedirectUrl(url)
+
   def encodeRedirectUrl(url: String): String = {
     // do something fancy encoding on uri, return that.
     url
   }
+
   def encodeURL(url: String): String = encodeUrl(url)
+
   def encodeUrl(url: String): String = {
     // use the same encoder as encodeRedirectUrl
     url
   }
+
   def containsHeader(header: String): Boolean = {
     headers.contains(header)
   }
+
   def addCookie(cookie: Cookie) = {
-    cookies =  cookie :: cookies
+    cookies = cookie :: cookies
   }
+
   def getLocale: Locale = locale
+
   def setLocale(l: Locale) = locale = l
+
   def reset {
     // well, reset all the state to it's original values. yikes. later.
   }
+
   def isCommitted = false
+
   def resetBuffer {
     // reset the buffer.
   }
+
   def flushBuffer {
     // flush the buffer
   }
+
   def getBufferSize = bufferSize
+
   def setBufferSize(i: Int) = bufferSize = i
+
   def setContentType(t: String) = contentType = t
+
   def setContentLength(l: Int) = contentLength = l
+
   def setCharacterEncoding(e: String) = charEncoding = e
+
   def getWriter = null
+
   def getOutputStream = null
+
   def getContentType = contentType
+
   def getCharacterEncoding = charEncoding
 }

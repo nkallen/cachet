@@ -1,9 +1,11 @@
 package com.twitter.service.cachet.cache
 
-import net.sf.ehcache._
+import net.sf._
 
 object Ehcache extends Cache {
-  val cache = CacheManager.getInstance.getEhcache("Name")
+  val cacheManager = ehcache.CacheManager.getInstance
+  val cache = new ehcache.Cache("Cache", 5000, false, true, 5000, 5000)
+  cacheManager.addCache(cache)
 
   def fetch(key: String) = {
     val element = cache.get(key)
@@ -15,6 +17,6 @@ object Ehcache extends Cache {
   }
 
   def put(key: String, value: CacheEntry) {
-    cache.put(new Element(key, value))
+    cache.put(new ehcache.Element(key, value))
   }
 }

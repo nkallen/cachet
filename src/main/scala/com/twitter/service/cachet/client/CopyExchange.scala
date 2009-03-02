@@ -5,7 +5,7 @@ import org.mortbay.io.Buffer
 import org.mortbay.jetty.client.{HttpClient, HttpExchange}
 
 class CopyExchange(request: HttpServletRequest, response: HttpServletResponse) extends HttpExchange {
-  request.suspend()
+  //  request.suspend()
 
   override def onResponseHeader(name: Buffer, value: Buffer) {
     response.setHeader(name.toString, value.toString)
@@ -19,7 +19,7 @@ class CopyExchange(request: HttpServletRequest, response: HttpServletResponse) e
     response.setStatus(status)
   }
 
-  override def onResponseComplete {
-    request.resume()
-  }
+  //  override def onResponseComplete {
+  //    request.resume()
+  //  }
 }

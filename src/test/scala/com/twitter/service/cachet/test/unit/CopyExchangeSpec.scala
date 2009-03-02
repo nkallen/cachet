@@ -5,7 +5,7 @@ import _root_.javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import _root_.javax.servlet.ServletOutputStream
 import client.CopyExchange
 import com.twitter.service.cachet._
-import mock.{FakeHttpServletResponse, FakeHttpServletRequest}
+import mock.{FakeHttpServletRequest}
 import org.mortbay.io.{ByteArrayBuffer, Buffer}
 import org.specs.mock.{ClassMocker, JMocker}
 import org.specs.Specification
@@ -18,13 +18,14 @@ object CopyExchangeSpec extends Specification with JMocker with ClassMocker {
   "CopyExchange" should {
     "initialize & onResponseComplete" >> {
       "suspends and resumes the request" >> {
+        skip("Disabling async")
         request = mock[HttpServletRequest]
         expect{
           one(request).suspend() then
                   one(request).resume()
         }
         exchange = new CopyExchange(request, null: HttpServletResponse)
-        exchange.onResponseComplete
+        //        exchange.onResponseComplete
       }
     }
 

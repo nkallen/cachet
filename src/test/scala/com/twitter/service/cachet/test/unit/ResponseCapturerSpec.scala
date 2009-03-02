@@ -159,18 +159,18 @@ object ResponseCapturerSpec extends Specification with JMocker with ClassMocker 
       "maxAge" >> {
         "when there is a max-age control" >> {
           responseCapturer.setHeader("Cache-Control", "max-age=100")
-          responseCapturer.maxAge mustEqual Some(100)
+          responseCapturer.maxAge mustEqual Some(100000)
         }
 
         "when there is a s-maxage control" >> {
           responseCapturer.setHeader("Cache-Control", "s-maxage=100")
-          responseCapturer.maxAge mustEqual Some(100)
+          responseCapturer.maxAge mustEqual Some(100000)
         }
 
         "when both a max-age and s-maxage are present" >> {
           "returns s-maxage" >> {
             responseCapturer.setHeader("Cache-Control", "s-maxage=1, max-age=2")
-            responseCapturer.maxAge mustEqual Some(1)
+            responseCapturer.maxAge mustEqual Some(1000)
           }
         }
       }

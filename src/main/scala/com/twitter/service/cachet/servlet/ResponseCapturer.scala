@@ -53,7 +53,7 @@ class ResponseCapturer(response: HttpServletResponse, servletOutputStreamCapture
   def maxAge =
     for (cacheControl <- stringHeaders get "Cache-Control";
          maxAge <- MaxAge findFirstMatchIn cacheControl)
-    yield maxAge group (1) toLong
+    yield convertFromSecondsToMillis(maxAge group 1 toInt)
 
   def age = intHeaders get "Age" map (_.toLong) orElse
           (stringHeaders get "Age" map (_.toLong))
@@ -167,4 +167,6 @@ class ResponseCapturer(response: HttpServletResponse, servletOutputStreamCapture
     dateHeaders get name orElse
             (stringHeaders get name map (Date.parse(_)))
   }
+
+  private def convertFromSecondsToMillis(s: Int) = s.toLong * 1000
 }

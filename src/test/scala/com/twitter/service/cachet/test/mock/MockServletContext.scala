@@ -20,7 +20,7 @@ import _root_.javax.servlet.http._
 /**
  * An example of how to use these mock classes in your unit tests:
  *
- *   def testLiftCore = {
+ *   def testLiftCore =  {
  *     val output = new ByteArrayOutputStream
  *     val outputStream = new MockServletOutputStream(output)
  *     val writer = new PrintWriter(outputStream)
@@ -34,9 +34,8 @@ import _root_.javax.servlet.http._
  *     filter.init(new MockFilterConfig(new MockServletContext("target/test1-1.0-SNAPSHOT")))
  *     filter.doFilter(req, res,new DoNothingFilterChain)
  *     assertTrue(output.toString.startsWith("<?xml"))
- *   }
+ * }
  */
-
 
 
 /**
@@ -46,21 +45,35 @@ import _root_.javax.servlet.http._
  *
  * @author Steve Jenson (stevej@pobox.com)
  */
-class MockServletContext(var target: String) extends ServletContext {
+abstract class MockServletContext(var target: String) extends ServletContext {
   def getInitParameter(f: String) = null
+
   def getInitParameterNames = new Vector[AnyRef]().elements
+
   def getAttribute(f: String) = null
+
   def getAttributeNames = new Vector[AnyRef]().elements
+
   def removeAttribute(name: String) {}
+
   def setAttribute(name: String, o: Object) {}
+
   def getContext(path: String) = this
+
   def getMajorVersion = 2
+
   def getMimeType(file: String) = null
+
   def getMinorVersion = 3
+
   def getRealPath(path: String) = null
+
   def getNamedDispatcher(name: String) = null
+
   def getRequestDispatcher(path: String) = null
+
   def getResource(path: String) = null
+
   def getResourceAsStream(path: String) = {
     val file = new File(target + path)
     if (file.exists) {
@@ -71,20 +84,29 @@ class MockServletContext(var target: String) extends ServletContext {
   }
 
   def getResourcePaths(path: String) = null
+
   def getServerInfo = null
+
   def getServlet(name: String) = null
+
   def getServletContextName = null
+
   def getServletNames = new Vector[AnyRef]().elements
+
   def getServlets = new Vector[AnyRef]().elements
+
   def log(msg: String, t: Throwable) {
     t.printStackTrace
     log(msg)
   }
+
   def log(e: Exception, msg: String) {
     e.printStackTrace
     log(msg)
   }
+
   def log(msg: String) = println("MockServletContext.log: " + msg)
+
   def getContextPath = null
 }
 
@@ -96,7 +118,9 @@ class MockServletContext(var target: String) extends ServletContext {
 class MockFilterConfig(servletContext: ServletContext) extends FilterConfig {
   def getFilterName = "LiftFilter" // as in lift's default web.xml
   def getInitParameter(key: String) = null
-  def getInitParameterNames  = new Vector[AnyRef]().elements
+
+  def getInitParameterNames = new Vector[AnyRef]().elements
+
   def getServletContext = servletContext
 }
 
@@ -141,27 +165,44 @@ class MockHttpSession extends HttpSession {
   var maxii = 0
   var servletContext = null
   var creationTime = System.currentTimeMillis
+
   def isNew = false
+
   def invalidate {}
+
   def getValue(key: String) = values.get(key) match {
     case Some(v) => v.asInstanceOf[Object]
     case None => Nil
   }
+
   def removeValue(key: String) = values -= key
+
   def putValue(key: String, value: Any) = values += (key -> value)
+
   def getAttribute(key: String) = attr.get(key) match {
-      case Some(v) => v.asInstanceOf[Object]
-      case None => Nil
-    }
+    case Some(v) => v.asInstanceOf[Object]
+    case None => Nil
+  }
+
   def removeAttribute(key: String) = attr -= key
+
   def setAttribute(key: String, value: Any) = attr += (key -> value)
+
   def getValueNames: Array[String] = values.keySet.toArray
+
   def getAttributeNames = new Vector[AnyRef](attr.underlying.keySet).elements
+
   def getSessionContext = sessionContext
+
   def getMaxInactiveInterval = maxii
+
   def setMaxInactiveInterval(i: Int) = maxii = i
+
   def getServletContext = servletContext
+
   def getLastAccessedTime = 0L
+
   def getId = null
+
   def getCreationTime = creationTime
 }
