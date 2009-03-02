@@ -180,7 +180,8 @@ object ResponseCapturerSpec extends Specification with JMocker with ClassMocker 
         }
 
         "when the age is set by setHeader" >> {
-
+          responseCapturer.setHeader("Age", "10")
+          responseCapturer.age mustEqual Some(10)
         }
       }
 

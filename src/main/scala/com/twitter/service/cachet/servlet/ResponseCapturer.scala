@@ -51,11 +51,12 @@ class ResponseCapturer(response: HttpServletResponse, servletOutputStreamCapture
   private val MaxAge = """\b(?:s-maxage|max-age)=(\d+)\b""".r
 
   def maxAge =
-    for (cacheControl <- stringHeaders.get("Cache-Control");
+    for (cacheControl <- stringHeaders get "Cache-Control";
          maxAge <- MaxAge findFirstMatchIn cacheControl)
     yield maxAge group (1) toLong
 
-  def age = intHeaders get "Age" map (_.toLong)
+  def age = intHeaders get "Age" map (_.toLong) orElse
+          (stringHeaders get "Age" map (_.toLong))
 
   override def addCookie(c: Cookie) {
     cookies += c
