@@ -4,7 +4,7 @@ import _root_.javax.servlet.ServletOutputStream
 import com.twitter.service.cachet._
 import java.io.{PrintWriter, OutputStream, ByteArrayOutputStream}
 import java.lang.String
-import java.util.Locale
+import java.util.{Date, Locale}
 import javax.servlet.http._
 import net.sf.ehcache.constructs.web.filter.FilterServletOutputStream
 import org.specs._
@@ -154,6 +154,8 @@ object ResponseCapturerSpec extends Specification with JMocker with ClassMocker 
     }
 
     "Freshness Information" >> {
+      val dateInRFC1123 = "Sun, 06 Nov 1994 08:49:37 GMT"
+
       "maxAge" >> {
         "when there is a max-age control" >> {
           responseCapturer.setHeader("Cache-Control", "max-age=100")
@@ -192,7 +194,8 @@ object ResponseCapturerSpec extends Specification with JMocker with ClassMocker 
         }
 
         "when the expires is set by setHeader" >> {
-
+          responseCapturer.setHeader("Expires", dateInRFC1123)
+          responseCapturer.expires mustEqual Some(Date.parse(dateInRFC1123))
         }
 
       }
@@ -204,7 +207,8 @@ object ResponseCapturerSpec extends Specification with JMocker with ClassMocker 
         }
 
         "when the date is set by setHeader" >> {
-
+          responseCapturer.setHeader("Date", dateInRFC1123)
+          responseCapturer.date mustEqual Some(Date.parse(dateInRFC1123))
         }
       }
     }

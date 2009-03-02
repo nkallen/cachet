@@ -39,7 +39,14 @@ class FreshResponseCacheEntry(val responseCapturer: ResponseCapturer, now: () =>
 
   def isFresh = freshnessLifetime map (_ > currentAge) getOrElse false
 
-  def isCachable = isFresh && Array(200, 203, 300, 301, 302, 307, 410).contains(responseCapturer.getStatusCode)
+  def isCachable = isFresh && Array(
+    HttpServletResponse.SC_OK,
+    HttpServletResponse.SC_NON_AUTHORITATIVE_INFORMATION,
+    HttpServletResponse.SC_MULTIPLE_CHOICES,
+    HttpServletResponse.SC_MOVED_PERMANENTLY,
+    HttpServletResponse.SC_MOVED_TEMPORARILY,
+    HttpServletResponse.SC_TEMPORARY_REDIRECT,
+    HttpServletResponse.SC_GONE).contains(responseCapturer.getStatusCode)
 
   def isTransparent = isFresh
 

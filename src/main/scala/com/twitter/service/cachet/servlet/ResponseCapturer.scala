@@ -3,7 +3,7 @@ package com.twitter.service.cachet
 import java.io.{OutputStreamWriter, PrintWriter, ByteArrayOutputStream}
 import java.lang.String
 import javax.servlet.ServletOutputStream
-import java.util.Locale
+import java.util.{Locale, Date}
 import javax.servlet.http._
 import scala.collection.mutable._
 import scala.util.matching.Regex
@@ -44,9 +44,9 @@ class ResponseCapturer(response: HttpServletResponse, servletOutputStreamCapture
 
   override def setDateHeader(n: String, v: Long) = addDateHeader(n, v)
 
-  def date = dateHeaders get "Date"
+  def date = getDate("Date")
 
-  def expires = dateHeaders get "Expires"
+  def expires = getDate("Expires")
 
   private val MaxAge = """\b(?:s-maxage|max-age)=(\d+)\b""".r
 
@@ -161,5 +161,10 @@ class ResponseCapturer(response: HttpServletResponse, servletOutputStreamCapture
 
   private def flush() {
     writer map (_.flush())
+  }
+
+  private def getDate(name: String) = {
+    dateHeaders get name orElse
+            (stringHeaders get name map (Date.parse(_)))
   }
 }
