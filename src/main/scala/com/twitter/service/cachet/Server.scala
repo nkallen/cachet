@@ -2,15 +2,21 @@ package com.twitter.service.cachet
 
 import org.mortbay.jetty
 import org.mortbay.jetty.bio.SocketConnector
+import org.mortbay.jetty.nio.SelectChannelConnector
 import org.mortbay.jetty.servlet.{FilterHolder, ServletHolder, Context}
+import org.mortbay.thread.QueuedThreadPool
 import servlet.{CacheProxyServletFilter, ProxyServlet}
 
 class Server {
   val server = new jetty.Server
-  val connector = new SocketConnector
+  val connector = new SelectChannelConnector
   val root = new Context(server, "/", Context.SESSIONS)
   val servlet = new ProxyServlet
   val filter = new CacheProxyServletFilter
+
+  val threadPool = new QueuedThreadPool
+  threadPool.setMaxThreads(100)
+  server.setThreadPool(threadPool)
 
   connector.setPort(1234)
   server.setConnectors(Array(connector))

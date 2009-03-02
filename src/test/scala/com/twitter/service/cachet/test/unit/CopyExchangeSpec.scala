@@ -19,12 +19,12 @@ object CopyExchangeSpec extends Specification with JMocker with ClassMocker {
     "initialize & onResponseComplete" >> {
       "suspends and resumes the request" >> {
         skip("Disabling async")
-        request = mock[HttpServletRequest]
-        expect{
-          one(request).suspend() then
-                  one(request).resume()
-        }
-        exchange = new CopyExchange(request, null: HttpServletResponse)
+        //        request = mock[HttpServletRequest]
+        //        expect{
+        //          one(request).suspend() then
+        //                  one(request).resume()
+        //        }
+        //        exchange = new CopyExchange(request, null: HttpServletResponse)
         //        exchange.onResponseComplete
       }
     }
@@ -34,7 +34,7 @@ object CopyExchangeSpec extends Specification with JMocker with ClassMocker {
       doBefore{
         request = mock[HttpServletRequest]
         response = mock[HttpServletResponse]
-        expect{allowing(request).suspend()}
+        //        expect{allowing(request).suspend()}
         exchange = new CopyExchange(request, response)
       }
 

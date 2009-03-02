@@ -49,6 +49,7 @@ object ClientRequestSpec extends Specification with JMocker with ClassMocker {
       }
 
       "does nothing" >> {
+        skip("suspendable requests temporarily disabled")
         expect{never(client).send(exchange)}
         clientRequest(request, response)
       }
