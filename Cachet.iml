@@ -20,19 +20,18 @@
     <orderEntry type="module-library">
       <library name="IvyIDEA-resolved">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.scala-lang/scala-compiler/jars/scala-compiler-2.7.2.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.7.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.scala-lang/scala-compiler/jars/scala-compiler-2.7.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.7.3.jar!/" />
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.scala-tools/vscaladoc/jars/vscaladoc-1.1.jar!/" />
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/net.sf.ehcache/ehcache/jars/ehcache-1.5.0.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/jetty/jars/jetty-7.0.0.pre5.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/jetty-util/jars/jetty-util-7.0.0.pre5.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/jetty-client/jars/jetty-client-7.0.0.pre5.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/jetty-ssl/jars/jetty-ssl-7.0.0.pre5.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/jetty/jars/jetty-6.1.14.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/jetty-util/jars/jetty-util-6.1.14.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/jetty-client/jars/jetty-client-6.1.14.jar!/" />
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/javax.servlet/servlet-api/jars/servlet-api-2.5.jar!/" />
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/net.lag/configgy/jars/configgy-1.2.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.specs/specs/jars/specs-1.3.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.specs/specs/jars/specs-1.4.3.jar!/" />
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/commons-collections/commons-collections/jars/commons-collections-3.2.1.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/commons-httpclient/commons-httpclient/jars/commons-httpclient-3.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.apache.httpcomponents/httpclient/jars/httpclient-4.0-beta2.jar!/" />
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/commons-logging/commons-logging/jars/commons-logging-1.1.1.jar!/" />
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.jmock/jmock/jars/jmock-2.4.0.jar!/" />
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.hamcrest/hamcrest-all/jars/hamcrest-all-1.1.jar!/" />
@@ -54,10 +53,10 @@
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/antlr/antlr/jars/antlr-2.7.6.jar!/" />
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/ant/ant/jars/ant-1.6.5.jar!/" />
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/concurrent/concurrent/jars/concurrent-1.3.4.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/servlet-api/jars/servlet-api-3.0.pre4.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/jetty-security/jars/jetty-security-7.0.0.pre5.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/jetty-xml/jars/jetty-xml-7.0.0.pre5.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/commons-codec/commons-codec/jars/commons-codec-1.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/servlet-api-2.5/jars/servlet-api-2.5-6.1.14.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/jetty-sslengine/jars/jetty-sslengine-6.1.14.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.apache.httpcomponents/httpcore/jars/httpcore-4.0-beta3.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/commons-codec/commons-codec/jars/commons-codec-1.3.jar!/" />
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/log4j/log4j/jars/log4j-1.2.12.jar!/" />
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.hamcrest/hamcrest-core/jars/hamcrest-core-1.1.jar!/" />
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.hamcrest/hamcrest-library/jars/hamcrest-library-1.1.jar!/" />
@@ -67,22 +66,18 @@
         </CLASSES>
         <JAVADOC>
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/net.sf.ehcache/ehcache/javadocs/ehcache-1.5.0-javadoc.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/jetty/javadocs/jetty-7.0.0.pre5-javadoc.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/jetty-util/javadocs/jetty-util-7.0.0.pre5-javadoc.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/jetty-client/javadocs/jetty-client-7.0.0.pre5-javadoc.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/jetty-ssl/javadocs/jetty-ssl-7.0.0.pre5-javadoc.jar!/" />
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/commons-collections/commons-collections/javadocs/commons-collections-3.2.1-javadoc.jar!/" />
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/commons-logging/commons-logging/javadocs/commons-logging-1.1.1-javadoc.jar!/" />
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.objenesis/objenesis/javadocs/objenesis-1.1-javadoc.jar!/" />
         </JAVADOC>
         <SOURCES>
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/net.sf.ehcache/ehcache/sources/ehcache-1.5.0-sources.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/jetty/sources/jetty-7.0.0.pre5-sources.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/jetty-util/sources/jetty-util-7.0.0.pre5-sources.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/jetty-client/sources/jetty-client-7.0.0.pre5-sources.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/jetty-ssl/sources/jetty-ssl-7.0.0.pre5-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/jetty/sources/jetty-6.1.14-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/jetty-util/sources/jetty-util-6.1.14-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.mortbay.jetty/jetty-client/sources/jetty-client-6.1.14-sources.jar!/" />
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/javax.servlet/servlet-api/sources/servlet-api-2.5-sources.jar!/" />
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/commons-collections/commons-collections/sources/commons-collections-3.2.1-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.apache.httpcomponents/httpclient/sources/httpclient-4.0-beta2-sources.jar!/" />
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/commons-logging/commons-logging/sources/commons-logging-1.1.1-sources.jar!/" />
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/org.hamcrest/hamcrest-all/sources/hamcrest-all-1.1-sources.jar!/" />
           <root url="jar://$MODULE_DIR$/../../.ivy2/cache/cglib/cglib/sources/cglib-2.1_3-sources.jar!/" />

@@ -1,7 +1,14 @@
+Remove Hop-by-hop headers from request
+Remove Hop-by-hop headers from response
+Propagate X-Forwarded-For OR set it with getRemoteAddr()
+Add Via header
+
+Move to Apache Client
+Add Forwarded For Header
+
 The responseWrapper object is untested and still a little janky when mocked out in tests
 CPSF/Receive should only do it's business if the request is initial
 
-Hop-by-hop headers
 Cache-Control pragmas like no-cache
 
 Learn . vs ' ' method invocation convention

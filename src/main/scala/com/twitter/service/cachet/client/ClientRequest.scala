@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServletResponse
 
 class ClientRequest(client: HttpClient, Exchange: (HttpServletRequest, HttpServletResponse) => HttpExchange) {
   def apply(request: HttpServletRequest, response: HttpServletResponse) {
-    //    if (request.isInitial) {
     val exchange = Exchange(request, response)
     val headers = request.getHeaderNames
     while (headers.hasMoreElements) {
@@ -19,6 +18,5 @@ class ClientRequest(client: HttpClient, Exchange: (HttpServletRequest, HttpServl
 
     client.send(exchange)
     exchange.waitForDone()
-    //    }
   }
 }
