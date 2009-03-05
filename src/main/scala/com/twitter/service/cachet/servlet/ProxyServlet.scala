@@ -1,20 +1,19 @@
 package com.twitter.service.cachet.servlet
 
-import _root_.com.twitter.service.cache.client.ClientRequest
+import _root_.com.twitter.service.cache.client.ForwardRequest
 import _root_.javax.servlet._
-import client.{CopyExchange, ClientRequest}
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
-import org.mortbay.jetty.client.HttpClient
+import org.apache.http.client.HttpClient
+import org.apache.http.impl.client.DefaultHttpClient
 
 class ProxyServlet extends HttpServlet {
   var config = null: ServletConfig
-  var clientRequest = null: ClientRequest
+  var clientRequest = null: ForwardRequest
 
   override def init(c: ServletConfig) {
     config = c
-    val client = new HttpClient
-    client.start()
-    clientRequest = new ClientRequest(client, (request, response) => new CopyExchange(request, response))
+    val client = new DefaultHttpClient
+    clientRequest = new ForwardRequest(client)
   }
 
   override def doGet(request: HttpServletRequest, response: HttpServletResponse) {
