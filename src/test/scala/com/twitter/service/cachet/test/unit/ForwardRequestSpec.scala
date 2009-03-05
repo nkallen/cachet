@@ -32,6 +32,7 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
         servletRequest.path = "/path"
         servletRequest.isInitial = true
         servletRequest.setHeader("foo", "bar")
+        servletRequest.setHeader("Proxy-Connection", "baz")
 
         expect{
           one(httpClient).newRequest willReturn (httpRequest)
@@ -43,6 +44,7 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
           one(httpRequest).queryString = ""
           one(httpRequest).inputStream = servletRequest.getInputStream
           one(httpRequest).addHeader("foo", "bar")
+          never(httpRequest).addHeader("Proxy-Connection", "baz")
           one(httpRequest).performAndWriteTo(servletResponse)
         }
         forwardRequest(servletRequest, servletResponse)

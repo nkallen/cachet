@@ -26,13 +26,13 @@ class ApacheHttpClient extends HttpClient {
       request.addHeader(name, value)
     }
 
-    def performAndWriteTo(response: HttpServletResponse) {
+    def performAndWriteTo(servletResponse: HttpServletResponse) {
       val httpHost = new org.apache.http.HttpHost(host, port, scheme)
       val response = client.execute(httpHost, request)
-      ()
-      //    for (headerName <- response.getHeaderNameSet;
-      //         headerValue <- response.getHeaderList(headerName))
-      //      response.addHeader(headerName, headerValue)
+
+      for (header <- response.getAllHeaders)
+        servletResponse.addHeader(header.getName, header.getValue)
+      response.getEntity.writeTo(servletResponse.getOutputStream())
     }
 
     private class RawApacheRequest extends org.apache.http.client.methods.HttpEntityEnclosingRequestBase with org.apache.http.HttpRequest {
