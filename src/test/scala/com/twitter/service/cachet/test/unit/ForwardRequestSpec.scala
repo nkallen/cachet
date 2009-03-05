@@ -1,7 +1,7 @@
 package com.twitter.service.cachet.test.unit
 
 import _root_.com.twitter.service.cache.client.ForwardRequest
-import client.HttpClient
+import client.{HttpRequest, HttpClient}
 import com.twitter.service.cachet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.specs._
@@ -11,37 +11,40 @@ import com.twitter.service.cachet.test.mock._
 
 object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
   var forwardRequest = null: ForwardRequest
-  var request = null: FakeHttpServletRequest
-  var response = null: HttpServletResponse
+  var httpRequest = mock[HttpRequest]
+  var servletRequest = null: FakeHttpServletRequest
+  var servletResponse = null: HttpServletResponse
   var httpClient = null: HttpClient
 
   "ForwardRequest" should {
     doBefore{
       httpClient = mock[HttpClient]
-      request = new FakeHttpServletRequest
-      response = mock[HttpServletResponse]
+      httpRequest = mock[HttpRequest]
+      servletRequest = new FakeHttpServletRequest
+      servletResponse = mock[HttpServletResponse]
 
       forwardRequest = new ForwardRequest(httpClient)
     }
 
     "apply" >> {
       "sets the request's method, url, headers, etc. on the client, and invokes the client" >> {
-        request.method = "PUT"
-        request.path = "/path"
-        request.isInitial = true
-        request.setHeader("foo", "bar")
+        servletRequest.method = "PUT"
+        servletRequest.path = "/path"
+        servletRequest.isInitial = true
+        servletRequest.setHeader("foo", "bar")
 
         expect{
-          one(httpClient).host = "localhost"
-          one(httpClient).port = 3000
-          one(httpClient).scheme = "http"
-          one(httpClient).method = "PUT"
-          one(httpClient).uri = "/path"
-          one(httpClient).queryString = ""
-          one(httpClient).addHeader("foo", "bar")
-          one(httpClient).performRequestAndWriteTo(response)
+          one(httpClient).newRequest willReturn (httpRequest)
+          one(httpRequest).host = "localhost"
+          one(httpRequest).port = 3000
+          one(httpRequest).scheme = "http"
+          one(httpRequest).method = "PUT"
+          one(httpRequest).uri = "/path"
+          one(httpRequest).queryString = ""
+          one(httpRequest).addHeader("foo", "bar")
+          one(httpRequest).performAndWriteTo(servletResponse)
         }
-        forwardRequest(request, response)
+        forwardRequest(servletRequest, servletResponse)
       }
     }
   }
