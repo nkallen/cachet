@@ -32,7 +32,7 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
       "sets the request's method, url, headers, etc. on the client, and invokes the client" >> {
         expect{
           one(httpClient).newRequest willReturn httpRequest
-          one(httpRequest).execute("localhost", 3000, servletRequest, servletResponse)
+          one(httpRequest).execute(a[String], an[Int], a[RequestWrapper], a[ResponseWrapper])
         }
         forwardRequest(servletRequest, servletResponse)
       }
