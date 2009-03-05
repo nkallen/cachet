@@ -13,32 +13,18 @@ class JettyHttpClient extends HttpClient {
   }
 
   private class JettyHttpRequest extends HttpRequest {
-    private var exchange = new HttpExchange
-
-    var host = null: String
-    var port = 80: Int
-    var scheme = null: String
-    var method = null: String
-    var uri = null: String
-    var queryString = null: String
-    var inputStream = null: InputStream
-
-    def addHeader(name: String, value: String) {
-      exchange.addRequestHeader(name, value)
-    }
-
-    def performAndWriteTo(response: HttpServletResponse) {
-      exchange.setRequestContentSource(inputStream)
-      exchange.setMethod(method)
-      exchange.setURL(scheme + "://" + host + ":" + port + uri + (if (queryString != null) "?" + queryString else ""))
-      exchange.response = response
+    def execute(host: String, port: Int, servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) {
+      var exchange = new HttpExchange(servletResponse)
+      exchange.setRequestContentSource(servletRequest.getInputStream)
+      exchange.setMethod(servletRequest.getMethod)
+      exchange.setURL(servletRequest.getScheme + "://" + host + ":" + port + servletRequest.getRequestURI + (if (servletRequest.getQueryString != null) "?" + servletRequest.getQueryString else ""))
+      for ((headerName, headerValue) <- headers(servletRequest))
+        exchange.addRequestHeader(headerName, headerValue)
       client.send(exchange)
       exchange.waitForDone()
     }
 
-    private class HttpExchange extends org.mortbay.jetty.client.HttpExchange {
-      var response = null: HttpServletResponse
-
+    private class HttpExchange(response: HttpServletResponse) extends org.mortbay.jetty.client.HttpExchange {
       override def onResponseHeader(name: Buffer, value: Buffer) {
         response.addHeader(name.toString, value.toString)
       }

@@ -12,7 +12,7 @@ import com.twitter.service.cachet.test.mock._
 object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
   var forwardRequest = null: ForwardRequest
   var httpRequest = mock[HttpRequest]
-  var servletRequest = null: FakeHttpServletRequest
+  var servletRequest = null: HttpServletRequest
   var servletResponse = null: HttpServletResponse
   var httpClient = null: HttpClient
 
@@ -20,7 +20,7 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
     doBefore{
       httpClient = mock[HttpClient]
       httpRequest = mock[HttpRequest]
-      servletRequest = new FakeHttpServletRequest
+      servletRequest = mock[HttpServletRequest]
       servletResponse = mock[HttpServletResponse]
 
       forwardRequest = new ForwardRequest(httpClient)
@@ -28,24 +28,9 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
 
     "apply" >> {
       "sets the request's method, url, headers, etc. on the client, and invokes the client" >> {
-        servletRequest.method = "PUT"
-        servletRequest.path = "/path"
-        servletRequest.isInitial = true
-        servletRequest.setHeader("foo", "bar")
-        servletRequest.setHeader("Proxy-Connection", "baz")
-
         expect{
           one(httpClient).newRequest willReturn (httpRequest)
-          one(httpRequest).host = "localhost"
-          one(httpRequest).port = 3000
-          one(httpRequest).scheme = "http"
-          one(httpRequest).method = "PUT"
-          one(httpRequest).uri = "/path"
-          one(httpRequest).queryString = ""
-          one(httpRequest).inputStream = servletRequest.getInputStream
-          one(httpRequest).addHeader("foo", "bar")
-          never(httpRequest).addHeader("Proxy-Connection", "baz")
-          one(httpRequest).performAndWriteTo(servletResponse)
+          one(httpRequest).execute("localhost", 3000, servletRequest, servletResponse)
         }
         forwardRequest(servletRequest, servletResponse)
       }

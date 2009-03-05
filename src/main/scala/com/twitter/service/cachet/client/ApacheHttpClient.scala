@@ -12,22 +12,10 @@ class ApacheHttpClient extends HttpClient {
   }
 
   private class ApacheHttpRequest extends HttpRequest {
-    private val request = new RawApacheRequest
+    def execute(host: String, port: Int, servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) {
+      val request = new RawApacheRequest(servletRequest.getMethod, servletRequest.getRequestURI, headers(servletRequest), servletRequest.getInputStream)
+      val httpHost = new org.apache.http.HttpHost(host, port, servletRequest.getScheme)
 
-    var host = null: String
-    var port = 80: Int
-    var scheme = null: String
-    var uri = null: String
-    var queryString = null: String
-    var method = null: String
-    var inputStream = null: InputStream
-
-    def addHeader(name: String, value: String) {
-      request.addHeader(name, value)
-    }
-
-    def performAndWriteTo(servletResponse: HttpServletResponse) {
-      val httpHost = new org.apache.http.HttpHost(host, port, scheme)
       val response = client.execute(httpHost, request)
 
       for (header <- response.getAllHeaders)
@@ -35,7 +23,10 @@ class ApacheHttpClient extends HttpClient {
       response.getEntity.writeTo(servletResponse.getOutputStream())
     }
 
-    private class RawApacheRequest extends org.apache.http.client.methods.HttpEntityEnclosingRequestBase with org.apache.http.HttpRequest {
+    private class RawApacheRequest(method: String, uri: String, headers: List[(String, String)], inputStream: InputStream) extends org.apache.http.client.methods.HttpEntityEnclosingRequestBase with org.apache.http.HttpRequest {
+      for ((headerName, headerValue) <- headers)
+        addHeader(headerName, headerValue)
+
       override def getMethod = method
 
       override def getEntity = new InputStreamEntity(inputStream, -1)

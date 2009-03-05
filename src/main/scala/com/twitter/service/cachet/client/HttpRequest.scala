@@ -1,18 +1,15 @@
 package com.twitter.service.cachet.client
 
-import _root_.javax.servlet.http.HttpServletResponse
-import java.io.InputStream
+import _root_.javax.servlet.http.{HttpServletResponse, HttpServletRequest}
+import scala.collection.jcl.Conversions._
+import java.util.Collections._
 
 trait HttpRequest {
-  var host: String
-  var port: Int
-  var scheme: String
-  var method: String
-  var uri: String
-  var queryString: String
-  var inputStream: InputStream
+  def execute(host: String, port: Int, request: HttpServletRequest, response: HttpServletResponse)
 
-  def addHeader(name: String, value: String)
-
-  def performAndWriteTo(response: HttpServletResponse)
+  protected def headers(request: HttpServletRequest) = {
+    for (headerName <- list(request.getHeaderNames).asInstanceOf[List[String]];
+         headerValue <- list(request.getHeaders(headerName)).asInstanceOf[List[String]])
+    yield (headerName, headerValue)
+  }
 }
