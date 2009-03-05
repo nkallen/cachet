@@ -2,9 +2,8 @@ package com.twitter.service.cachet.servlet
 
 import _root_.com.twitter.service.cache.client.ForwardRequest
 import _root_.javax.servlet._
+import client.ApacheHttpClient
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
-import org.apache.http.client.HttpClient
-import org.apache.http.impl.client.DefaultHttpClient
 
 class ProxyServlet extends HttpServlet {
   var config = null: ServletConfig
@@ -12,7 +11,7 @@ class ProxyServlet extends HttpServlet {
 
   override def init(c: ServletConfig) {
     config = c
-    val client = new DefaultHttpClient
+    val client = new ApacheHttpClient
     clientRequest = new ForwardRequest(client)
   }
 

@@ -5,17 +5,12 @@ import org.apache.http.HttpHost
 import org.apache.http.impl.client.DefaultHttpClient
 
 trait HttpClient {
-  def host = (host: String)
-
-  def port = (port: Int)
-
-  def scheme = (scheme: String)
-
-  def method = (method: String)
-
-  def uri = (uri: String)
-
-  def queryString = (queryString: String)
+  var host: String
+  var port: Int
+  var scheme: String
+  var method: String
+  var uri: String
+  var queryString: String
 
   def addHeader(name: String, value: String)
 

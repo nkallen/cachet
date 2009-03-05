@@ -4,16 +4,13 @@ import _root_.com.twitter.service.cache.client.ForwardRequest
 import client.HttpClient
 import com.twitter.service.cachet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
-import org.apache.http.client.HttpClient
-import org.apache.http.HttpHost
-import org.apache.http.message.BasicHttpRequest
 import org.specs._
 import org.specs.mock._
 import org.specs.mock.JMocker._
 import com.twitter.service.cachet.test.mock._
 
 object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
-  var forwardRequest = null: HttpClient
+  var forwardRequest = null: ForwardRequest
   var request = null: FakeHttpServletRequest
   var response = null: HttpServletResponse
   var httpClient = null: HttpClient
@@ -40,9 +37,9 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
           one(httpClient).scheme = "http"
           one(httpClient).method = "PUT"
           one(httpClient).uri = "/path"
-          one(httpClient).queryString = null
+          one(httpClient).queryString = ""
           one(httpClient).addHeader("foo", "bar")
-          one(httpClient).performAndWriteTo(response)
+          one(httpClient).performRequestAndWriteTo(response)
         }
         forwardRequest(request, response)
       }
