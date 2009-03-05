@@ -37,36 +37,36 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
         }
         forwardRequest(servletRequest, servletResponse)
       }
+    }
 
-      "ResponseWrapper" >> {
-        "addHeader" >> {
-          "propagates normal headers" >> {
-            val responseWrapper = new ResponseWrapper(servletResponse)
-            expect{never(servletResponse).addHeader(a[String], a[String])}
-            responseWrapper.addHeader("Proxy-Connection", "bar")
-          }
+    "ResponseWrapper" >> {
+      "addHeader" >> {
+        "propagates normal headers" >> {
+          val responseWrapper = new ResponseWrapper(servletResponse)
+          expect{never(servletResponse).addHeader(a[String], a[String])}
+          responseWrapper.addHeader("Proxy-Connection", "bar")
+        }
 
-          "does not propagate hop-by-hop headers" >> {
-            val responseWrapper = new ResponseWrapper(servletResponse)
-            expect{one(servletResponse).addHeader("foo", "bar")}
-            responseWrapper.addHeader("foo", "bar")
-          }
+        "does not propagate hop-by-hop headers" >> {
+          val responseWrapper = new ResponseWrapper(servletResponse)
+          expect{one(servletResponse).addHeader("foo", "bar")}
+          responseWrapper.addHeader("foo", "bar")
         }
       }
+    }
 
-      "RequestWrapper" >> {
-        "getHeaders" >> {
-          "propagates normal headers" >> {
-            val requestWrapper = new RequestWrapper(servletRequest)
-            servletRequest.setHeader("foo", "bar")
-            requestWrapper.getHeaders("foo").nextElement() mustEqual "bar"
-          }
+    "RequestWrapper" >> {
+      "getHeaders" >> {
+        "propagates normal headers" >> {
+          val requestWrapper = new RequestWrapper(servletRequest)
+          servletRequest.setHeader("foo", "bar")
+          requestWrapper.getHeaders("foo").nextElement() mustEqual "bar"
+        }
 
-          "does not propagate hop-by-hop headers" >> {
-            val requestWrapper = new RequestWrapper(servletRequest)
-            servletRequest.setHeader("Proxy-Connection", "bar")
-            requestWrapper.getHeaders("Proxy-Connection").hasMoreElements must beFalse
-          }
+        "does not propagate hop-by-hop headers" >> {
+          val requestWrapper = new RequestWrapper(servletRequest)
+          servletRequest.setHeader("Proxy-Connection", "bar")
+          requestWrapper.getHeaders("Proxy-Connection").hasMoreElements must beFalse
         }
       }
     }
