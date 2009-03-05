@@ -34,8 +34,24 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
           one(httpClient).newRequest willReturn httpRequest
           one(httpRequest).execute(a[String], an[Int], a[RequestWrapper], a[ResponseWrapper])
           one(servletResponse).addHeader("Via", "NProxy")
+          one(servletResponse).setHeader("X-Forwarded-For", "1.1.1.1")
         }
+        servletRequest.remoteAddr = "1.1.1.1"
         forwardRequest(servletRequest, servletResponse)
+      }
+
+      "when the request has an X-Forwarded-For header" >> {
+        "appends to it" >> {
+          expect{
+            one(httpClient).newRequest willReturn httpRequest
+            one(httpRequest).execute(a[String], an[Int], a[RequestWrapper], a[ResponseWrapper])
+            one(servletResponse).addHeader("Via", "NProxy")
+            one(servletResponse).setHeader("X-Forwarded-For", "1.1.1.1, 2.2.2.2")
+          }
+          servletRequest.remoteAddr = "2.2.2.2"
+          servletRequest.setHeader("X-Forwarded-For", "1.1.1.1")
+          forwardRequest(servletRequest, servletResponse)
+        }
       }
     }
 

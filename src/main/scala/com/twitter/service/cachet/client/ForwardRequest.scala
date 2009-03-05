@@ -16,6 +16,10 @@ class ForwardRequest(httpClient: HttpClient) {
   def apply(request: HttpServletRequest, response: HttpServletResponse) {
     httpClient.newRequest.execute("localhost", 3000, new RequestWrapper(request), new ResponseWrapper(response))
     response.addHeader("Via", "NProxy")
+    if (request.getHeader("X-Forwarded-For") == null)
+      response.setHeader("X-Forwarded-For", request.getRemoteAddr)
+    else
+      response.setHeader("X-Forwarded-For", request.getHeader("X-Forwarded-For") + ", " + request.getRemoteAddr)
   }
 }
 

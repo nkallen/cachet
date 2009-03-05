@@ -40,7 +40,7 @@ class FakeHttpServletRequest extends HttpServletRequest {
   var localName = null
   var remotePort = 0
   var remoteHost = null
-  var remoteAddr = null
+  var remoteAddr = null: String
   var isInitial = true
   var locale = Locale.getDefault
   var reader: BufferedReader = new BufferedReader(new StringReader(method + " " + path + "/\r\n\r\n"))
