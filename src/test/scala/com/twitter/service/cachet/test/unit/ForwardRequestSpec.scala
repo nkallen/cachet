@@ -34,24 +34,8 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
           one(httpClient).newRequest willReturn httpRequest
           one(httpRequest).execute(a[String], an[Int], a[RequestWrapper], a[ResponseWrapper])
           one(servletResponse).addHeader("Via", "NProxy")
-          one(servletResponse).setHeader("X-Forwarded-For", "1.1.1.1")
         }
-        servletRequest.remoteAddr = "1.1.1.1"
         forwardRequest(servletRequest, servletResponse)
-      }
-
-      "when the request has an X-Forwarded-For header" >> {
-        "appends to it" >> {
-          expect{
-            one(httpClient).newRequest willReturn httpRequest
-            one(httpRequest).execute(a[String], an[Int], a[RequestWrapper], a[ResponseWrapper])
-            one(servletResponse).addHeader("Via", "NProxy")
-            one(servletResponse).setHeader("X-Forwarded-For", "1.1.1.1, 2.2.2.2")
-          }
-          servletRequest.remoteAddr = "2.2.2.2"
-          servletRequest.setHeader("X-Forwarded-For", "1.1.1.1")
-          forwardRequest(servletRequest, servletResponse)
-        }
       }
     }
 
@@ -73,16 +57,35 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
 
     "RequestWrapper" >> {
       "getHeaders" >> {
+        var requestWrapper = null: RequestWrapper
+
+        doBefore{
+          requestWrapper = new RequestWrapper(servletRequest)
+        }
+
         "propagates normal headers" >> {
-          val requestWrapper = new RequestWrapper(servletRequest)
           servletRequest.setHeader("foo", "bar")
-          requestWrapper.getHeaders("foo").nextElement() mustEqual "bar"
+          requestWrapper.getHeaders("foo").nextElement().asInstanceOf[String] mustEqual "bar"
         }
 
         "does not propagate hop-by-hop headers" >> {
-          val requestWrapper = new RequestWrapper(servletRequest)
           servletRequest.setHeader("Proxy-Connection", "bar")
           requestWrapper.getHeaders("Proxy-Connection").hasMoreElements must beFalse
+        }
+
+        "X-Forwarded-For" >> {
+          "when the request doesn't have an X-Forwarded-For header" >> {
+            "sets the X-Forwaded-For header" >> {
+              servletRequest.remoteAddr = "1.1.1.1"
+              requestWrapper.getHeaders("X-Forwarded-For").nextElement().asInstanceOf[String] mustEqual "1.1.1.1"
+            }
+          }
+
+          "when the request has an X-Forwarded-For header" >> {
+            servletRequest.remoteAddr = "2.2.2.2"
+            servletRequest.setHeader("X-Forwarded-For", "1.1.1.1")
+            requestWrapper.getHeaders("X-Forwarded-For").nextElement().asInstanceOf[String] mustEqual "1.1.1.1, 2.2.2.2"
+          }
         }
       }
     }
