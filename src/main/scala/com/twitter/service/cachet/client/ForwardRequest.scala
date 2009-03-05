@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse
 import org.apache.http.{HttpRequest, HttpHost}
 import scala.collection.jcl.Conversions._
 
-class ForwardRequest(client: HttpClient) {
+class ForwardRequest(client: HttpClient, ClientRequest: (String, String) => HttpRequest) {
   def apply(request: HttpServletRequest, response: HttpServletResponse) {
     val (forwardHost, forwardRequest) = constructForwardRequest(request)
     val forwardResponse = client.execute(forwardHost, forwardRequest)
@@ -20,7 +20,7 @@ class ForwardRequest(client: HttpClient) {
   private def constructForwardRequest(request: HttpServletRequest) = {
     val queryString = if (request.getQueryString != null) "?" + request.getQueryString else ""
 
-    val forwardRequest = new BasicHttpRequest(request.getMethod, request.getRequestURI + queryString)
+    val forwardRequest = ClientRequest(request.getMethod, request.getRequestURI + queryString)
     for (headerName <- list(request.getHeaderNames).asInstanceOf[List[String]];
          headerValue <- list(request.getHeaders(headerName)).asInstanceOf[List[String]])
       forwardRequest.addHeader(headerName, headerValue)

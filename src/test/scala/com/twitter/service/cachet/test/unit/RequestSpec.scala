@@ -33,7 +33,11 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
         request.isInitial = true
         request.setHeader("foo", "bar")
 
-        expect{one(client).execute(a[HttpHost], a[BasicHttpRequest])}
+        expect{
+          val host = capturing[HttpHost]
+          val request = capturing[BasicHttpRequest]
+          one(client).execute(host.capture, request.capture)
+        }
         forwardRequest(request, response)
       }
     }
