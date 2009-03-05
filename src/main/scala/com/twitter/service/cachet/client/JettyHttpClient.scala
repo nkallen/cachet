@@ -2,11 +2,20 @@ package com.twitter.service.cachet.client
 
 import _root_.javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import org.mortbay.io.Buffer
-import org.mortbay.jetty.client.{HttpClient, HttpExchange}
+import org.mortbay.jetty.client.HttpExchange
 
-class CopyExchange(request: HttpServletRequest, response: HttpServletResponse) extends HttpExchange {
+class JettyHttpClient extends HttpClient {
+  val client = new org.mortbay.jetty.client.HttpClient
+  client.start()
+
+  def performRequestAndWriteTo(response: HttpServletResponse) {
+    client.send(new CopyExchange(response))
+  }
+}
+
+class CopyExchange(response: HttpServletResponse) extends HttpExchange {
   override def onResponseHeader(name: Buffer, value: Buffer) {
-    response.setHeader(name.toString, value.toString)
+    response.addHeader(name.toString, value.toString)
   }
 
   override def onResponseContent(content: Buffer) {

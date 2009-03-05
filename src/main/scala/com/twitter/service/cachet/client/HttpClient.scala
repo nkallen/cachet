@@ -1,21 +1,23 @@
 package com.twitter.service.cachet.client
 
-import _root_.javax.servlet.http.HttpServletRequest
+import _root_.javax.servlet.http.HttpServletResponse
+import org.apache.http.HttpHost
+import org.apache.http.impl.client.DefaultHttpClient
 
-trait HttpRequest {
-  def setHost(host: String)
+trait HttpClient {
+  def host = (host: String)
 
-  def setPort(port: Int)
+  def port = (port: Int)
 
-  def setScheme(scheme: String)
+  def scheme = (scheme: String)
 
-  def setMethod(method: String)
+  def method = (method: String)
 
-  def setUri(uri: String)
+  def uri = (uri: String)
 
-  def setQueryString(queryString: String)
+  def queryString = (queryString: String)
 
   def addHeader(name: String, value: String)
 
-  def writeTo(request: HttpServletRequest)
+  def performRequestAndWriteTo(response: HttpServletResponse)
 }
