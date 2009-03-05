@@ -16,6 +16,7 @@ class ForwardRequest(httpClient: HttpClient) {
     forwardRequest.method = request.getMethod
     forwardRequest.uri = request.getRequestURI
     forwardRequest.queryString = request.getQueryString
+    forwardRequest.inputStream = request.getInputStream
     for (headerName <- list(request.getHeaderNames).asInstanceOf[List[String]];
          headerValue <- list(request.getHeaders(headerName)).asInstanceOf[List[String]])
       forwardRequest.addHeader(headerName, headerValue)

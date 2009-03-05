@@ -1,6 +1,8 @@
 package com.twitter.service.cachet.client
 
 import _root_.javax.servlet.http.{HttpServletResponse, HttpServletRequest}
+import java.io.InputStream
+import org.apache.http.entity.InputStreamEntity
 
 class ApacheHttpClient extends HttpClient {
   private val client = new org.apache.http.impl.client.DefaultHttpClient
@@ -18,6 +20,7 @@ class ApacheHttpClient extends HttpClient {
     var uri = null: String
     var queryString = null: String
     var method = null: String
+    var inputStream = null: InputStream
 
     def addHeader(name: String, value: String) {
       request.addHeader(name, value)
@@ -32,8 +35,10 @@ class ApacheHttpClient extends HttpClient {
       //      response.addHeader(headerName, headerValue)
     }
 
-    private class RawApacheRequest extends org.apache.http.client.methods.HttpRequestBase with org.apache.http.HttpRequest {
+    private class RawApacheRequest extends org.apache.http.client.methods.HttpEntityEnclosingRequestBase with org.apache.http.HttpRequest {
       override def getMethod = method
+
+      override def getEntity = new InputStreamEntity(inputStream, -1)
 
       override def getProtocolVersion = null
 

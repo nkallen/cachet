@@ -41,6 +41,7 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
           one(httpRequest).method = "PUT"
           one(httpRequest).uri = "/path"
           one(httpRequest).queryString = ""
+          one(httpRequest).inputStream = servletRequest.getInputStream
           one(httpRequest).addHeader("foo", "bar")
           one(httpRequest).performAndWriteTo(servletResponse)
         }

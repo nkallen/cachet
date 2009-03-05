@@ -1,6 +1,7 @@
 package com.twitter.service.cachet.client
 
 import _root_.javax.servlet.http.{HttpServletResponse, HttpServletRequest}
+import java.io.InputStream
 import org.mortbay.io.Buffer
 
 class JettyHttpClient extends HttpClient {
@@ -13,7 +14,6 @@ class JettyHttpClient extends HttpClient {
 
   private class JettyHttpRequest extends HttpRequest {
     private var exchange = new HttpExchange
-    //  request.setRequestContentSource(request.getInputStream)
 
     var host = null: String
     var port = 80: Int
@@ -21,12 +21,14 @@ class JettyHttpClient extends HttpClient {
     var method = null: String
     var uri = null: String
     var queryString = null: String
+    var inputStream = null: InputStream
 
     def addHeader(name: String, value: String) {
       exchange.addRequestHeader(name, value)
     }
 
     def performAndWriteTo(response: HttpServletResponse) {
+      exchange.setRequestContentSource(inputStream)
       exchange.setMethod(method)
       exchange.setURL(scheme + "://" + host + ":" + port + uri + (if (queryString != null) "?" + queryString else ""))
       exchange.response = response
