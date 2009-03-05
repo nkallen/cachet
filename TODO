@@ -1,5 +1,3 @@
-Remove Hop-by-hop headers from request
-Remove Hop-by-hop headers from response
 Propagate X-Forwarded-For OR set it with getRemoteAddr()
 Add Via header
 

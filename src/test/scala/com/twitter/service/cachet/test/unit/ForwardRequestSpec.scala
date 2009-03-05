@@ -33,6 +33,7 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
         expect{
           one(httpClient).newRequest willReturn httpRequest
           one(httpRequest).execute(a[String], an[Int], a[RequestWrapper], a[ResponseWrapper])
+          one(servletResponse).addHeader("Via", "NProxy")
         }
         forwardRequest(servletRequest, servletResponse)
       }
