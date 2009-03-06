@@ -1,8 +1,6 @@
 package com.twitter.service.cachet.test.unit
 
-import _root_.com.twitter.service.cache.client.ForwardRequest
-import _root_.com.twitter.service.cache.client.RequestWrapper
-import _root_.com.twitter.service.cache.client.ResponseWrapper
+import com.twitter.service.cache.client._
 import client.{HttpRequest, HttpClient}
 import com.twitter.service.cachet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
@@ -32,7 +30,7 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
       "sets the request's method, url, headers, etc. on the client, and invokes the client" >> {
         expect{
           one(httpClient).newRequest willReturn httpRequest
-          one(httpRequest).execute(a[String], an[Int], a[RequestWrapper], a[ResponseWrapper])
+          one(httpRequest).execute(a[String], an[Int], a[RequestSpecification], a[ResponseWrapper])
           one(servletResponse).addHeader("Via", "NProxy")
         }
         forwardRequest(servletRequest, servletResponse)
@@ -55,36 +53,37 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
       }
     }
 
-    "RequestWrapper" >> {
+    "RequestSpecification" >> {
       "getHeaders" >> {
-        var requestWrapper = null: RequestWrapper
-
-        doBefore{
-          requestWrapper = new RequestWrapper(servletRequest)
-        }
-
         "propagates normal headers" >> {
+          val requestWrapper = new RequestSpecification(servletRequest)
           servletRequest.setHeader("foo", "bar")
-          requestWrapper.getHeaders("foo").nextElement().asInstanceOf[String] mustEqual "bar"
+          requestWrapper.headers.contains(("foo", "bar")) must beTrue
         }
 
         "does not propagate hop-by-hop headers" >> {
+          val requestWrapper = new RequestSpecification(servletRequest)
           servletRequest.setHeader("Proxy-Connection", "bar")
-          requestWrapper.getHeaders("Proxy-Connection").hasMoreElements must beFalse
+          requestWrapper.headers.contains("Proxy-Connection") must beFalse
         }
 
         "X-Forwarded-For" >> {
           "when the request doesn't have an X-Forwarded-For header" >> {
             "sets the X-Forwaded-For header" >> {
+              val requestWrapper = new RequestSpecification(servletRequest)
               servletRequest.remoteAddr = "1.1.1.1"
-              requestWrapper.getHeaders("X-Forwarded-For").nextElement().asInstanceOf[String] mustEqual "1.1.1.1"
+              requestWrapper.headers.contains(("X-Forwarded-For", "1.1.1.1")) must beTrue
             }
           }
 
           "when the request has an X-Forwarded-For header" >> {
-            servletRequest.remoteAddr = "2.2.2.2"
-            servletRequest.setHeader("X-Forwarded-For", "1.1.1.1")
-            requestWrapper.getHeaders("X-Forwarded-For").nextElement().asInstanceOf[String] mustEqual "1.1.1.1, 2.2.2.2"
+            "appends to the X-Forwarded-For header" >> {
+              val requestWrapper = new RequestSpecification(servletRequest)
+              servletRequest.remoteAddr = "2.2.2.2"
+              servletRequest.setHeader("X-Forwarded-For", "1.1.1.1")
+              requestWrapper.headers.contains(("X-Forwarded-For", "1.1.1.1, 2.2.2.2")) must beTrue
+              requestWrapper.headers.contains(("X-Forwarded-For", "1.1.1.1")) must beFalse
+            }
           }
         }
       }

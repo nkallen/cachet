@@ -1,16 +1,15 @@
 package com.twitter.service.cachet.client
 
+import _root_.com.twitter.service.cache.client.RequestSpecification
 import _root_.javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import java.util.ArrayList
 import scala.collection.jcl.Conversions._
 import java.util.Collections._
 
 trait HttpRequest {
-  def execute(host: String, port: Int, request: HttpServletRequest, response: HttpServletResponse)
+  def execute(host: String, port: Int, request: RequestSpecification, response: HttpServletResponse)
 
-  protected def headers(request: HttpServletRequest) = {
-    for (headerName <- list(request.getHeaderNames).asInstanceOf[ArrayList[String]];
-         headerValue <- list(request.getHeaders(headerName)).asInstanceOf[ArrayList[String]])
-    yield (headerName, headerValue)
+  protected def uriWithQueryString(requestSpecification: RequestSpecification) {
+    requestSpecification.uri + (if (requestSpecification.queryString != null) "?" + requestSpecification.queryString else "")
   }
 }

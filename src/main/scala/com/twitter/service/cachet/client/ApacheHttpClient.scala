@@ -1,5 +1,6 @@
 package com.twitter.service.cachet.client
 
+import _root_.com.twitter.service.cache.client.RequestSpecification
 import _root_.javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import java.io.InputStream
 import java.net.URI
@@ -17,9 +18,9 @@ class ApacheHttpClient extends HttpClient {
   }
 
   private class ApacheHttpRequest extends HttpRequest {
-    def execute(host: String, port: Int, servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) {
-      val request = new RawApacheRequest(servletRequest.getMethod, servletRequest.getRequestURI, headers(servletRequest), servletRequest.getInputStream)
-      val httpHost = new org.apache.http.HttpHost(host, port, servletRequest.getScheme)
+    def execute(host: String, port: Int, requestSpecification: RequestSpecification, servletResponse: HttpServletResponse) {
+      val request = new RawApacheRequest(requestSpecification.method, requestSpecification.uri, requestSpecification.headers, requestSpecification.inputStream)
+      val httpHost = new org.apache.http.HttpHost(host, port, requestSpecification.scheme)
 
       val response = client.execute(httpHost, request)
 

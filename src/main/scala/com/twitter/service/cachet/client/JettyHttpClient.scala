@@ -1,5 +1,6 @@
 package com.twitter.service.cachet.client
 
+import _root_.com.twitter.service.cache.client.RequestSpecification
 import _root_.javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import java.io.InputStream
 import org.mortbay.io.Buffer
@@ -13,12 +14,12 @@ class JettyHttpClient extends HttpClient {
   }
 
   private class JettyHttpRequest extends HttpRequest {
-    def execute(host: String, port: Int, servletRequest: HttpServletRequest, servletResponse: HttpServletResponse) {
+    def execute(host: String, port: Int, requestSpecification: RequestSpecification, servletResponse: HttpServletResponse) {
       var exchange = new HttpExchange(servletResponse)
-      exchange.setRequestContentSource(servletRequest.getInputStream)
-      exchange.setMethod(servletRequest.getMethod)
-      exchange.setURL(servletRequest.getScheme + "://" + host + ":" + port + servletRequest.getRequestURI + (if (servletRequest.getQueryString != null) "?" + servletRequest.getQueryString else ""))
-      for ((headerName, headerValue) <- headers(servletRequest))
+      exchange.setRequestContentSource(requestSpecification.inputStream)
+      exchange.setMethod(requestSpecification.method)
+      exchange.setURL(requestSpecification.scheme + "://" + host + ":" + port + uriWithQueryString(requestSpecification))
+      for ((headerName, headerValue) <- requestSpecification.headers)
         exchange.addRequestHeader(headerName, headerValue)
       client.send(exchange)
       exchange.waitForDone()

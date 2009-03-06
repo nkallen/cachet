@@ -14,7 +14,7 @@ object ForwardRequest {
 
 class ForwardRequest(httpClient: HttpClient) {
   def apply(request: HttpServletRequest, response: HttpServletResponse) {
-    httpClient.newRequest.execute("192.168.0.101", 80, new RequestWrapper(request), new ResponseWrapper(response))
+    httpClient.newRequest.execute("192.168.0.101", 80, new RequestSpecification(request), new ResponseWrapper(response))
     response.addHeader("Via", "NProxy")
   }
 }
@@ -25,16 +25,21 @@ class ResponseWrapper(response: HttpServletResponse) extends javax.servlet.http.
   }
 }
 
-class RequestWrapper(request: HttpServletRequest) extends javax.servlet.http.HttpServletRequestWrapper(request) {
-  override def getHeaders(name: String): java.util.Enumeration[_] = {
-    if (ForwardRequest.hopByHopHeaders.contains(name))
-      enumeration(new Vector)
-    else if (name == "X-Forwarded-For") {
-      val v = new Vector[AnyRef]
-      v.add(xForwardedFor)
-      enumeration(v)
-    } else
-      super.getHeaders(name)
+class RequestSpecification(request: HttpServletRequest) {
+  def scheme = request.getScheme
+
+  def uri = request.getRequestURI
+
+  def inputStream = request.getInputStream
+
+  def queryString = request.getQueryString
+
+  def method = request.getMethod
+
+  def headers: Seq[(String, String)] = {
+    (for (headerName <- list(request.getHeaderNames).asInstanceOf[ArrayList[String]] if !ForwardRequest.hopByHopHeaders.contains(headerName) && headerName != "X-Forwarded-For";
+          headerValue <- list(request.getHeaders(headerName)).asInstanceOf[ArrayList[String]])
+    yield (headerName, headerValue)) ++ (Seq(("X-Forwarded-For", xForwardedFor)))
   }
 
   private def xForwardedFor = {
