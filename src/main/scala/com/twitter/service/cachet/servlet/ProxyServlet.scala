@@ -2,7 +2,7 @@ package com.twitter.service.cachet.servlet
 
 import _root_.com.twitter.service.cache.client.ForwardRequest
 import _root_.javax.servlet._
-import client.ApacheHttpClient
+import client.{JettyHttpClient, ApacheHttpClient}
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
 
 class ProxyServlet extends HttpServlet {
@@ -11,7 +11,7 @@ class ProxyServlet extends HttpServlet {
 
   override def init(c: ServletConfig) {
     config = c
-    val client = new ApacheHttpClient
+    val client = new JettyHttpClient
     forwardRequest = new ForwardRequest(client)
   }
 

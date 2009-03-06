@@ -14,7 +14,7 @@ object ForwardRequest {
 
 class ForwardRequest(httpClient: HttpClient) {
   def apply(request: HttpServletRequest, response: HttpServletResponse) {
-    httpClient.newRequest.execute("192.168.0.101", 80, new RequestSpecification(request), new ResponseWrapper(response))
+    httpClient.newRequest.execute("localhost", 80, new RequestSpecification(request), new ResponseWrapper(response))
     response.addHeader("Via", "NProxy")
   }
 }

@@ -9,7 +9,10 @@ import java.util.Collections._
 trait HttpRequest {
   def execute(host: String, port: Int, request: RequestSpecification, response: HttpServletResponse)
 
-  protected def uriWithQueryString(requestSpecification: RequestSpecification) {
-    requestSpecification.uri + (if (requestSpecification.queryString != null) "?" + requestSpecification.queryString else "")
+  protected def uriWithQueryString(requestSpecification: RequestSpecification) = {
+    val queryString = if (requestSpecification.queryString != null)
+      "?" + requestSpecification.queryString
+    else ""
+    requestSpecification.uri + queryString
   }
 }
