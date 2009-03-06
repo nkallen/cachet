@@ -12,7 +12,7 @@ class ProxyServlet extends HttpServlet {
   override def init(c: ServletConfig) {
     config = c
     val client = new JettyHttpClient
-    forwardRequest = new ForwardRequest(client)
+    forwardRequest = new ForwardRequest(client, config.getInitParameter("host"), config.getInitParameter("port").toInt)
   }
 
   override def doGet(request: HttpServletRequest, response: HttpServletResponse) {

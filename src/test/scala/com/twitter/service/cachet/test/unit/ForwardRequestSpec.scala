@@ -23,7 +23,7 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
       servletRequest = new FakeHttpServletRequest
       servletResponse = mock[HttpServletResponse]
 
-      forwardRequest = new ForwardRequest(httpClient)
+      forwardRequest = new ForwardRequest(httpClient, "localhost", 80)
     }
 
     "apply" >> {

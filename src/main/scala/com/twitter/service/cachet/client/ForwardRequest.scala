@@ -12,9 +12,9 @@ object ForwardRequest {
   val hopByHopHeaders = Array("Proxy-Connection", "Connection", "Keep-Alive", "Transfer-Encoding", "TE", "Trailer", "Proxy-Authorization", "Proxy-Authenticate", "Upgrade")
 }
 
-class ForwardRequest(httpClient: HttpClient) {
+class ForwardRequest(httpClient: HttpClient, host: String, port: Int) {
   def apply(request: HttpServletRequest, response: HttpServletResponse) {
-    httpClient.newRequest.execute("localhost", 80, new RequestSpecification(request), new ResponseWrapper(response))
+    httpClient.newRequest.execute(host, port, new RequestSpecification(request), new ResponseWrapper(response))
     response.addHeader("Via", "NProxy")
   }
 }

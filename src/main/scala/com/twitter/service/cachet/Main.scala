@@ -1,6 +1,8 @@
 package com.twitter.service.cachet
 
-object Main extends Application {
-   val server = new Server
-   server.start()
+object Main {
+  def main(args: Array[String]) {
+    val server = new Server
+    server.start()
+  }
 }
