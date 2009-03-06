@@ -18,7 +18,7 @@ class JettyHttpClient extends HttpClient {
       var exchange = new HttpExchange(servletResponse)
       exchange.setRequestContentSource(requestSpecification.inputStream)
       exchange.setMethod(requestSpecification.method)
-      exchange.setURL(requestSpecification.scheme + "://" + host + ":" + port + uriWithQueryString(requestSpecification))
+      exchange.setURL(requestSpecification.scheme + "://" + host + ":" + port + requestSpecification.uri)
       for ((headerName, headerValue) <- requestSpecification.headers)
         exchange.addRequestHeader(headerName, headerValue)
       client.send(exchange)

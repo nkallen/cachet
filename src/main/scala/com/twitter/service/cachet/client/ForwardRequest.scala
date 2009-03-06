@@ -28,7 +28,12 @@ class ResponseWrapper(response: HttpServletResponse) extends javax.servlet.http.
 class RequestSpecification(request: HttpServletRequest) {
   def scheme = request.getScheme
 
-  def uri = request.getRequestURI
+  def uri = {
+    val queryString = if (request.getQueryString != null)
+      "?" + request.getQueryString
+    else ""
+    request.getRequestURI + queryString
+  }
 
   def inputStream = request.getInputStream
 

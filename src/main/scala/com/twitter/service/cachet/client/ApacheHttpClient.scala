@@ -5,13 +5,26 @@ import _root_.javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import java.io.InputStream
 import java.net.URI
 import org.apache.http.client.methods.HttpUriRequest
+import org.apache.http.conn.scheme.{SchemeRegistry, Scheme}
 import org.apache.http.entity.InputStreamEntity
 import org.apache.http.HttpVersion
-import org.apache.http.impl.client.RequestWrapper
+import org.apache.http.impl.client.{DefaultHttpClient, RequestWrapper}
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager
 import org.apache.http.message.BasicRequestLine
+import org.apache.http.params.BasicHttpParams
+import org.apache.http.conn.params.ConnManagerParams
+import org.apache.http.conn.scheme.PlainSocketFactory
 
 class ApacheHttpClient extends HttpClient {
-  private val client = new org.apache.http.impl.client.DefaultHttpClient
+  private val params = new BasicHttpParams
+  ConnManagerParams.setMaxTotalConnections(params, 100)
+
+  private val schemeRegistry = new SchemeRegistry
+  schemeRegistry.register(
+    new Scheme("http", PlainSocketFactory.getSocketFactory(), 80))
+
+  private val connectionManager = new ThreadSafeClientConnManager(params, schemeRegistry)
+  private val client = new org.apache.http.impl.client.DefaultHttpClient(connectionManager, params)
 
   def newRequest: HttpRequest = {
     new ApacheHttpRequest

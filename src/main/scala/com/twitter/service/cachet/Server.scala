@@ -12,7 +12,7 @@ class Server {
   val connector = new SelectChannelConnector
   val root = new Context(server, "/", Context.SESSIONS)
   val servlet = new ProxyServlet
-  val filter = new CacheProxyServletFilter
+  //  val filter = new CacheProxyServletFilter
 
   val threadPool = new QueuedThreadPool
   threadPool.setMaxThreads(100)
@@ -21,7 +21,7 @@ class Server {
   connector.setPort(1234)
   server.setConnectors(Array(connector))
 
-  root.addFilter(new FilterHolder(filter), "/", 1)
+  //  root.addFilter(new FilterHolder(filter), "/", 1)
   root.addServlet(new ServletHolder(servlet), "/")
 
   def start() {
