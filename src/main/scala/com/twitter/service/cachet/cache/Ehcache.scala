@@ -1,6 +1,6 @@
 package com.twitter.service.cachet.cache
 
-import net.sf._
+import net.sf.ehcache
 
 object Ehcache extends Cache {
   val cacheManager = ehcache.CacheManager.getInstance

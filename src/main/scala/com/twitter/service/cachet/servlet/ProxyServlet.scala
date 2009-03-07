@@ -15,19 +15,7 @@ class ProxyServlet extends HttpServlet {
     forwardRequest = new ForwardRequest(client, config.getInitParameter("host"), config.getInitParameter("port").toInt)
   }
 
-  override def doGet(request: HttpServletRequest, response: HttpServletResponse) {
-    forwardRequest(request, response)
-  }
-
-  override def doPost(request: HttpServletRequest, response: HttpServletResponse) {
-    forwardRequest(request, response)
-  }
-
-  override def doPut(request: HttpServletRequest, response: HttpServletResponse) {
-    forwardRequest(request, response)
-  }
-
-  override def doDelete(request: HttpServletRequest, response: HttpServletResponse) {
+  override def service(request: HttpServletRequest, response: HttpServletResponse) {
     forwardRequest(request, response)
   }
 }
