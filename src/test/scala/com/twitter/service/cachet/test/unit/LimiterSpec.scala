@@ -38,6 +38,7 @@ object LimiterSpec extends Specification with JMocker {
       "applies the chain" >> {
         expect{
           allowing(limitingService).isUnderLimit(request) willReturn false
+          one(response).setStatus(HttpServletResponse.SC_BAD_REQUEST)
           never(chain).doFilter(request, response)
         }
         limiter(request, response, chain)
