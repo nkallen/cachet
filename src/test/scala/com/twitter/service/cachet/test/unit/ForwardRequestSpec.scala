@@ -1,7 +1,7 @@
 package com.twitter.service.cachet.test.unit
 
 import com.twitter.service.cache.client._
-import client.{HttpRequest, HttpClient}
+import client.HttpClient
 import com.twitter.service.cachet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.specs._
@@ -11,7 +11,6 @@ import com.twitter.service.cachet.test.mock._
 
 object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
   var forwardRequest = null: ForwardRequest
-  var httpRequest = mock[HttpRequest]
   var servletRequest = null: FakeHttpServletRequest
   var servletResponse = null: HttpServletResponse
   var httpClient = null: HttpClient
@@ -19,7 +18,6 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
   "ForwardRequest" should {
     doBefore{
       httpClient = mock[HttpClient]
-      httpRequest = mock[HttpRequest]
       servletRequest = new FakeHttpServletRequest
       servletResponse = mock[HttpServletResponse]
 
@@ -29,8 +27,7 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
     "apply" >> {
       "sets the request's method, url, headers, etc. on the client, and invokes the client" >> {
         expect{
-          one(httpClient).newRequest willReturn httpRequest
-          one(httpRequest).execute(a[String], an[Int], a[RequestSpecification], a[ResponseWrapper])
+          one(httpClient).execute(a[String], an[Int], a[RequestSpecification], a[ResponseWrapper])
           one(servletResponse).addHeader("Via", "NProxy")
         }
         forwardRequest(servletRequest, servletResponse)
