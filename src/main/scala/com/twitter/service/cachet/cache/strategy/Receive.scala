@@ -1,4 +1,4 @@
-package com.twitter.service.cachet.strategy
+package com.twitter.service.cachet.cache.strategy
 
 import cache.{Cache, CacheEntry}
 import java.lang.String

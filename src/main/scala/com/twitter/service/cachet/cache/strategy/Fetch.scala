@@ -1,4 +1,4 @@
-package com.twitter.service.cachet.strategy
+package com.twitter.service.cachet.cache.strategy
 
 import _root_.javax.servlet.FilterChain
 import _root_.javax.servlet.http.{HttpServletResponse, HttpServletRequest}
