@@ -27,7 +27,7 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
     "apply" >> {
       "sets the request's method, url, headers, etc. on the client, and invokes the client" >> {
         expect{
-          one(httpClient).execute(a[String], an[Int], a[RequestSpecification], a[ResponseWrapper])
+          one(httpClient).apply(a[String], an[Int], a[RequestSpecification], a[ResponseWrapper])
           one(servletResponse).addHeader("Via", "NProxy")
         }
         forwardRequest(servletRequest, servletResponse)

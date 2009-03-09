@@ -11,7 +11,7 @@ class JettyHttpClient extends HttpClient {
   val client = new org.mortbay.jetty.client.HttpClient
   client.start()
 
-  def execute(host: String, port: Int, requestSpecification: RequestSpecification, servletResponse: HttpServletResponse) {
+  def apply(host: String, port: Int, requestSpecification: RequestSpecification, servletResponse: HttpServletResponse) {
     var exchange = new HttpExchange(servletResponse)
     exchange.setRequestContentSource(requestSpecification.inputStream)
     exchange.setMethod(requestSpecification.method)

@@ -26,7 +26,7 @@ class ApacheHttpClient extends HttpClient {
   private val connectionManager = new ThreadSafeClientConnManager(params, schemeRegistry)
   private val client = new org.apache.http.impl.client.DefaultHttpClient(connectionManager, params)
 
-  def execute(host: String, port: Int, requestSpecification: RequestSpecification, servletResponse: HttpServletResponse) {
+  def apply(host: String, port: Int, requestSpecification: RequestSpecification, servletResponse: HttpServletResponse) {
     val request = new ApacheRequest(requestSpecification.method, requestSpecification.uri, requestSpecification.headers, requestSpecification.inputStream)
     val httpHost = new org.apache.http.HttpHost(host, port, requestSpecification.scheme)
 
