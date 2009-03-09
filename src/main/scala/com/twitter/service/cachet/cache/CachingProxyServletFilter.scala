@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import strategy.{Receive, Fetch}
 
-class CacheProxyServletFilter extends Filter {
+class CachingProxyServletFilter extends Filter {
   var config = null: FilterConfig
   var receive = null: Receive
 

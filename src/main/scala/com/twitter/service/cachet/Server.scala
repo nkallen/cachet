@@ -5,7 +5,7 @@ import org.mortbay.jetty.bio.SocketConnector
 import org.mortbay.jetty.nio.SelectChannelConnector
 import org.mortbay.jetty.servlet.{FilterHolder, ServletHolder, Context}
 import org.mortbay.thread.QueuedThreadPool
-import servlet.{CacheProxyServletFilter, ProxyServlet}
+import servlet.{CachingProxyServletFilter, ProxyServlet}
 
 class Server {
   val (server, context) = configureServer()
@@ -38,7 +38,7 @@ class Server {
   }
 
   private def configureCacheProxy(context: Context) {
-    val filter = new CacheProxyServletFilter
+    val filter = new CachingProxyServletFilter
     context.addFilter(new FilterHolder(filter), "/", 1)
   }
 }
