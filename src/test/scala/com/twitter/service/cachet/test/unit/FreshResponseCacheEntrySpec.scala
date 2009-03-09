@@ -1,6 +1,6 @@
 package com.twitter.service.cachet.test.unit
 
-import _root_.com.twitter.service.cachet.cache.FreshResponseCacheEntry
+import com.twitter.service.cachet.cache.FreshResponseCacheEntry
 import com.twitter.service.cachet._
 import javax.servlet.http._
 import org.jmock.core.Stub

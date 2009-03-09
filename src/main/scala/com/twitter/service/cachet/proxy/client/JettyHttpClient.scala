@@ -1,7 +1,7 @@
 package com.twitter.service.cachet.proxy.client
 
-import _root_.com.twitter.service.cache.proxy.client.RequestSpecification
-import _root_.javax.servlet.http.{HttpServletResponse, HttpServletRequest}
+import com.twitter.service.cache.proxy.client.RequestSpecification
+import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import java.io.InputStream
 import org.mortbay.io.Buffer
 import org.mortbay.jetty.client.Address

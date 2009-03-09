@@ -1,6 +1,6 @@
 package com.twitter.service.cachet.test.unit
 
-import _root_.javax.servlet.ServletOutputStream
+import javax.servlet.ServletOutputStream
 import com.twitter.service.cachet._
 import java.io.{PrintWriter, OutputStream, ByteArrayOutputStream}
 import java.lang.String

@@ -1,7 +1,7 @@
 package com.twitter.service.cachet.servlet
 
-import _root_.com.twitter.service.cache.proxy.client.ForwardRequest
-import _root_.javax.servlet._
+import com.twitter.service.cache.proxy.client.ForwardRequest
+import javax.servlet._
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
 import proxy.client.JettyHttpClient
 

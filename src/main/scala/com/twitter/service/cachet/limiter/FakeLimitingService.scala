@@ -1,6 +1,6 @@
 package com.twitter.service.cachet.limiter
 
-import _root_.javax.servlet.http.{HttpServletResponse, HttpServletRequest}
+import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 
 class FakeLimitingService extends LimitingService {
   var count = 0

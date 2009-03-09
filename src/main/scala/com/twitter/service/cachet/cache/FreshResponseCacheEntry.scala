@@ -1,6 +1,6 @@
 package com.twitter.service.cachet.cache
 
-import _root_.javax.servlet.http.HttpServletResponse
+import javax.servlet.http.HttpServletResponse
 import scala.util.matching.Regex
 
 object FreshResponseCacheEntry extends Function[ResponseCapturer, FreshResponseCacheEntry] {

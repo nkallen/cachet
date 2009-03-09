@@ -1,26 +1,26 @@
 package com.twitter.service.cachet.test.mock
 
-import _root_.scala.collection.mutable.HashMap
-import _root_.java.io.PrintWriter
-import _root_.java.io.StringReader
-import _root_.java.io.BufferedReader
-import _root_.java.io.ByteArrayOutputStream
-import _root_.java.io.ByteArrayInputStream
-import _root_.java.io.FileInputStream
-import _root_.java.io.InputStream
-import _root_.java.io.StringBufferInputStream
-import _root_.java.io.File
-import _root_.java.util.Arrays
-import _root_.java.util.Date
-import _root_.java.util.Locale
-import _root_.java.util.Vector
-import _root_.javax.servlet._
-import _root_.javax.servlet.http._
+import scala.collection.mutable.HashMap
+import java.io.PrintWriter
+import java.io.StringReader
+import java.io.BufferedReader
+import java.io.ByteArrayOutputStream
+import java.io.ByteArrayInputStream
+import java.io.FileInputStream
+import java.io.InputStream
+import java.io.StringBufferInputStream
+import java.io.File
+import java.util.Arrays
+import java.util.Date
+import java.util.Locale
+import java.util.Vector
+import javax.servlet._
+import javax.servlet.http._
 
 /**
  * An example of how to use these mock classes in your unit tests:
  *
- *   def testLiftCore =  {
+ *   def testLiftCore =   {
  *     val output = new ByteArrayOutputStream
  *     val outputStream = new MockServletOutputStream(output)
  *     val writer = new PrintWriter(outputStream)
@@ -159,8 +159,8 @@ class MockServletOutputStream(os: ByteArrayOutputStream) extends ServletOutputSt
  * @author Steve Jenson (stevej@pobox.com)
  */
 class MockHttpSession extends HttpSession {
-  val values = new _root_.scala.collection.jcl.HashMap[String, Any](new _root_.java.util.HashMap)
-  val attr = new _root_.scala.collection.jcl.HashMap[String, Any](new _root_.java.util.HashMap)
+  val values = new scala.collection.jcl.HashMap[String, Any](new java.util.HashMap)
+  val attr = new scala.collection.jcl.HashMap[String, Any](new java.util.HashMap)
   val sessionContext = null
   var maxii = 0
   var servletContext = null

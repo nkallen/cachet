@@ -1,21 +1,21 @@
 package com.twitter.service.cachet.test.mock
 
-import _root_.scala.collection.mutable.HashMap
-import _root_.java.io.PrintWriter
-import _root_.java.io.StringReader
-import _root_.java.io.BufferedReader
-import _root_.java.io.ByteArrayOutputStream
-import _root_.java.io.ByteArrayInputStream
-import _root_.java.io.FileInputStream
-import _root_.java.io.InputStream
-import _root_.java.io.StringBufferInputStream
-import _root_.java.io.File
-import _root_.java.util.Arrays
-import _root_.java.util.Date
-import _root_.java.util.Locale
-import _root_.java.util.Vector
-import _root_.javax.servlet._
-import _root_.javax.servlet.http._
+import scala.collection.mutable.HashMap
+import java.io.PrintWriter
+import java.io.StringReader
+import java.io.BufferedReader
+import java.io.ByteArrayOutputStream
+import java.io.ByteArrayInputStream
+import java.io.FileInputStream
+import java.io.InputStream
+import java.io.StringBufferInputStream
+import java.io.File
+import java.util.Arrays
+import java.util.Date
+import java.util.Locale
+import java.util.Vector
+import javax.servlet._
+import javax.servlet.http._
 
 /**
  * A Mock ServletRequest. Change it's state to to create the request you are
@@ -29,10 +29,10 @@ class FakeHttpServletRequest extends HttpServletRequest {
   var contextPath = ""
   var path = ""
   var method = "GET"
-  val headers: _root_.scala.collection.jcl.HashMap[String, String] =
-  new _root_.scala.collection.jcl.HashMap[String, String](new _root_.java.util.HashMap)
-  val attr: _root_.scala.collection.jcl.HashMap[String, Any] =
-  new _root_.scala.collection.jcl.HashMap[String, Any](new _root_.java.util.HashMap)
+  val headers: scala.collection.jcl.HashMap[String, String] =
+  new scala.collection.jcl.HashMap[String, String](new java.util.HashMap)
+  val attr: scala.collection.jcl.HashMap[String, Any] =
+  new scala.collection.jcl.HashMap[String, Any](new java.util.HashMap)
   var cookies: List[Cookie] = Nil
   var authType = null
   var localPort = 0
@@ -48,8 +48,8 @@ class FakeHttpServletRequest extends HttpServletRequest {
   var serverName = null
   var scheme = "http"
   var protocol = "http 1.0"
-  var parameterMap: _root_.scala.collection.jcl.HashMap[String, String] =
-  new _root_.scala.collection.jcl.HashMap[String, String](new _root_.java.util.HashMap)
+  var parameterMap: scala.collection.jcl.HashMap[String, String] =
+  new scala.collection.jcl.HashMap[String, String](new java.util.HashMap)
   val sbis = new StringBufferInputStream("")
   var inputStream: ServletInputStream = new MockServletInputStream(sbis)
   var contentType = null
@@ -185,7 +185,7 @@ class FakeHttpServletRequest extends HttpServletRequest {
   def getParameterValues(key: String) =
     parameterMap.underlying.values.toArray.asInstanceOf[Array[String]]
 
-  def getParameterNames = new Vector[ZZ](parameterMap.underlying.keySet.asInstanceOf[_root_.java.util.Set[ZZ]]).elements
+  def getParameterNames = new Vector[ZZ](parameterMap.underlying.keySet.asInstanceOf[java.util.Set[ZZ]]).elements
 
   def getParameter(key: String) = parameterMap(key)
 
@@ -199,7 +199,7 @@ class FakeHttpServletRequest extends HttpServletRequest {
 
   def setCharacterEncoding(enc: String) = charEncoding = enc
 
-  def getAttributeNames = new Vector[ZZ](attr.underlying.keySet.asInstanceOf[_root_.java.util.Set[ZZ]]).elements
+  def getAttributeNames = new Vector[ZZ](attr.underlying.keySet.asInstanceOf[java.util.Set[ZZ]]).elements
 
   def getAttribute(key: String) = attr(key).asInstanceOf[Object]
 
