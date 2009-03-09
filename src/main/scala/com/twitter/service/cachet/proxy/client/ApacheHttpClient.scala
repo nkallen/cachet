@@ -1,6 +1,6 @@
-package com.twitter.service.cachet.client
+package com.twitter.service.cachet.proxy.client
 
-import _root_.com.twitter.service.cache.client.RequestSpecification
+import _root_.com.twitter.service.cache.proxy.client.RequestSpecification
 import _root_.javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import java.io.InputStream
 import java.net.URI

@@ -1,7 +1,9 @@
 package com.twitter.service.cachet.test.unit
 
-import com.twitter.service.cache.client._
-import client.HttpClient
+import _root_.com.twitter.service.cache.proxy.client.ForwardRequest
+import proxy.client.HttpClient
+import _root_.com.twitter.service.cache.proxy.client.RequestSpecification
+import _root_.com.twitter.service.cache.proxy.client.ResponseWrapper
 import com.twitter.service.cachet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.specs._

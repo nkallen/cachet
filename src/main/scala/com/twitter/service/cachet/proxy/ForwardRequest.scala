@@ -1,6 +1,6 @@
-package com.twitter.service.cache.client
+package com.twitter.service.cache.proxy.client
 
-import cachet.client.HttpClient
+import cachet.proxy.client.HttpClient
 import java.lang.String
 import java.util.{ArrayList, List, Vector}
 import javax.servlet.http.HttpServletRequest
