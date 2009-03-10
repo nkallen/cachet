@@ -1,3 +1,11 @@
+=== Reliability of Proxy ===
+
+client.setMaxConnectionsPerAddress(123)
+    .getIdleTimeout # probably doesnt work
+    .setTimeout
+
+=== ===
+
 The responseWrapper object is untested and still a little janky when mocked out in tests
 Cache-Control pragmas like no-cache
 

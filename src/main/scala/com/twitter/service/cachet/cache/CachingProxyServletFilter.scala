@@ -1,4 +1,4 @@
-package com.twitter.service.cachet.servlet
+package com.twitter.service.cachet
 
 import cache._
 import javax.servlet._

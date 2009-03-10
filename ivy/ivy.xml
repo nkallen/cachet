@@ -17,10 +17,10 @@
         <dependency org="org.scala-lang" name="scala-library" rev="2.7.3"/>
         <dependency org="org.scala-tools" name="vscaladoc" rev="1.1" conf="bootstrap->default"/>
         <dependency org="net.sf.ehcache" name="ehcache" rev="1.5.0"/>
-        <dependency org="org.mortbay.jetty" name="jetty" rev="7.0.0.pre5"/>
-        <dependency org="org.mortbay.jetty" name="jetty-util" rev="7.0.0.pre5"/>
-        <dependency org="org.mortbay.jetty" name="jetty-client" rev="7.0.0.pre5"/>
-        <dependency org="org.mortbay.jetty" name="jetty-ssl" rev="7.0.0.pre5"/>
+        <dependency org="org.mortbay.jetty" name="jetty" rev="6.1.15"/>
+        <dependency org="org.mortbay.jetty" name="jetty-util" rev="6.1.15"/>
+        <dependency org="org.mortbay.jetty" name="jetty-client" rev="6.1.15"/>
+        <dependency org="org.mortbay.jetty" name="jetty-servlet-tester" rev="6.1.15"/>
         <dependency org="javax.servlet" name="servlet-api" rev="2.5"/>
         <dependency org="net.lag" name="configgy" rev="1.2"/>
         <dependency org="org.specs" name="specs" rev="1.4.3" conf="bootstrap->*; test->*"/>

@@ -1,51 +1,50 @@
 package com.twitter.service.cachet
 
-import limiter.LimitingProxyServletFilter
+import javax.servlet.Filter
+import javax.servlet.http.HttpServlet
 import org.mortbay.jetty
 import org.mortbay.jetty.bio.SocketConnector
+import org.mortbay.jetty.Connector
 import org.mortbay.jetty.nio.SelectChannelConnector
 import org.mortbay.jetty.servlet.{FilterHolder, ServletHolder, Context}
 import org.mortbay.thread.QueuedThreadPool
-import servlet.{CachingProxyServletFilter, ProxyServlet}
 
-class Server {
-  val (server, context) = configureServer()
-  //  configureCachingProxy(context)
-  configureLimitingProxy(context)
-  configureProxyServlet(context)
+class Server(port: Int) {
+  protected val (server, context, connector) = configureServer()
+
+  def addServlet(servlet: HttpServlet, route: String) {
+    context.addServlet(new ServletHolder(servlet), route)
+  }
+
+  def addFilter(filter: Filter, route: String) {
+    context.addFilter(new FilterHolder(filter), route, 1)
+  }
 
   def start() {
     server.start()
+  }
+
+  def join() {
     server.join()
+  }
+
+  def stop() {
+    server.stop()
   }
 
   private def configureServer() = {
     val server = new jetty.Server
     val context = new Context(server, "/", Context.SESSIONS)
-    val connector = new SelectChannelConnector
+    val connector = newConnector
     val threadPool = new QueuedThreadPool
     threadPool.setMaxThreads(100)
     server.setThreadPool(threadPool)
-    connector.setPort(1234)
+    connector.setPort(port)
     server.setConnectors(Array(connector))
-    (server, context)
+    (server, context, connector)
   }
 
-  private def configureProxyServlet(context: Context) {
-    val servlet = new ProxyServlet
-    val servletHolder = new ServletHolder(servlet)
-    servletHolder.setInitParameter("host", "localhost")
-    servletHolder.setInitParameter("port", "80")
-    context.addServlet(servletHolder, "/")
-  }
-
-  private def configureCachingProxy(context: Context) {
-    val filter = new CachingProxyServletFilter
-    context.addFilter(new FilterHolder(filter), "/", 1)
-  }
-
-  private def configureLimitingProxy(context: Context) {
-    val filter = new LimitingProxyServletFilter
-    context.addFilter(new FilterHolder(filter), "/", 1)
+  protected def newConnector: Connector = {
+    new SelectChannelConnector
   }
 }
