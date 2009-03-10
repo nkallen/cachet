@@ -7,9 +7,9 @@ import org.mortbay.io.Buffer
 import org.mortbay.jetty.client.Address
 import org.mortbay.jetty.HttpSchemes
 
-class JettyHttpClient extends HttpClient {
+class JettyHttpClient(timeout: Long) extends HttpClient {
   val client = new org.mortbay.jetty.client.HttpClient
-  client.setTimeout(1000)
+  client.setTimeout(timeout)
   client.start()
 
   def apply(host: String, port: Int, requestSpecification: RequestSpecification, servletResponse: HttpServletResponse) {

@@ -15,9 +15,10 @@ import org.apache.http.params.BasicHttpParams
 import org.apache.http.conn.params.ConnManagerParams
 import org.apache.http.conn.scheme.PlainSocketFactory
 
-class ApacheHttpClient extends HttpClient {
+class ApacheHttpClient(timeout: Long) extends HttpClient {
+  // FIXME: Timeout is not used
   private val params = new BasicHttpParams
-  ConnManagerParams.setMaxTotalConnections(params, 100)
+  ConnManagerParams.setMaxTotalConnections(params, 32)
 
   private val schemeRegistry = new SchemeRegistry
   schemeRegistry.register(
