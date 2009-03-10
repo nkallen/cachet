@@ -1,8 +1,6 @@
 === Reliability of Proxy ===
 
-client.setMaxConnectionsPerAddress(123)
-    .getIdleTimeout # probably doesnt work
-    .setTimeout
+Test coverage for onException on Jetty
 
 === ===
 

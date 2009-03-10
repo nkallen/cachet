@@ -1,6 +1,7 @@
 package com.twitter.service.cachet.proxy.client
 
 import com.twitter.service.cache.proxy.client.RequestSpecification
+import java.lang.Throwable
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import java.io.InputStream
 import org.mortbay.io.Buffer
@@ -41,6 +42,14 @@ class JettyHttpClient(timeout: Long) extends HttpClient {
 
     override def onResponseStatus(version: Buffer, status: Int, reason: Buffer) {
       response.setStatus(status)
+    }
+
+    override def onExpire = {
+      response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE)
+    }
+
+    override def onException(ex: Throwable) = {
+      response.setStatus(HttpServletResponse.SC_BAD_GATEWAY)
     }
   }
 }
