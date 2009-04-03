@@ -6,7 +6,7 @@ class TestServer(port: Int) extends Server(port) {
   def apply(request: String) = {
     val c = connector.asInstanceOf[LocalConnector]
     c.reopen()
-    c.getResponses(request);
+    c.getResponses(request)
   }
 
   override def newConnector = {

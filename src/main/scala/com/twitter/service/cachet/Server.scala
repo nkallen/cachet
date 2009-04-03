@@ -9,6 +9,14 @@ import org.mortbay.jetty.nio.SelectChannelConnector
 import org.mortbay.jetty.servlet.{FilterHolder, ServletHolder, Context}
 import org.mortbay.thread.QueuedThreadPool
 
+/**
+ * Class that allows easy embedding of Jetty.
+ * How to use:
+ * <code>
+ *   val server = new Server(8080)
+ *   server.start()
+ * </code>
+ */
 class Server(port: Int) {
   protected val (server, context, connector) = configureServer()
 

@@ -12,9 +12,13 @@ object ForwardRequest {
   val hopByHopHeaders = Array("Proxy-Connection", "Connection", "Keep-Alive", "Transfer-Encoding", "TE", "Trailer", "Proxy-Authorization", "Proxy-Authenticate", "Upgrade")
 }
 
+/**
+ * Forwards Requests to the backend.
+ */
 class ForwardRequest(httpClient: HttpClient, host: String, port: Int) {
   def apply(request: HttpServletRequest, response: HttpServletResponse) {
     httpClient(host, port, new RequestSpecification(request), new ResponseWrapper(response))
+    // FIXME: add version
     response.addHeader("Via", "NProxy")
   }
 }
@@ -25,9 +29,15 @@ class ResponseWrapper(response: HttpServletResponse) extends javax.servlet.http.
   }
 }
 
+/**
+ * Removes hopByHop Headers from the incoming request, adds an X-Forwarded-For header, for talking to a backend.
+ */
 class RequestSpecification(request: HttpServletRequest) {
   def scheme = request.getScheme
 
+  /**
+   * Returns resource and query string, not scheme or host.
+   */
   def uri = {
     val queryString = if (request.getQueryString != null)
       "?" + request.getQueryString
