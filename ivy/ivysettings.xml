@@ -1,23 +1,26 @@
 <ivysettings>
   <settings defaultResolver="chain-repos" />
   <resolvers>
-    <chain name="chain-repos">
-      <filesystem name="local-libs" m2compatible="true" transactional="false">
-        <artifact pattern="${basedir}/libs/[artifact]-[revision].[ext]" />
-      </filesystem>
-      <url name="scala-tools.org" m2compatible="true">
-        <artifact pattern="http://scala-tools.org/repo-releases/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
-      </url>
-      <url name="scala-tools.org-snapshots" m2compatible="true">
-        <artifact pattern="http://scala-tools.org/repo-snapshots/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
-      </url>
-      <ibiblio name="maven2" m2compatible="true"/>
-      <url name="lag.net" m2compatible="true">
-        <artifact pattern="http://www.lag.net/repo/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
-      </url>
-    </chain>
+    <filesystem name="local-libs" m2compatible="true" transactional="false" local="true" checkmodified="true">
+      <artifact pattern="${basedir}/libs/[artifact]-[revision].[ext]" />
+    </filesystem>
     <filesystem name="local" m2compatible="true" transactional="false">
       <artifact pattern="${basedir}/dist/repo/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
     </filesystem>
+
+    <!-- Our chain defines in what order libraries are resolved. -->
+    <chain name="chain-repos" returnFirst="false">
+      <resolver ref="local-libs" />
+      <resolver ref="local" />
+
+      <ibiblio name="scala-tools.org" m2compatible="true" root="http://scala-tools.org/repo-releases/" />
+      <ibiblio name="scala-tools.org-snapshots" m2compatible="true" root="http://scala-tools.org/repo-snapshots/" changingPattern=".*-SNAPSHOT" />
+      <ibiblio name="reucon" m2compatible="true" root="http://maven.reucon.com/public/" />
+
+      <!-- can't use poms because commons-io pom is corrupted -->
+      <ibiblio name="maven2" m2compatible="true" usepoms="false" />
+      <ibiblio name="lag.net" m2compatible="true" root="http://www.lag.net/repo/" />
+    </chain>
   </resolvers>
+  <caches useOrigin="true" />
 </ivysettings>
