@@ -45,6 +45,7 @@ class Server(port: Int) {
     val context = new Context(server, "/", Context.SESSIONS)
     val connector = newConnector
     val threadPool = new QueuedThreadPool
+    // FIXME: make into a Configgy deal.
     threadPool.setMaxThreads(100)
     server.setThreadPool(threadPool)
     connector.setPort(port)

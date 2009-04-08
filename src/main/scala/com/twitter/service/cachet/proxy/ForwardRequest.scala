@@ -9,6 +9,7 @@ import scala.collection.jcl.Conversions._
 import java.util.Collections._
 
 object ForwardRequest {
+  // TODO: Find the RFC 2616 Section where these are defined.
   val hopByHopHeaders = Array("Proxy-Connection", "Connection", "Keep-Alive", "Transfer-Encoding", "TE", "Trailer", "Proxy-Authorization", "Proxy-Authenticate", "Upgrade")
 }
 
@@ -18,8 +19,8 @@ object ForwardRequest {
 class ForwardRequest(httpClient: HttpClient, host: String, port: Int) {
   def apply(request: HttpServletRequest, response: HttpServletResponse) {
     httpClient(host, port, new RequestSpecification(request), new ResponseWrapper(response))
-    // FIXME: add version
-    response.addHeader("Via", "NProxy")
+    // FIXME: add version via configgy.
+    response.addHeader("Via", "Cachet/%s".format("0.10")
   }
 }
 

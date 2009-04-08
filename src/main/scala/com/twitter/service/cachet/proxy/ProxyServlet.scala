@@ -16,6 +16,7 @@ class ProxyServlet(host: String, port: Int, timeout: Long) extends HttpServlet {
   }
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
+    // FIXME: Add backend-response-time metric.
     forwardRequest(request, response)
   }
 }
