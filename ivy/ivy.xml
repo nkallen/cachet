@@ -16,7 +16,11 @@
         <dependency org="org.scala-lang" name="scala-compiler" rev="2.7.3" conf="bootstrap->default; test->default"/>
         <dependency org="org.scala-lang" name="scala-library" rev="2.7.3"/>
         <dependency org="org.scala-tools" name="vscaladoc" rev="1.1" conf="bootstrap->default"/>
-        <dependency org="net.sf.ehcache" name="ehcache" rev="1.5.0"/>
+        <dependency org="net.sf.ehcache" name="ehcache" rev="1.5.0">
+          <exclude org="org.hibernate" />
+          <exclude org="javax.transaction" />
+          <exclude org="javax.security" />
+        </dependency>
         <dependency org="org.mortbay.jetty" name="jetty" rev="6.1.15"/>
         <dependency org="org.mortbay.jetty" name="jetty-util" rev="6.1.15"/>
         <dependency org="org.mortbay.jetty" name="jetty-client" rev="6.1.15"/>
@@ -33,5 +37,6 @@
         <dependency org="asm" name="asm" rev="1.5.3"/>
         <dependency org="org.scalatest" name="scalatest" rev="0.9.3"/>
         <dependency org="org.objenesis" name="objenesis" rev="1.1"/>
+        <dependency org="com.google" name="opengse" rev="v.9091" />
     </dependencies>
 </ivy-module>
