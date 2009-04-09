@@ -5,7 +5,7 @@ import java.util.Properties
 
 object Main {
   def main(args: Array[String]) {
-    val server = new GSEServer(1234)
+    val server = new JettyServer(1234)
     //server.addFilter(new LimitingProxyServletFilter, "/")
     val initParams = new Properties()
     // FIXME: make these configurable.
