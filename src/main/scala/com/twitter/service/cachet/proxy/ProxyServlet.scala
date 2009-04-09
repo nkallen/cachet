@@ -1,16 +1,34 @@
 package com.twitter.service.cachet
 
 import com.twitter.service.cache.proxy.client.ForwardRequest
-import javax.servlet._
-import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
+import javax.servlet.{Filter, FilterChain, FilterConfig, ServletConfig, ServletRequest, ServletResponse}
+import javax.servlet.http.{HttpServlet, HttpServletResponse, HttpServletRequest}
 import proxy.client.{JettyHttpClient, ApacheHttpClient}
 
-class ProxyServlet(host: String, port: Int, timeout: Long) extends HttpServlet {
+class ProxyServlet extends HttpServlet {
   var config = null: ServletConfig
   var forwardRequest = null: ForwardRequest
+  var host: String = ""
+  var port: Int = 0
+  var timeout: Long = 0L
 
   override def init(c: ServletConfig) {
     config = c
+    host = config.getInitParameter("backend-host") match {
+      case null => "localhost"
+      case x: String => x
+    }
+
+    port = config.getInitParameter("backend-port") match {
+      case null => 3000
+      case x: String => x.toInt
+    }
+
+    timeout = config.getInitParameter("backend-timeout") match {
+      case null => 1000L
+      case x: String => x.toLong
+    }
+
     val client = new JettyHttpClient(timeout)
     forwardRequest = new ForwardRequest(client, host, port)
   }
@@ -18,4 +36,15 @@ class ProxyServlet(host: String, port: Int, timeout: Long) extends HttpServlet {
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
     forwardRequest(request, response)
   }
+}
+
+class BasicFilter extends Filter {
+  override def doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
+    response.getWriter().append("yo").append(" - ")
+    chain.doFilter(request, response)
+  }
+
+  def init(filterConfig: FilterConfig) { /* nothing */ }
+
+  def destroy() { /* nothing */ }
 }

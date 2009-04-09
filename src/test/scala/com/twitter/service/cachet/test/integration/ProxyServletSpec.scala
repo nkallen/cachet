@@ -3,6 +3,7 @@ package com.twitter.service.cachet.test.integration
 import limiter.LimitingProxyServletFilter
 import mock.{WaitingServlet, TestServer}
 import org.mortbay.jetty.testing.HttpTester
+import java.util.Properties
 import javax.servlet.http.HttpServletResponse
 import org.specs.Specification
 
@@ -10,11 +11,13 @@ object ProxyServletSpec extends Specification {
   "ProxyServlet" >> {
     def makeRequestThroughProxy(sleepTime: Long) = {
       val proxyServer = new TestServer(2345)
-      proxyServer.addServlet(new ProxyServlet("localhost", 3456, 1000), "/")
+      proxyServer.addServlet(classOf[ProxyServlet], "/")
       proxyServer.start()
 
-      val slowServer = new Server(3456)
-      slowServer.addServlet(new WaitingServlet(sleepTime), "/")
+      val slowServer = new JettyServer(3000)
+      val waitingProps = new Properties()
+      waitingProps.put("timeout", sleepTime.toString)
+      slowServer.addServlet(classOf[WaitingServlet], "/", waitingProps)
       slowServer.start()
 
       val request = new HttpTester
