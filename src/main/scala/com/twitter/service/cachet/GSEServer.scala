@@ -51,9 +51,8 @@ class GSEServer(val port: Int) extends Server {
     addFilter(filter.getClass.asInstanceOf[Filter], route)
   }
 
-  def join() {
-    engine.awaitInitialization(10 * 1000)
-  }
+  // FIXME: this should actually block until the server exits.
+  def join() {}
 
 
   def start() {
@@ -61,6 +60,7 @@ class GSEServer(val port: Int) extends Server {
     webapps.startAll()
     engine = ServletEngineImpl.create(port, max_threads, webapps)
     engine.run()
+    engine.awaitInitialization(10 * 1000)
   }
 
   def stop() {
