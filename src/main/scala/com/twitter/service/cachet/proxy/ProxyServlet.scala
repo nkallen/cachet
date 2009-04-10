@@ -48,7 +48,7 @@ class LoggingFilter extends Filter {
   private val log = Logger.get // FIXME: use a separate logfile
   override def doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
     chain.doFilter(request, response)
-    log.info(Stats.w3c.log_entry) // FIXME: put this into another logfile.
+    log.info(Stats.w3c.log_entry)
     Stats.w3c.clear
   }
 
