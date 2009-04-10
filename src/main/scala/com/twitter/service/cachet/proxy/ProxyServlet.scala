@@ -12,7 +12,6 @@ class ProxyServlet extends HttpServlet {
   var host: String = ""
   var port: Int = 0
   var timeout: Long = 0L
-  private val log = Logger.get
 
   override def init(c: ServletConfig) {
     config = c
@@ -39,8 +38,23 @@ class ProxyServlet extends HttpServlet {
     Stats.w3c.time("rs-response-time") {
       forwardRequest(request, response)
     }
-    log.info(Stats.w3c.log_entry)
   }
+}
+
+/**
+ * At the end of each request, print the w3c log line and clear the w3c log store.
+ */
+class LoggingFilter extends Filter {
+  private val log = Logger.get // FIXME: use a separate logfile
+  override def doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
+    chain.doFilter(request, response)
+    log.info(Stats.w3c.log_entry) // FIXME: put this into another logfile.
+    Stats.w3c.clear
+  }
+
+  def init(filterConfig: FilterConfig) { /* nothing */ }
+
+  def destroy() { /* nothing */ }
 }
 
 class BasicFilter extends Filter {

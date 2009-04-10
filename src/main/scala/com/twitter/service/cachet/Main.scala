@@ -16,7 +16,6 @@ object Main {
     val PROXY_PORT = Configgy.config.getInt("proxy_port", 1234)
     val server = new JettyServer(1234)
     log.info("Proxy Server listening on port: %s", PROXY_PORT)
-    log.info("In thread: " + Thread.currentThread.getName)
     log.info(Stats.w3c.log_header)
     //server.addFilter(new LimitingProxyServletFilter, "/")
     val initParams = new Properties()
@@ -26,6 +25,7 @@ object Main {
     initParams.put("backend-timeout", "1000")
     // FIXME: nail down how to pass all traffic through either a proxy or servlet using OpenGSE.
     //server.addFilter(classOf[BasicFilter], "/*")
+    server.addFilter(classOf[LoggingFilter], "/")
     server.addServlet(classOf[ProxyServlet], "/", initParams)
     server.start()
     server.join()
