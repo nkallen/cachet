@@ -1,9 +1,10 @@
 package com.twitter.service.cachet
 
-import com.twitter.service.cache.proxy.client.ForwardRequest
+import proxy.client.{ApacheHttpClient, ForwardRequest, JettyHttpClient}
+import com.twitter.commons.W3CStats
+import net.lag.logging.Logger
 import javax.servlet.{Filter, FilterChain, FilterConfig, ServletConfig, ServletRequest, ServletResponse}
 import javax.servlet.http.{HttpServlet, HttpServletResponse, HttpServletRequest}
-import proxy.client.{JettyHttpClient, ApacheHttpClient}
 
 class ProxyServlet extends HttpServlet {
   var config = null: ServletConfig
@@ -11,6 +12,7 @@ class ProxyServlet extends HttpServlet {
   var host: String = ""
   var port: Int = 0
   var timeout: Long = 0L
+  private val log = Logger.get
 
   override def init(c: ServletConfig) {
     config = c
@@ -34,8 +36,10 @@ class ProxyServlet extends HttpServlet {
   }
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
-    // FIXME: Add backend-response-time metric.
-    forwardRequest(request, response)
+    Stats.w3c.time("rs-response-time") {
+      forwardRequest(request, response)
+    }
+    log.info(Stats.w3c.log_entry)
   }
 }
 
