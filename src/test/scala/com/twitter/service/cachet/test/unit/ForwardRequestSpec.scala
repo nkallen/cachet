@@ -1,9 +1,6 @@
 package com.twitter.service.cachet.test.unit
 
-import com.twitter.service.cache.proxy.client.ForwardRequest
-import proxy.client.HttpClient
-import com.twitter.service.cache.proxy.client.RequestSpecification
-import com.twitter.service.cache.proxy.client.ResponseWrapper
+import com.twitter.service.cachet.proxy.client.{HttpClient, ForwardRequest, RequestSpecification, ResponseWrapper}
 import com.twitter.service.cachet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.specs._
@@ -30,7 +27,7 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
       "sets the request's method, url, headers, etc. on the client, and invokes the client" >> {
         expect{
           one(httpClient).apply(a[String], an[Int], a[RequestSpecification], a[ResponseWrapper])
-          one(servletResponse).addHeader("Via", "NProxy")
+          one(servletResponse).addHeader("Via", "Cachet/0.10")
         }
         forwardRequest(servletRequest, servletResponse)
       }
