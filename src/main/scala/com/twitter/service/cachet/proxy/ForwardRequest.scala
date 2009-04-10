@@ -1,6 +1,5 @@
-package com.twitter.service.cache.proxy.client
+package com.twitter.service.cachet.proxy.client
 
-import cachet.proxy.client.HttpClient
 import java.lang.String
 import java.util.{ArrayList, List, Vector}
 import javax.servlet.http.HttpServletRequest
@@ -20,7 +19,7 @@ class ForwardRequest(httpClient: HttpClient, host: String, port: Int) {
   def apply(request: HttpServletRequest, response: HttpServletResponse) {
     httpClient(host, port, new RequestSpecification(request), new ResponseWrapper(response))
     // FIXME: add version via configgy.
-    response.addHeader("Via", "Cachet/%s".format("0.10")
+    response.addHeader("Via", "Cachet/%s".format("0.10"))
   }
 }
 
