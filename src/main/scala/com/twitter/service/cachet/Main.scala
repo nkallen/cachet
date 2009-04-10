@@ -1,6 +1,7 @@
 package com.twitter.service.cachet
 
 import limiter.LimitingProxyServletFilter
+import com.twitter.commons.W3CStats
 import net.lag.configgy.{Config, Configgy, RuntimeEnvironment}
 import net.lag.logging.Logger
 import java.util.Properties
@@ -14,7 +15,9 @@ object Main {
 
     val PROXY_PORT = Configgy.config.getInt("proxy_port", 1234)
     val server = new JettyServer(1234)
-    log.info("Proxy Server listening on port: %s", PORT)
+    log.info("Proxy Server listening on port: %s", PROXY_PORT)
+    log.info("In thread: " + Thread.currentThread.getName)
+    log.info(Stats.w3c.log_header)
     //server.addFilter(new LimitingProxyServletFilter, "/")
     val initParams = new Properties()
     // FIXME: make these configurable.
@@ -27,4 +30,8 @@ object Main {
     server.start()
     server.join()
   }
+}
+
+object Stats {
+  val w3c = new W3CStats(Array("rs-response-time", "rs-response-code", "rs-response-method", "uri", "rs-content-type", "rs-content-length"))
 }
