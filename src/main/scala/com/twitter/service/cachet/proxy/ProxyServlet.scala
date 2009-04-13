@@ -5,6 +5,7 @@ import com.twitter.commons.W3CStats
 import net.lag.logging.Logger
 import javax.servlet.{Filter, FilterChain, FilterConfig, ServletConfig, ServletRequest, ServletResponse}
 import javax.servlet.http.{HttpServlet, HttpServletResponse, HttpServletRequest}
+import java.net.ConnectException
 
 class ProxyServlet extends HttpServlet {
   var config = null: ServletConfig
@@ -12,31 +13,51 @@ class ProxyServlet extends HttpServlet {
   var host: String = ""
   var port: Int = 0
   var timeout: Long = 0L
+  val log = Logger.get
 
-  override def init(c: ServletConfig) {
-    config = c
-    host = config.getInitParameter("backend-host") match {
-      case null => "localhost"
-      case x: String => x
-    }
-
-    port = config.getInitParameter("backend-port") match {
-      case null => 3000
-      case x: String => x.toInt
-    }
-
-    timeout = config.getInitParameter("backend-timeout") match {
-      case null => 1000L
-      case x: String => x.toLong
-    }
+  def init(backend_host: String, backend_port: Int, backend_timeout: Long) {
+    this.host = backend_host
+    this.port = backend_port
+    this.timeout = backend_timeout
 
     val client = new JettyHttpClient(timeout)
     forwardRequest = new ForwardRequest(client, host, port)
   }
 
+  override def init(c: ServletConfig) {
+    config = c
+    val _host = config.getInitParameter("backend-host") match {
+      case null => "localhost"
+      case x: String => x
+    }
+
+    val _port = config.getInitParameter("backend-port") match {
+      case null => 3000
+      case x: String => x.toInt
+    }
+
+    val _timeout = config.getInitParameter("backend-timeout") match {
+      case null => 1000L
+      case x: String => x.toLong
+    }
+
+    init(_host, _port, _timeout)
+  }
+
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
     Stats.w3c.time("rs-response-time") {
-      forwardRequest(request, response)
+      try {
+        forwardRequest(request, response)
+      } catch {
+        case c: ConnectException => {
+          log.error("unable to connect to backend")
+        }
+        case e: NullPointerException => {
+          // this is GSE telling us it had a connect timeout.
+          log.error("unable to talk to backend due to exception: %s".format(e))
+        }
+        case e => e.printStackTrace; log.error("uncaught exception: " + e)
+      }
     }
   }
 }
