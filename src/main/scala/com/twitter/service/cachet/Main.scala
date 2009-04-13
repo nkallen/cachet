@@ -23,10 +23,9 @@ object Main {
     initParams.put("backend-host", "localhost")
     initParams.put("backend-port", "80")
     initParams.put("backend-timeout", "1000")
-    initParams.put("backend-numthreads", "10")
     // FIXME: nail down how to pass all traffic through either a proxy or servlet using OpenGSE.
     //server.addFilter(classOf[BasicFilter], "/*")
-    server.addFilter(classOf[LoggingFilter], "/*")
+    server.addFilter(classOf[LoggingFilter], "/")
     server.addServlet(classOf[ProxyServlet], "/", initParams)
     server.start()
     server.join()
@@ -34,5 +33,5 @@ object Main {
 }
 
 object Stats {
-  val w3c = new W3CStats(Array("rs-response-time", "s-response-code", "rs-response-code", "rs-response-method", "uri", "rs-content-type", "rs-content-length"))
+  val w3c = new W3CStats(Array("rs-response-time", "rs-response-code", "rs-response-method", "uri", "rs-content-type", "rs-content-length"))
 }

@@ -12,8 +12,6 @@ class ProxyServlet extends HttpServlet {
   var host: String = ""
   var port: Int = 0
   var timeout: Long = 0L
-  var numThreads: Int = 0
-  private val log = Logger.get // FIXME: use a separate logfile
 
   override def init(c: ServletConfig) {
     config = c
@@ -32,16 +30,7 @@ class ProxyServlet extends HttpServlet {
       case x: String => x.toLong
     }
 
-    numThreads = config.getInitParameter("backend-numthreads") match {
-      case null => 10
-      case x: String => x.toInt
-    }
-
-
-    log.info("Instantiating JettyHttpClient with host = %s, port = %d, timeout = %d, threads = %d ", 
-      host, port, timeout, numThreads)
-
-    val client = new JettyHttpClient(timeout, numThreads)
+    val client = new JettyHttpClient(timeout)
     forwardRequest = new ForwardRequest(client, host, port)
   }
 
@@ -49,8 +38,6 @@ class ProxyServlet extends HttpServlet {
     Stats.w3c.time("rs-response-time") {
       forwardRequest(request, response)
     }
-    log.info(Stats.w3c.log_entry)
-    Stats.w3c.clear
   }
 }
 
@@ -59,9 +46,10 @@ class ProxyServlet extends HttpServlet {
  */
 class LoggingFilter extends Filter {
   private val log = Logger.get // FIXME: use a separate logfile
-  log.info("Instantiating logging filter %s".format(this))
   override def doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
     chain.doFilter(request, response)
+    log.info(Stats.w3c.log_entry)
+    Stats.w3c.clear
   }
 
   def init(filterConfig: FilterConfig) { /* nothing */ }
@@ -79,4 +67,3 @@ class BasicFilter extends Filter {
 
   def destroy() { /* nothing */ }
 }
-
