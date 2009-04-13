@@ -1,11 +1,13 @@
 package com.twitter.service.cachet
 
 import com.google.opengse.webapp.{WebAppConfigurationBuilder, WebAppCollection, WebAppCollectionFactory, WebAppFactory}
-import com.google.opengse.{ServletEngine,ServletEngineConfiguration, ServletEngineConfigurationImpl}
+import com.google.opengse.{ServletEngine, ServletEngineConfiguration, ServletEngineFactory, ServletEngineConfigurationImpl}
+import com.google.opengse.core.ServletEngineFactoryImpl
 import com.google.opengse.core.ServletEngineImpl
+import net.lag.logging.Logger
 import java.util.Properties
 import java.io.{File, PrintWriter}
-import javax.servlet.{Filter, FilterChain}
+import javax.servlet.{Filter, FilterChain, ServletRequest, ServletResponse}
 import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse}
 
 class BasicServlet extends HttpServlet {
@@ -21,18 +23,14 @@ class BasicServlet extends HttpServlet {
  */
 class GSEServer(val port: Int) extends Server {
   val max_threads = 5
-  val configBuilder = new WebAppConfigurationBuilder()
-
-  val props = new Properties()
-  props.setProperty("context", "foo") // FIXME: change this to handle ALL incoming requests.
-  props.setProperty("contextdir", System.getProperty("java.io.tmpdir"))
-  props.setProperty("javax.servlet.context.tempdir", System.getProperty("java.io.tmpdir"))
-
+  val engineFactory: ServletEngineFactory = new ServletEngineFactoryImpl();
+  val config: ServletEngineConfiguration = ServletEngineConfigurationImpl.create(port, max_threads);
+  val proxyFilter = new ProxyFilterChain()
+  val engine: ServletEngine = engineFactory.createServletEngine(proxyFilter, config);
   var webapps: WebAppCollection = null
-  var engine: ServletEngine = null
 
   def addServlet(servlet: Class[_ <: HttpServlet], route: String, properties: Properties) {
-    configBuilder.addServlet(servlet, route, properties)
+    //configBuilder.addServlet(servlet, route, properties)
   }
 
   def addServlet(servlet: Class[_ <: HttpServlet], route: String) {
@@ -44,7 +42,7 @@ class GSEServer(val port: Int) extends Server {
   }
 
   def addFilter(filter: Class[_ <: Filter], route: String) {
-    configBuilder.addFilter(filter, route)
+    //configBuilder.addFilter(filter, route)
   }
 
   def addFilter(filter: Filter, route: String) {
@@ -56,15 +54,31 @@ class GSEServer(val port: Int) extends Server {
 
 
   def start() {
-    webapps = WebAppCollectionFactory.createWebAppCollectionWithOneContext(props, configBuilder.getConfiguration())
-    webapps.startAll()
-    engine = ServletEngineImpl.create(port, max_threads, webapps)
     engine.run()
+    // FIXME: make this timeout configurable.
     engine.awaitInitialization(10 * 1000)
   }
 
   def stop() {
     // FIXME: make this timeout configurable.
     engine.quit(10 * 1000) // quit with a timeout of 10 seconds.
+  }
+}
+
+class ProxyFilterChain extends FilterChain {
+  val log = Logger.get
+  val proxy_servlet = new ProxyServlet
+  proxy_servlet.init("localhost", 80, 1000)
+
+  override def doFilter(request: ServletRequest, response: ServletResponse) {
+    (request, response) match {
+      case (req: HttpServletRequest, res: HttpServletResponse) => {
+        proxy_servlet.service(req, res)
+        // FIXME: learn to compose this properly using FilterChain
+        log.info(Stats.w3c.log_entry)
+        Stats.w3c.clear
+      }
+      case x => log.info("expected HttpServletRequest/Response, instead got %s so processing the next request.".format(x))
+    }
   }
 }
