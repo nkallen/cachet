@@ -5,6 +5,7 @@ import com.twitter.commons.W3CStats
 import net.lag.logging.Logger
 import javax.servlet.{Filter, FilterChain, FilterConfig, ServletConfig, ServletRequest, ServletResponse}
 import javax.servlet.http.{HttpServlet, HttpServletResponse, HttpServletRequest}
+import java.net.ConnectException
 
 class ProxyServlet extends HttpServlet {
   var config = null: ServletConfig
@@ -12,32 +13,64 @@ class ProxyServlet extends HttpServlet {
   var host: String = ""
   var port: Int = 0
   var timeout: Long = 0L
+  var numThreads: Int = 0
+  private val log = Logger.get // FIXME: use a separate logfile
+
+  def init(backend_host: String, backend_port: Int, backend_timeout: Long , num_threads: Int) {
+    this.host = backend_host
+    this.port = backend_port
+    this.timeout = backend_timeout
+    this.numThreads = num_threads
+
+    val client = new JettyHttpClient(timeout, numThreads)
+    forwardRequest = new ForwardRequest(client, host, port)
+  }
 
   override def init(c: ServletConfig) {
     config = c
-    host = config.getInitParameter("backend-host") match {
+    val _host = config.getInitParameter("backend-host") match {
       case null => "localhost"
       case x: String => x
     }
 
-    port = config.getInitParameter("backend-port") match {
+    val _port = config.getInitParameter("backend-port") match {
       case null => 3000
       case x: String => x.toInt
     }
 
-    timeout = config.getInitParameter("backend-timeout") match {
+    val _timeout = config.getInitParameter("backend-timeout") match {
       case null => 1000L
       case x: String => x.toLong
     }
 
-    val client = new JettyHttpClient(timeout)
-    forwardRequest = new ForwardRequest(client, host, port)
+    val _numThreads = config.getInitParameter("backend-numthreads") match {
+      case null => 10
+      case x: String => x.toInt
+    }
+
+    log.info("Instantiating JettyHttpClient with host = %s, port = %d, timeout = %d, threads = %d ", 
+      _host, _port, _timeout, _numThreads)
+
+    init(_host, _port, _timeout, _numThreads)
   }
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
     Stats.w3c.time("rs-response-time") {
-      forwardRequest(request, response)
+      try {
+        forwardRequest(request, response)
+      } catch {
+        case c: ConnectException => {
+          log.error("unable to connect to backend")
+        }
+        case e: NullPointerException => {
+          // this is GSE telling us it had a connect timeout.
+          log.error("unable to talk to backend due to exception: %s".format(e))
+        }
+        case e => e.printStackTrace; log.error("uncaught exception: " + e)
+      }
     }
+    log.info(Stats.w3c.log_entry)
+    Stats.w3c.clear
   }
 }
 
@@ -46,10 +79,9 @@ class ProxyServlet extends HttpServlet {
  */
 class LoggingFilter extends Filter {
   private val log = Logger.get // FIXME: use a separate logfile
+  log.info("Instantiating logging filter %s".format(this))
   override def doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
     chain.doFilter(request, response)
-    log.info(Stats.w3c.log_entry)
-    Stats.w3c.clear
   }
 
   def init(filterConfig: FilterConfig) { /* nothing */ }
@@ -67,3 +99,4 @@ class BasicFilter extends Filter {
 
   def destroy() { /* nothing */ }
 }
+
