@@ -1,6 +1,8 @@
 package com.twitter.service.cachet.proxy.client
 
+import net.lag.logging.Logger
 import org.mortbay.io.Buffer
+import org.mortbay.thread.QueuedThreadPool
 import org.mortbay.jetty.client.{HttpClient => MortbayHttpClient}
 import org.mortbay.jetty.client.Address
 import org.mortbay.jetty.HttpSchemes
@@ -9,10 +11,12 @@ import java.lang.Throwable
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import java.io.InputStream
 
-class JettyHttpClient(timeout: Long) extends HttpClient {
+class JettyHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
   val client = new MortbayHttpClient
+  val threadPool = new QueuedThreadPool(numThreads)
   //client.setConnectorType(MortbayHttpClient.CONNECTOR_SOCKET)
   client.setTimeout(timeout)
+  client.setThreadPool(threadPool)
   client.start()
 
   def apply(host: String, port: Int, requestSpecification: RequestSpecification, servletResponse: HttpServletResponse) {
@@ -43,6 +47,7 @@ class JettyHttpClient(timeout: Long) extends HttpClient {
   private class HttpExchange[T](response: HttpServletResponse) extends org.mortbay.jetty.client.HttpExchange {
     // A placeholder so we can access the response headers from the main thread.
     var headerMap: mutable.Map[String, String] = new mutable.HashMap[String, String]()
+    val log = Logger.get
     override def onResponseHeader(name: Buffer, value: Buffer) {
       headerMap + (name.toString -> value.toString)
       response.addHeader(name.toString, value.toString)
@@ -58,10 +63,12 @@ class JettyHttpClient(timeout: Long) extends HttpClient {
     }
 
     override def onExpire = {
+      log.info("onExpire called")
       response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE)
     }
 
     override def onException(ex: Throwable) = {
+      log.info("onException called %s".format(ex.getMessage))
       response.setStatus(HttpServletResponse.SC_BAD_GATEWAY)
     }
   }
