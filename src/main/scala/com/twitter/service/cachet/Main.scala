@@ -14,7 +14,8 @@ object Main {
     runtime.load(args)
 
     val PROXY_PORT = Configgy.config.getInt("proxy_port", 1234)
-    val server = new JettyServer(1234)
+    //val server = new JettyServer(PROXY_PORT)
+    val server = new GSEServer(PROXY_PORT)
     log.info("Proxy Server listening on port: %s", PROXY_PORT)
     log.info(Stats.w3c.log_header)
     //server.addFilter(new LimitingProxyServletFilter, "/")
@@ -33,5 +34,5 @@ object Main {
 }
 
 object Stats {
-  val w3c = new W3CStats(Array("rs-response-time", "rs-response-code", "rs-response-method", "uri", "rs-content-type", "rs-content-length"))
+  val w3c = new W3CStats(Array("rs-response-time", "sc-response-code", "rs-response-code", "rs-response-method", "uri", "rs-content-type", "rs-content-length"))
 }

@@ -62,7 +62,14 @@ class JettyHttpClient(timeout: Long) extends HttpClient {
     }
 
     override def onException(ex: Throwable) = {
+      Stats.w3c.log("sc-response-code", HttpServletResponse.SC_BAD_GATEWAY)
       response.setStatus(HttpServletResponse.SC_BAD_GATEWAY)
+    }
+
+    override def onConnectionFailed(ex: Throwable) = {
+      Stats.w3c.log("sc-response-code", HttpServletResponse.SC_BAD_GATEWAY)
+      response.setStatus(HttpServletResponse.SC_BAD_GATEWAY)
+      throw ex
     }
   }
 }
