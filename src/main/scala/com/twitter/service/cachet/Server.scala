@@ -104,11 +104,16 @@ class JettyServer(val port: Int) extends Server {
 
   private def configureServer() = {
     val server = new jetty.Server
+    // FIXME: make this configurable.
+    server.setGracefulShutdown(1000)
     val context = new Context(server, "/", Context.SESSIONS)
     val connector = newConnector
     val threadPool = new QueuedThreadPool
     // FIXME: make into a Configgy deal.
-    threadPool.setMaxThreads(100)
+    threadPool.setMinThreads(10)
+    threadPool.setMaxThreads(250)
+    threadPool.setMaxIdleTimeMs(1000)
+    threadPool.setDaemon(true)
     server.setThreadPool(threadPool)
     connector.setPort(port)
     server.setConnectors(Array(connector))
