@@ -48,29 +48,32 @@ class ProxyServlet extends HttpServlet {
       case x: String => x.toInt
     }
 
-    log.info("Instantiating JettyHttpClient with host = %s, port = %d, timeout = %d, threads = %d ", 
+    log.info("Instantiating JettyHttpClient with host = %s, port = %d, timeout = %d, threads = %d ",
       _host, _port, _timeout, _numThreads)
 
     init(_host, _port, _timeout, _numThreads)
   }
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
-    Stats.w3c.time("rs-response-time") {
-      try {
-        forwardRequest(request, response)
-      } catch {
-        case c: ConnectException => {
-          log.error("unable to connect to backend")
+    try {
+      Stats.w3c.time("rs-response-time") {
+        try {
+          forwardRequest(request, response)
+        } catch {
+          case c: ConnectException => {
+            log.error("unable to connect to backend")
+          }
+          case e: NullPointerException => {
+            // this is GSE telling us it had a connect timeout.
+            log.error("unable to talk to backend due to exception: %s".format(e))
+          }
+          case e => e.printStackTrace; log.error("uncaught exception: " + e)
         }
-        case e: NullPointerException => {
-          // this is GSE telling us it had a connect timeout.
-          log.error("unable to talk to backend due to exception: %s".format(e))
-        }
-        case e => e.printStackTrace; log.error("uncaught exception: " + e)
       }
+    } finally {
+      log.info(Stats.w3c.log_entry)
+      Stats.w3c.clear
     }
-    log.info(Stats.w3c.log_entry)
-    Stats.w3c.clear
   }
 }
 
