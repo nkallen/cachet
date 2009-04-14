@@ -67,18 +67,18 @@ class JettyHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
     }
 
     override def onExpire = {
-      log.warn("onExpire called")
+      log.warning("onExpire called")
       response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE)
     }
 
     override def onException(ex: Throwable) = {
       headerMap + ("sc-response-code" -> HttpServletResponse.SC_BAD_GATEWAY.toString)
-      log.warn("Request to backend failed: %s caused by %s ".format(ex, ex.getCause()))
+      log.warning("Request to backend failed: %s caused by %s ".format(ex, ex.getCause()))
       response.setStatus(HttpServletResponse.SC_BAD_GATEWAY)
     }
 
     override def onRetry() {
-      log.warn("Retrying request")
+      log.warning("Retrying request")
       super.onRetry()
     }
 
