@@ -36,7 +36,7 @@ object ProxyServletSpec extends Specification {
     "when the backend too slow" >> {
       "it times out the response, returning HTTP 503" >> {
         val response = makeRequestThroughProxy(2000)
-        response.getStatus mustEqual HttpServletResponse.SC_SERVICE_UNAVAILABLE
+        response.getStatus mustEqual HttpServletResponse.SC_GATEWAY_TIMEOUT
       }
     }
 
