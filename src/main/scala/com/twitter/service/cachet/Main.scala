@@ -23,7 +23,7 @@ object Main {
     // FIXME: make these configurable.
     initParams.put("backend-host", "localhost")
     initParams.put("backend-port", "80")
-    initParams.put("backend-timeout", "1000")
+    initParams.put("backend-timeout", "4000")
     initParams.put("backend-numthreads", "100")
     // FIXME: nail down how to pass all traffic through either a proxy or servlet using OpenGSE.
     //server.addFilter(classOf[BasicFilter], "/*")
