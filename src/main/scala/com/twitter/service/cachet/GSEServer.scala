@@ -68,7 +68,7 @@ class GSEServer(val port: Int) extends Server {
 class ProxyFilterChain extends FilterChain {
   val log = Logger.get
   val proxy_servlet = new ProxyServlet
-  proxy_servlet.init("localhost", 80, 1000)
+  proxy_servlet.init("localhost", 80, 1000, 10)
 
   override def doFilter(request: ServletRequest, response: ServletResponse) {
     (request, response) match {

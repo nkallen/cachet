@@ -13,14 +13,16 @@ class ProxyServlet extends HttpServlet {
   var host: String = ""
   var port: Int = 0
   var timeout: Long = 0L
-  val log = Logger.get
+  var numThreads: Int = 0
+  private val log = Logger.get // FIXME: use a separate logfile
 
-  def init(backend_host: String, backend_port: Int, backend_timeout: Long) {
+  def init(backend_host: String, backend_port: Int, backend_timeout: Long , num_threads: Int) {
     this.host = backend_host
     this.port = backend_port
     this.timeout = backend_timeout
+    this.numThreads = num_threads
 
-    val client = new JettyHttpClient(timeout)
+    val client = new JettyHttpClient(timeout, numThreads)
     forwardRequest = new ForwardRequest(client, host, port)
   }
 
@@ -41,7 +43,15 @@ class ProxyServlet extends HttpServlet {
       case x: String => x.toLong
     }
 
-    init(_host, _port, _timeout)
+    val _numThreads = config.getInitParameter("backend-numthreads") match {
+      case null => 10
+      case x: String => x.toInt
+    }
+
+    log.info("Instantiating JettyHttpClient with host = %s, port = %d, timeout = %d, threads = %d ", 
+      _host, _port, _timeout, _numThreads)
+
+    init(_host, _port, _timeout, _numThreads)
   }
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
@@ -59,6 +69,8 @@ class ProxyServlet extends HttpServlet {
         case e => e.printStackTrace; log.error("uncaught exception: " + e)
       }
     }
+    log.info(Stats.w3c.log_entry)
+    Stats.w3c.clear
   }
 }
 
@@ -67,10 +79,9 @@ class ProxyServlet extends HttpServlet {
  */
 class LoggingFilter extends Filter {
   private val log = Logger.get // FIXME: use a separate logfile
+  log.info("Instantiating logging filter %s".format(this))
   override def doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
     chain.doFilter(request, response)
-    log.info(Stats.w3c.log_entry)
-    Stats.w3c.clear
   }
 
   def init(filterConfig: FilterConfig) { /* nothing */ }
@@ -88,3 +99,4 @@ class BasicFilter extends Filter {
 
   def destroy() { /* nothing */ }
 }
+

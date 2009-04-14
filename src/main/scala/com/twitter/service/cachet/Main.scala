@@ -24,9 +24,10 @@ object Main {
     initParams.put("backend-host", "localhost")
     initParams.put("backend-port", "80")
     initParams.put("backend-timeout", "1000")
+    initParams.put("backend-numthreads", "10")
     // FIXME: nail down how to pass all traffic through either a proxy or servlet using OpenGSE.
     //server.addFilter(classOf[BasicFilter], "/*")
-    server.addFilter(classOf[LoggingFilter], "/")
+    server.addFilter(classOf[LoggingFilter], "/*")
     server.addServlet(classOf[ProxyServlet], "/", initParams)
     server.start()
     server.join()
