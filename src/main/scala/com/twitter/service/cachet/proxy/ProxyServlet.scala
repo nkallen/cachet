@@ -63,11 +63,7 @@ class ProxyServlet extends HttpServlet {
           case c: ConnectException => {
             log.error("unable to connect to backend")
           }
-          case e: NullPointerException => {
-            // this is GSE telling us it had a connect timeout.
-            log.error("unable to talk to backend due to exception: %s".format(e))
-          }
-          case e => e.printStackTrace; log.error("uncaught exception: " + e)
+          case e => log.error("unable to connect to backend with uncaught exception: %s with optional cause: %s".format(e, e.getCause))
         }
       }
     } finally {
