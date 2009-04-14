@@ -38,6 +38,7 @@ class JettyHttpClient(timeout: Long) extends HttpClient {
     Stats.w3c.log("rs-response-code", exchange.headerMap.getOrElse("Code", null))
     Stats.w3c.log("rs-content-type", exchange.headerMap.getOrElse("Content-Type", null))
     Stats.w3c.log("rs-content-length", exchange.headerMap.getOrElse("Content-Length", null))
+    Stats.w3c.log("sc-response-code", exchange.headerMap.getOrElse("sc-response-code", null))
   }
 
   private class HttpExchange[T](response: HttpServletResponse) extends org.mortbay.jetty.client.HttpExchange {
@@ -62,12 +63,12 @@ class JettyHttpClient(timeout: Long) extends HttpClient {
     }
 
     override def onException(ex: Throwable) = {
-      Stats.w3c.log("sc-response-code", HttpServletResponse.SC_BAD_GATEWAY)
+      headerMap + ("sc-response-code" -> HttpServletResponse.SC_BAD_GATEWAY.toString)
       response.setStatus(HttpServletResponse.SC_BAD_GATEWAY)
     }
 
     override def onConnectionFailed(ex: Throwable) = {
-      Stats.w3c.log("sc-response-code", HttpServletResponse.SC_BAD_GATEWAY)
+      headerMap + ("sc-response-code" -> HttpServletResponse.SC_BAD_GATEWAY.toString)
       response.setStatus(HttpServletResponse.SC_BAD_GATEWAY)
       throw ex
     }
