@@ -37,12 +37,15 @@ class JettyHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
     exchange.setURI(requestSpecification.uri)
     for ((headerName, headerValue) <- requestSpecification.headers)
       exchange.addRequestHeader(headerName, headerValue)
-    client.send(exchange)
-    exchange.waitForDone()
-    Stats.w3c.log("rs-response-code", exchange.headerMap.getOrElse("Code", null))
-    Stats.w3c.log("rs-content-type", exchange.headerMap.getOrElse("Content-Type", null))
-    Stats.w3c.log("rs-content-length", exchange.headerMap.getOrElse("Content-Length", null))
-    Stats.w3c.log("sc-response-code", exchange.headerMap.getOrElse("sc-response-code", null))
+    try {
+      client.send(exchange)
+      exchange.waitForDone()
+    } finally {
+      Stats.w3c.log("rs-response-code", exchange.headerMap.getOrElse("Code", null))
+      Stats.w3c.log("rs-content-type", exchange.headerMap.getOrElse("Content-Type", null))
+      Stats.w3c.log("rs-content-length", exchange.headerMap.getOrElse("Content-Length", null))
+      Stats.w3c.log("sc-response-code", exchange.headerMap.getOrElse("sc-response-code", null))
+    }
   }
 
   private class HttpExchange[T](response: HttpServletResponse) extends org.mortbay.jetty.client.HttpExchange {
@@ -64,20 +67,22 @@ class JettyHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
     }
 
     override def onExpire = {
-      log.info("onExpire called")
+      log.warn("onExpire called")
       response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE)
     }
 
     override def onException(ex: Throwable) = {
       headerMap + ("sc-response-code" -> HttpServletResponse.SC_BAD_GATEWAY.toString)
-      log.info("onException called %s".format(ex.getMessage))
+      log.warn("Request to backend failed: %s caused by %s ".format(ex, ex.getCause()))
       response.setStatus(HttpServletResponse.SC_BAD_GATEWAY)
     }
 
-    override def onConnectionFailed(ex: Throwable) = {
-      headerMap + ("sc-response-code" -> HttpServletResponse.SC_BAD_GATEWAY.toString)
-      response.setStatus(HttpServletResponse.SC_BAD_GATEWAY)
-      throw ex
+    override def onRetry() {
+      log.warn("Retrying request")
+      super.onRetry()
     }
+
+
+    override def onConnectionFailed(ex: Throwable) = onException(ex)
   }
 }
