@@ -74,9 +74,6 @@ class ProxyFilterChain extends FilterChain {
     (request, response) match {
       case (req: HttpServletRequest, res: HttpServletResponse) => {
         proxy_servlet.service(req, res)
-        // FIXME: learn to compose this properly using FilterChain
-        log.info(Stats.w3c.log_entry)
-        Stats.w3c.clear
       }
       case x => log.info("expected HttpServletRequest/Response, instead got %s so processing the next request.".format(x))
     }
