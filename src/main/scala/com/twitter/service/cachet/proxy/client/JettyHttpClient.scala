@@ -12,12 +12,17 @@ import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import java.io.InputStream
 
 class JettyHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
+  private val log = Logger.get
   val client = new MortbayHttpClient
+  val threadPool = ThreadPool(numThreads)
   client.setTimeout(timeout)
-  client.setThreadPool(ThreadPool(numThreads))
+  client.setThreadPool(threadPool)
   client.start()
 
   def apply(host: String, port: Int, requestSpecification: RequestSpecification, servletResponse: HttpServletResponse) {
+    if (threadPool.isLowOnThreads()) {
+      log.warning("JettyHttpClient threadPool is low on threads. Consider increasing threadpool-min-threads.")
+    }
     var exchange = new HttpExchange(servletResponse)
     exchange.setRequestContentSource(requestSpecification.inputStream)
 
