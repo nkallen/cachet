@@ -6,6 +6,7 @@ import net.lag.logging.Logger
 import javax.servlet.{Filter, FilterChain, FilterConfig, ServletConfig, ServletRequest, ServletResponse}
 import javax.servlet.http.{HttpServlet, HttpServletResponse, HttpServletRequest}
 import java.net.ConnectException
+import java.util.Date
 
 class ProxyServlet extends HttpServlet {
   var config = null: ServletConfig
@@ -55,6 +56,10 @@ class ProxyServlet extends HttpServlet {
   }
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
+    val datetime = Stats.w3c.datetime_format(new Date())
+    Stats.w3c.log("request-date", datetime._1)
+    Stats.w3c.log("request-time", datetime._2)
+    Stats.w3c.log("remote-ip", request.getRemoteAddr())
     try {
       Stats.w3c.time("rs-response-time") {
         try {
