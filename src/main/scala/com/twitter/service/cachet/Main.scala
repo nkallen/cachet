@@ -38,7 +38,11 @@ object Stats {
   val w3c = new W3CStats(Array("rs-response-time", "sc-response-code", "rs-response-code", "rs-response-method", "uri", "rs-content-type", "rs-content-length"))
 }
 
-object ThreadPool {
+trait ConfiggyInit {
+  def init(config: Config)
+}
+
+object ThreadPool extends ConfiggyInit {
   val log = Logger.get
   var minThreads = 10
   var maxThreads = 250
