@@ -4,6 +4,7 @@ import limiter.LimitingProxyServletFilter
 import com.twitter.commons.W3CStats
 import net.lag.configgy.{Config, Configgy, RuntimeEnvironment}
 import net.lag.logging.Logger
+import org.mortbay.thread.QueuedThreadPool
 import java.util.Properties
 
 object Main {
@@ -12,22 +13,21 @@ object Main {
 
   def main(args: Array[String]) {
     runtime.load(args)
+    ThreadPool.init(Configgy.config)
 
     val PROXY_PORT = Configgy.config.getInt("proxy_port", 1234)
-    val server = new JettyServer(PROXY_PORT)
+    val GRACEFUL_MS = Configgy.config.getInt("graceful-shutdown-ms", 1000)
+    val NUM_THREADS = Configgy.config.getInt("backend-numthreads", 100)
+    val server = new JettyServer(PROXY_PORT, GRACEFUL_MS, NUM_THREADS)
     //val server = new GSEServer(PROXY_PORT)
     log.info("Proxy Server listening on port: %s", PROXY_PORT)
     log.info(Stats.w3c.log_header)
     //server.addFilter(new LimitingProxyServletFilter, "/")
     val initParams = new Properties()
-    // FIXME: make these configurable.
-    initParams.put("backend-host", "localhost")
-    initParams.put("backend-port", "80")
-    initParams.put("backend-timeout", "4000")
-    initParams.put("backend-numthreads", "100")
-    // FIXME: nail down how to pass all traffic through either a proxy or servlet using OpenGSE.
-    //server.addFilter(classOf[BasicFilter], "/*")
-    server.addFilter(classOf[LoggingFilter], "/*")
+    initParams.put("backend-host", Configgy.config.getString("backend-host", "localhost"))
+    initParams.put("backend-port", Configgy.config.getString("backend-port", "80"))
+    initParams.put("backend-timeout", Configgy.config.getString("backend-timeout", "4000"))
+    initParams.put("backend-numthreads", NUM_THREADS.toString)
     server.addServlet(classOf[ProxyServlet], "/", initParams)
     server.start()
     server.join()
@@ -36,4 +36,27 @@ object Main {
 
 object Stats {
   val w3c = new W3CStats(Array("rs-response-time", "sc-response-code", "rs-response-code", "rs-response-method", "uri", "rs-content-type", "rs-content-length"))
+}
+
+object ThreadPool {
+  val log = Logger.get
+  var minThreads = 10
+  var maxThreads = 250
+  var maxIdleMS = 1000
+
+  def init(config: Config) {
+    log.info("initializing ThreadPool values from Configgy")
+    minThreads = Configgy.config.getInt("threadpool-min-threads", 10)
+    maxThreads = Configgy.config.getInt("threadpool-max-threads", 250)
+    maxIdleMS = Configgy.config.getInt("threadpool-min-threads", 10)
+  }
+
+  def apply(numThreads: Int) = {
+    val threadPool = new QueuedThreadPool(numThreads)
+    threadPool.setMinThreads(minThreads)
+    threadPool.setMaxThreads(maxThreads)
+    threadPool.setMaxIdleTimeMs(maxIdleMS)
+    threadPool.setDaemon(true)
+    threadPool
+  }
 }

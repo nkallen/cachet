@@ -20,6 +20,17 @@ trait Server {
   val port: Int
 
   /**
+   * Defines how long jetty should wait, after being issued a shutdown request, before
+   * dropping outstanding requests on the floor.
+   */
+  val gracefulShutdown: Int
+
+  /**
+   * the number of threads this http server should devote to listening to requests.
+   */
+  val numThreads: Int
+
+  /**
    * Add a servlet with a set of initial properties to initial the Servlet with.
    */
   def addServlet(servlet: Class[_ <: HttpServlet], route: String, initial: Properties)
@@ -61,11 +72,11 @@ trait Server {
  * Class that allows easy embedding of Jetty.
  * How to use:
  * <code>
- *   val server = new Server(8080)
+ *   val server = new JettyServer(8080)
  *   server.start()
  * </code>
  */
-class JettyServer(val port: Int) extends Server {
+class JettyServer(val port: Int, val gracefulShutdown: Int, val numThreads: Int) extends Server {
   protected val (server, context, connector) = configureServer()
 
   def addServlet(servlet: Class[_ <: HttpServlet], route: String, props: Properties) {
@@ -104,17 +115,12 @@ class JettyServer(val port: Int) extends Server {
 
   private def configureServer() = {
     val server = new jetty.Server
-    // FIXME: make this configurable.
-    server.setGracefulShutdown(1000)
+    server.setGracefulShutdown(gracefulShutdown)
     val context = new Context(server, "/", Context.SESSIONS)
     val connector = newConnector
     val threadPool = new QueuedThreadPool
     // FIXME: make into a Configgy deal.
-    threadPool.setMinThreads(10)
-    threadPool.setMaxThreads(250)
-    threadPool.setMaxIdleTimeMs(1000)
-    threadPool.setDaemon(true)
-    server.setThreadPool(threadPool)
+    server.setThreadPool(ThreadPool(numThreads))
     connector.setPort(port)
     server.setConnectors(Array(connector))
     (server, context, connector)
@@ -124,3 +130,5 @@ class JettyServer(val port: Int) extends Server {
     new SelectChannelConnector
   }
 }
+
+

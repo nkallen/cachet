@@ -21,12 +21,11 @@ class BasicServlet extends HttpServlet {
 /**
  * Implementation of Server trait using OpenGSE.
  */
-class GSEServer(val port: Int) extends Server {
-  val max_threads = 5
-  val engineFactory: ServletEngineFactory = new ServletEngineFactoryImpl();
-  val config: ServletEngineConfiguration = ServletEngineConfigurationImpl.create(port, max_threads);
+class GSEServer(val port: Int, val gracefulShutdown: Int, val numThreads: Int) extends Server {
+  val engineFactory: ServletEngineFactory = new ServletEngineFactoryImpl()
+  val config: ServletEngineConfiguration = ServletEngineConfigurationImpl.create(port, numThreads)
   val proxyFilter = new ProxyFilterChain()
-  val engine: ServletEngine = engineFactory.createServletEngine(proxyFilter, config);
+  val engine: ServletEngine = engineFactory.createServletEngine(proxyFilter, config)
   var webapps: WebAppCollection = null
 
   def addServlet(servlet: Class[_ <: HttpServlet], route: String, properties: Properties) {

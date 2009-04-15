@@ -13,14 +13,8 @@ import java.io.InputStream
 
 class JettyHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
   val client = new MortbayHttpClient
-  val threadPool = new QueuedThreadPool(numThreads)
-  //client.setConnectorType(MortbayHttpClient.CONNECTOR_SOCKET)
-  threadPool.setMinThreads(10)
-  threadPool.setMaxThreads(250)
-  threadPool.setMaxIdleTimeMs(1000)
-  threadPool.setDaemon(true)
   client.setTimeout(timeout)
-  client.setThreadPool(threadPool)
+  client.setThreadPool(ThreadPool(numThreads))
   client.start()
 
   def apply(host: String, port: Int, requestSpecification: RequestSpecification, servletResponse: HttpServletResponse) {
