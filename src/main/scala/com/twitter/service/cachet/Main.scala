@@ -6,6 +6,7 @@ import net.lag.configgy.{Config, Configgy, RuntimeEnvironment}
 import net.lag.logging.Logger
 import org.mortbay.thread.QueuedThreadPool
 import java.util.Properties
+import java.util.logging.Level
 
 object Main {
   private val log = Logger.get
@@ -13,6 +14,8 @@ object Main {
 
   def main(args: Array[String]) {
     runtime.load(args)
+    //Logger.get("").getHandlers().foreach(_.setLevel(Level.FINEST))
+    // FIXME: put this into a threadpool section.
     ThreadPool.init(Configgy.config)
 
     val PROXY_PORT = Configgy.config.getInt("proxy_port", 1234)

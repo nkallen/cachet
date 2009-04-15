@@ -30,13 +30,18 @@ class JettyHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
     if (threadPool.isLowOnThreads()) {
       log.warning("JettyHttpClient threadPool is low on threads. Consider increasing threadpool-min-threads.")
     }
-
+    println("apply gp level: " + Logger.get("").getLevel())
+    if (log.getHandlers().size > 0) {
+      println("handler 0 level: " + log.getHandlers()(0).getLevel)
+    }
+    log.debug("creating exchange")
     var exchange = new HttpExchange(servletResponse)
     exchange.setRequestContentSource(requestSpecification.inputStream)
 
     Stats.w3c.log("rs-response-method", requestSpecification.method)
     exchange.setMethod(requestSpecification.method)
-
+    log.debug("setting the method")
+    // FIXME: HEAD does not seem to work
     exchange.setAddress(new Address(host, port))
     exchange.setScheme(
       if (HttpSchemes.HTTPS.equals(requestSpecification.scheme))
@@ -48,8 +53,13 @@ class JettyHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
     exchange.setURI(requestSpecification.uri)
     for ((headerName, headerValue) <- requestSpecification.headers)
       exchange.addRequestHeader(headerName, headerValue)
+
+    log.debug("method? " + exchange.getMethod())
+
     try {
+      log.debug("sending request to backend")
       client.send(exchange)
+      log.debug("waitForDone")
       exchange.waitForDone()
     } finally {
       Stats.w3c.log("rs-response-code", exchange.headerMap.getOrElse("Code", null))
@@ -64,15 +74,38 @@ class JettyHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
     var headerMap: mutable.Map[String, String] = new mutable.HashMap[String, String]()
     val log = Logger.get
     override def onResponseHeader(name: Buffer, value: Buffer) {
+      log.debug("onResponseHeader: %s %s".format(name.toString, value.toString))
       headerMap + (name.toString -> value.toString)
       response.addHeader(name.toString, value.toString)
     }
 
+    override def onResponseHeaderComplete() {
+      log.debug("response header complete")
+      super.onResponseHeaderComplete()
+    }
+
+    override def onRequestCommitted() {
+      log.debug("request committed")
+      super.onRequestCommitted()
+    }
+
+    override def onRequestComplete() {
+      log.debug("request completed")
+      super.onRequestComplete()
+    }
+
+    override def onResponseComplete() {
+      log.debug("response completed")
+      super.onResponseComplete()
+    }
+
     override def onResponseContent(content: Buffer) {
+      log.debug("reading response content")
       content.writeTo(response.getOutputStream)
     }
 
     override def onResponseStatus(version: Buffer, status: Int, reason: Buffer) {
+      log.debug("getting status: " + status)
       headerMap + ("Code" -> status.toString)
       response.setStatus(status)
     }
@@ -89,7 +122,7 @@ class JettyHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
     }
 
     override def onRetry() {
-      log.warning("Retrying request")
+      log.debug("Retrying request")
       super.onRetry()
     }
 
