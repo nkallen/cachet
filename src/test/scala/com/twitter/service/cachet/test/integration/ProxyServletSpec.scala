@@ -39,7 +39,7 @@ object ProxyServletSpec extends Specification {
 
   "ProxyServlet" >> {
     "when the backend too slow" >> {
-      "it times out the response, returning HTTP 503" >> {
+      "it times out the response, returning HTTP 504" >> {
         val response = makeRequestThroughProxy(2000)
         response.getStatus mustEqual HttpServletResponse.SC_GATEWAY_TIMEOUT
       }
@@ -52,12 +52,6 @@ object ProxyServletSpec extends Specification {
       }
     }
 
-    "when a HEAD request is made (fast version)" >> {
-      "it propagates the response" >> {
-        val response = makeRequestThroughProxy(0, "HEAD")
-        response.getStatus mustEqual HttpServletResponse.SC_OK
-      }
-    }
     "when a HEAD request is made (slow version)" >> {
       "it propagates the response" >> {
         val response = makeRequestThroughProxy(2000, "HEAD")
@@ -65,5 +59,11 @@ object ProxyServletSpec extends Specification {
       }
     }
 
+    "when a HEAD request is made (fast version)" >> {
+      "it propagates the response" >> {
+        val response = makeRequestThroughProxy(0, "HEAD")
+        response.getStatus mustEqual HttpServletResponse.SC_OK
+      }
+    }
   }
 }
