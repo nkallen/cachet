@@ -111,14 +111,14 @@ class JettyHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
     }
 
     override def onExpire = {
-      log.warning("onExpire called")
-      response.setStatus(HttpServletResponse.SC_GATEWAY_TIMEOUT )
+      log.warning("connect or read from backend timed out")
+      response.setStatus(HttpServletResponse.SC_GATEWAY_TIMEOUT)
     }
 
     override def onException(ex: Throwable) = {
       headerMap + ("sc-response-code" -> HttpServletResponse.SC_GATEWAY_TIMEOUT.toString)
       log.warning("Request to backend failed: %s caused by %s ".format(ex, ex.getCause()))
-      response.setStatus(HttpServletResponse.SC_GATEWAY_TIMEOUT )
+      response.setStatus(HttpServletResponse.SC_GATEWAY_TIMEOUT)
     }
 
     override def onRetry() {
