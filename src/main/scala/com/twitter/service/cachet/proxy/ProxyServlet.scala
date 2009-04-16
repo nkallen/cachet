@@ -23,8 +23,8 @@ class ProxyServlet extends HttpServlet {
     this.timeout = backend_timeout
     this.numThreads = num_threads
 
-    val client = new JettyHttpClient(timeout, numThreads)
-    //val client = new ApacheHttpClient(timeout, numThreads)
+    //val client = new JettyHttpClient(timeout, numThreads)
+    val client = new ApacheHttpClient(timeout, numThreads)
     log.info("Instantiating HttpClient (%s) with host = %s, port = %d, timeout = %d, threads = %d ", client,
              host, port, timeout, numThreads)
 
