@@ -24,6 +24,10 @@ class ProxyServlet extends HttpServlet {
     this.numThreads = num_threads
 
     val client = new JettyHttpClient(timeout, numThreads)
+    //val client = new ApacheHttpClient(timeout, numThreads)
+    log.info("Instantiating HttpClient (%s) with host = %s, port = %d, timeout = %d, threads = %d ", client,
+             host, port, timeout, numThreads)
+
     forwardRequest = new ForwardRequest(client, host, port)
   }
 
@@ -48,9 +52,6 @@ class ProxyServlet extends HttpServlet {
       case null => 10
       case x: String => x.toInt
     }
-
-    log.info("Instantiating JettyHttpClient with host = %s, port = %d, timeout = %d, threads = %d ",
-      _host, _port, _timeout, _numThreads)
 
     init(_host, _port, _timeout, _numThreads)
   }

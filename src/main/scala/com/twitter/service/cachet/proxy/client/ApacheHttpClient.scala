@@ -14,12 +14,13 @@ import org.apache.http.params.BasicHttpParams
 import org.apache.http.conn.params.ConnManagerParams
 import org.apache.http.conn.scheme.PlainSocketFactory
 
-class ApacheHttpClient(timeout: Long) extends HttpClient {
+class ApacheHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
   // FIXME: Timeout is not used
   private val params = new BasicHttpParams
-  ConnManagerParams.setMaxTotalConnections(params, 32)
+  ConnManagerParams.setMaxTotalConnections(params, numThreads)
 
   private val schemeRegistry = new SchemeRegistry
+  // FIXME: Also support HTTPS
   schemeRegistry.register(
     new Scheme("http", PlainSocketFactory.getSocketFactory(), 80))
 
@@ -30,6 +31,7 @@ class ApacheHttpClient(timeout: Long) extends HttpClient {
     val request = new ApacheRequest(requestSpecification.method, requestSpecification.uri, requestSpecification.headers, requestSpecification.inputStream)
     val httpHost = new org.apache.http.HttpHost(host, port, requestSpecification.scheme)
 
+    // FIXME: add timings.
     val response = client.execute(httpHost, request)
 
     for (header <- response.getAllHeaders)
