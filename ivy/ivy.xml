@@ -29,6 +29,7 @@
         <dependency org="net.lag" name="configgy" rev="1.2"/>
         <dependency org="org.specs" name="specs" rev="1.4.3" conf="bootstrap->*; test->*"/>
         <dependency org="commons-collections" name="commons-collections" rev="3.2.1"/>
+        <dependency org="org.apache.httpcomponents" name="httpcore" rev="4.0"/>
         <dependency org="org.apache.httpcomponents" name="httpclient" rev="4.0-beta2"/>
         <dependency org="commons-logging" name="commons-logging" rev="1.1.1"/>
         <dependency org="org.jmock" name="jmock" rev="2.4.0"/>
