@@ -30,10 +30,6 @@ class JettyHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
     if (threadPool.isLowOnThreads()) {
       log.warning("JettyHttpClient threadPool is low on threads. Consider increasing threadpool-min-threads.")
     }
-    println("apply gp level: " + Logger.get("").getLevel())
-    if (log.getHandlers().size > 0) {
-      println("handler 0 level: " + log.getHandlers()(0).getLevel)
-    }
     log.debug("creating exchange")
     var exchange = new HttpExchange(servletResponse)
     exchange.setRequestContentSource(requestSpecification.inputStream)
