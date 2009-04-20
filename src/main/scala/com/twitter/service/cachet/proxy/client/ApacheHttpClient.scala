@@ -16,23 +16,22 @@ import org.apache.http.message.BasicRequestLine
 import org.apache.http.params.BasicHttpParams
 import org.apache.http.conn.params.ConnManagerParams
 import org.apache.http.conn.scheme.PlainSocketFactory
+import org.apache.http.conn.ssl.SSLSocketFactory
+
 
 class ApacheHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
   private val params = new BasicHttpParams
   private val log = Logger.get
   ConnManagerParams.setMaxTotalConnections(params, numThreads)
   params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, timeout.toInt)
+  params.setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true)
   params.setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout.toInt)
 
   private val schemeRegistry = new SchemeRegistry
   schemeRegistry.register(
     new Scheme("http", PlainSocketFactory.getSocketFactory(), 80))
-
-  /** FIXME: support https
   schemeRegistry.register(
     new Scheme("https", SSLSocketFactory.getSocketFactory(), 443))
-    **/
-  
 
   private val connectionManager = new ThreadSafeClientConnManager(params, schemeRegistry)
   private val client = new org.apache.http.impl.client.DefaultHttpClient(connectionManager, params)
@@ -41,7 +40,7 @@ class ApacheHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
     val log = Logger.get
     Stats.w3c.log("rs-response-method", requestSpecification.method)
     Stats.w3c.log("uri", requestSpecification.uri)
-  
+
     val request = new ApacheRequest(requestSpecification.method, requestSpecification.uri, requestSpecification.headers, requestSpecification.inputStream)
     val httpHost = new org.apache.http.HttpHost(host, port, requestSpecification.scheme)
 
@@ -53,32 +52,29 @@ class ApacheHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
 
       val entity = response.getEntity()
       val statusLine = response.getStatusLine()
-      //FIXME need sc-response-code, also check values of content-length and content-type
       if (entity != null) {
-        val ctyp = entity.getContentType() 
-        val ty = if (ctyp != null) (ctyp.getName() + ctyp.getValue()) else null
-        log.info("content-length=%d, content-type=%s, status-line=%s". format(entity.getContentLength(), ctyp, statusLine))
+        val contentType = if (entity.getContentType() != null) {
+          // Returns the Content-Type minus any parameters (rfc 2045 S5)
+          val cType = entity.getContentType.getValue()
+          val index = cType.indexOf(";")
+          if (index > 0) {
+            cType.substring(0, index)
+          } else {
+            cType
+          }
+        } else {
+          null
+        }
+
+        Stats.w3c.log("rs-content-type", contentType)
+
         entity.writeTo(servletResponse.getOutputStream)
         Stats.w3c.log("rs-content-length", entity.getContentLength())
-        //FIXME: Stats.w3c.log("rs-content-type", ctyp)
       }
       Stats.w3c.log("rs-response-code", statusLine.getStatusCode())
     } catch {
-      /***
-      // FIXME: check this for all exceptions http://java.sun.com/j2se/1.4.2/docs/api/index.html
-      case _: SocketTimeoutException => {
-        log.warning("SocketTimeoutException: backend timed out while reading, returning 504 to client.")
-        Stats.w3c.log("sc-response-code", HttpServletResponse.SC_GATEWAY_TIMEOUT)
-        servletResponse.setStatus(HttpServletResponse.SC_GATEWAY_TIMEOUT)
-      }
-      case _: ConnectException => {
-        log.warning("ConnectException: backend timed out while connecting, returning 504 to the client.")
-        Stats.w3c.log("sc-response-code", HttpServletResponse.SC_GATEWAY_TIMEOUT)
-        servletResponse.setStatus(HttpServletResponse.SC_GATEWAY_TIMEOUT)
-      }
-      ***/
       case e => {
-        log.warning("%s: backend timed out while reading (message='%s'), returning 504 to client.".format(e.toString, e.getMessage()))
+        log.warning("%s: backend timed out while connection (message='%s', cause='%s'), returning 504 to client.".format(e.toString, e.getMessage(), e.getCause()))
         Stats.w3c.log("sc-response-code", HttpServletResponse.SC_GATEWAY_TIMEOUT)
         servletResponse.setStatus(HttpServletResponse.SC_GATEWAY_TIMEOUT)
       }
