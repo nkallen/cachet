@@ -29,7 +29,7 @@ class ApacheHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
   params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, timeout.toInt)
   params.setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true)
   params.setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout.toInt)
-  HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1)
+  //HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1)
 
   private val schemeRegistry = new SchemeRegistry
   schemeRegistry.register(
