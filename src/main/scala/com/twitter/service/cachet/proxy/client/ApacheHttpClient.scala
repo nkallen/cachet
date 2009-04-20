@@ -8,12 +8,11 @@ import java.net.{SocketException, ConnectException, SocketTimeoutException, URI}
 import org.apache.http.client.methods.HttpUriRequest
 import org.apache.http.conn.scheme.{SchemeRegistry, Scheme}
 import org.apache.http.entity.InputStreamEntity
-import org.apache.http.params.CoreConnectionPNames
+import org.apache.http.params.{BasicHttpParams, CoreConnectionPNames, HttpProtocolParams}
 import org.apache.http.HttpVersion
 import org.apache.http.impl.client.{DefaultHttpClient, RequestWrapper}
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager
 import org.apache.http.message.BasicRequestLine
-import org.apache.http.params.BasicHttpParams
 import org.apache.http.conn.params.ConnManagerParams
 import org.apache.http.conn.scheme.PlainSocketFactory
 import org.apache.http.conn.ssl.SSLSocketFactory
@@ -26,6 +25,7 @@ class ApacheHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
   params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, timeout.toInt)
   params.setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true)
   params.setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout.toInt)
+  HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1)
 
   private val schemeRegistry = new SchemeRegistry
   schemeRegistry.register(
