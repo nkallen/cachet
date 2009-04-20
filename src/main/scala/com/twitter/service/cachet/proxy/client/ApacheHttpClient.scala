@@ -8,7 +8,8 @@ import java.net.{SocketException, ConnectException, SocketTimeoutException, URI}
 import org.apache.http.client.methods.HttpUriRequest
 import org.apache.http.conn.scheme.{SchemeRegistry, Scheme}
 import org.apache.http.entity.InputStreamEntity
-import org.apache.http.params.CoreConnectionPNames
+import org.apache.http.conn.params._
+import org.apache.http.params._
 import org.apache.http.HttpVersion
 import org.apache.http.impl.client.{DefaultHttpClient, RequestWrapper}
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager
@@ -20,9 +21,13 @@ import org.apache.http.conn.ssl.SSLSocketFactory
 
 
 class ApacheHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
-  private val params = new BasicHttpParams
   private val log = Logger.get
-  ConnManagerParams.setMaxTotalConnections(params, numThreads)
+  private val params = new BasicHttpParams
+  // The HTTP spec only allows 2 concurrent connections per host by default, this allows us to
+  // make Integer.MAX_VALUE concurrent connections per host.
+  val twitterRouter = new ConnPerRouteBean(Integer.MAX_VALUE)
+
+  params.setParameter(ConnManagerPNames.MAX_CONNECTIONS_PER_ROUTE, twitterRouter)
   params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, timeout.toInt)
   params.setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true)
   params.setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout.toInt)
