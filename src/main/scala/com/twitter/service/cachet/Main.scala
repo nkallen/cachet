@@ -21,8 +21,13 @@ object Main {
     val PROXY_PORT = Configgy.config.getInt("proxy_port", 1234)
     val GRACEFUL_MS = Configgy.config.getInt("graceful-shutdown-ms", 1000)
     val NUM_THREADS = Configgy.config.getInt("backend-numthreads", 100)
-    val server = new JettyServer(PROXY_PORT, GRACEFUL_MS, NUM_THREADS)
-    //val server = new GSEServer(PROXY_PORT)
+    var SSL_PORT = Configgy.config.getInt("ssl_port", 8433)
+    var KEYSTORE_PASSWORD = Configgy.config.getString("keystore-password", "asdfasdf")
+    // The path to your ssl keystore file.
+    var KEYSTORE_LOCATION = Configgy.config.getString("keystore-location", "data/keystore")
+    var SSL_PASSWORD = Configgy.config.getString("ssl-password", "asdfasdf")
+    val server = new JettyServer(PROXY_PORT, GRACEFUL_MS, NUM_THREADS, SSL_PORT, KEYSTORE_PASSWORD,
+                                 KEYSTORE_LOCATION, SSL_PASSWORD)
     log.info("Proxy Server listening on port: %s", PROXY_PORT)
     log.info(Stats.w3c.log_header)
     //server.addFilter(new LimitingProxyServletFilter, "/")

@@ -4,6 +4,7 @@ import org.mortbay.jetty
 import org.mortbay.jetty.bio.SocketConnector
 import org.mortbay.jetty.Connector
 import org.mortbay.jetty.nio.SelectChannelConnector
+import org.mortbay.jetty.security.SslSelectChannelConnector
 import org.mortbay.jetty.servlet.{FilterHolder, ServletHolder, Context}
 import org.mortbay.thread.QueuedThreadPool
 import java.util.Properties
@@ -76,8 +77,9 @@ trait Server {
  *   server.start()
  * </code>
  */
-class JettyServer(val port: Int, val gracefulShutdown: Int, val numThreads: Int) extends Server {
-  protected val (server, context, connector) = configureServer()
+class JettyServer(val port: Int, val gracefulShutdown: Int, val numThreads: Int, val ssl_port: Int,
+                  val keystore_location: String, val keystore_password: String, val ssl_password: String) extends Server {
+  protected val (server, context, connector, sslConnector) = configureServer()
 
   def addServlet(servlet: Class[_ <: HttpServlet], route: String, props: Properties) {
     val holder = new ServletHolder(servlet)
@@ -117,17 +119,28 @@ class JettyServer(val port: Int, val gracefulShutdown: Int, val numThreads: Int)
     val server = new jetty.Server
     server.setGracefulShutdown(gracefulShutdown)
     val context = new Context(server, "/", Context.SESSIONS)
-    val connector = newConnector
     val threadPool = new QueuedThreadPool
     // FIXME: make into a Configgy deal.
     server.setThreadPool(ThreadPool(numThreads))
-    connector.setPort(port)
-    server.setConnectors(Array(connector))
-    (server, context, connector)
+    val connector = newHttpConnector
+    val sslConnector = newSslConnector
+    server.setConnectors(Array(connector, sslConnector))
+    (server, context, connector, sslConnector)
   }
 
-  protected def newConnector: Connector = {
-    new SelectChannelConnector
+  protected def newHttpConnector: Connector = {
+    val conn = new SelectChannelConnector
+    conn.setPort(port)
+    conn
+  }
+
+  protected def newSslConnector: Connector = {
+    val conn = new SslSelectChannelConnector
+    conn.setKeystore(keystore_location)
+    conn.setKeyPassword(keystore_password)
+    conn.setPassword(ssl_password)
+    conn.setPort(ssl_port)
+    conn
   }
 }
 

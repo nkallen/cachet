@@ -9,11 +9,11 @@ import org.specs.Specification
 
 object ProxyServletSpec extends Specification {
   def makeRequestThroughProxy(sleepTime: Long, method: String): HttpTester = {
-    val proxyServer = new TestServer(2345, 0, 10)
+    val proxyServer = new TestServer(2345, 0, 10, 8433, "data/keystore", "asdfasdf", "asdfasdf")
     proxyServer.addServlet(classOf[ProxyServlet], "/")
     proxyServer.start()
 
-    val slowServer = new JettyServer(3000, 0, 10)
+    val slowServer = new JettyServer(3000, 0, 10, 8434, "data/keystore", "asdfasdf", "asdfasdf")
     val waitingProps = new Properties()
     waitingProps.put("timeout", sleepTime.toString)
     slowServer.addServlet(classOf[WaitingServlet], "/", waitingProps)
