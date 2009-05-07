@@ -44,6 +44,10 @@ class GSEServer(val port: Int, val gracefulShutdown: Int, val numThreads: Int) e
     //configBuilder.addFilter(filter, route)
   }
 
+  def addFilter(filter: Class[_ <: Filter], route: String, props: Properties) {
+    addFilter(filter, route)
+  }
+
   def addFilter(filter: Filter, route: String) {
     addFilter(filter.getClass.asInstanceOf[Filter], route)
   }

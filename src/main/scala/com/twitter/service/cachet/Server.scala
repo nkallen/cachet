@@ -44,6 +44,11 @@ trait Server {
   def addServlet(servlet: HttpServlet, route: String)
 
   /**
+   * Adds a ServletFilter for a given url initialized with a set of Properties
+   */
+  def addFilter(filter: Class[_ <: Filter], route: String, props: Properties)
+
+  /**
    * Adds a Servlet Filter for handling a given routing url
    */
   def addFilter(filter: Filter, route: String)
@@ -87,8 +92,14 @@ class JettyServer(val port: Int, val gracefulShutdown: Int, val numThreads: Int,
     context.addServlet(holder, route)
   }
 
+  def addFilter(filter: Class[_ <: Filter], route: String, props: Properties) {
+    val holder = new FilterHolder(filter)
+    holder.setInitParameters(props)
+    context.addFilter(holder, route, 1)
+  }
+
   def addFilter(filter: Class[_ <: Filter], route: String) {
-    context.addFilter(new FilterHolder(filter), route, 1)
+    addFilter(filter, route)
   }
 
   def addServlet(servlet: Class[_ <: HttpServlet], route: String) {
