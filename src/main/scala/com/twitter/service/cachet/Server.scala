@@ -10,6 +10,8 @@ import org.mortbay.thread.QueuedThreadPool
 import java.util.Properties
 import javax.servlet.Filter
 import javax.servlet.http.HttpServlet
+import net.lag.configgy.Config
+import net.lag.logging.Logger
 
 /**
  * Trait for exposing an ServletEngine.
@@ -24,7 +26,7 @@ trait Server {
    * Defines how long jetty should wait, after being issued a shutdown request, before
    * dropping outstanding requests on the floor.
    */
-  val gracefulShutdown: Int
+  val gracefulShutdownMS: Int
 
   /**
    * the number of threads this http server should devote to listening to requests.
@@ -82,8 +84,25 @@ trait Server {
  *   server.start()
  * </code>
  */
-class JettyServer(val port: Int, val gracefulShutdown: Int, val numThreads: Int, val ssl_port: Int,
+class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: Int, val ssl_port: Int,
                   val keystore_location: String, val keystore_password: String, val ssl_password: String) extends Server {
+  private val log = Logger.get
+  var acceptors = 1
+  var maxIdleTimeMS = 100
+  var lowResourcesMaxIdleTimeMS = 1000
+  var lowResourcesConnections = 100
+
+  def this(config: Config) {
+    this(config.getInt("port", 8080), config.getInt("gracefulShutdownMS", 10), config.getInt("backend-num-threads", 10),
+         config.getInt("ssl-port", 433), config.getString("keystore-location", "notset"),
+         config.getString("keystore-password", "notset"), config.getString("ssl-password", "notset"))
+    acceptors = config.getInt("connector.acceptors", acceptors)
+    maxIdleTimeMS = config.getInt("connector.maxIdleTimeMS", maxIdleTimeMS)
+    lowResourcesMaxIdleTimeMS = config.getInt("connector.lowResourcesMaxIdleTimeMS", lowResourcesMaxIdleTimeMS)
+    lowResourcesConnections = config.getInt("connector.lowResourcesConnections", lowResourcesConnections)
+    log.info("initilizing JettyServer with the following: port:%s, gracefulShutdownMS:%s, numThreads:%s, ssl_port:%s, keystore_location:%s acceptors:%s maxIdleTimeMS:%s lowResourcesMaxIdleTimeMS:%s lowResourcesConnections:%s".format(port, gracefulShutdownMS, numThreads, ssl_port, keystore_location, acceptors, maxIdleTimeMS, lowResourcesMaxIdleTimeMS, lowResourcesConnections))
+  }
+
   protected val (server, context, connector, sslConnector) = configureServer()
 
   def addServlet(servlet: Class[_ <: HttpServlet], route: String, props: Properties) {
@@ -128,7 +147,7 @@ class JettyServer(val port: Int, val gracefulShutdown: Int, val numThreads: Int,
 
   private def configureServer() = {
     val server = new jetty.Server
-    server.setGracefulShutdown(gracefulShutdown)
+    server.setGracefulShutdown(gracefulShutdownMS)
     val context = new Context(server, "/", Context.SESSIONS)
     val threadPool = new QueuedThreadPool
     // FIXME: make into a Configgy deal.
@@ -142,6 +161,10 @@ class JettyServer(val port: Int, val gracefulShutdown: Int, val numThreads: Int,
   protected def newHttpConnector: Connector = {
     val conn = new SelectChannelConnector
     conn.setPort(port)
+    conn.setAcceptors(acceptors)
+    conn.setMaxIdleTime(maxIdleTimeMS)
+    conn.setLowResourcesConnections(lowResourcesConnections)
+    conn.setLowResourcesMaxIdleTime(lowResourcesMaxIdleTimeMS)
     conn
   }
 
@@ -151,6 +174,10 @@ class JettyServer(val port: Int, val gracefulShutdown: Int, val numThreads: Int,
     conn.setKeyPassword(keystore_password)
     conn.setPassword(ssl_password)
     conn.setPort(ssl_port)
+    conn.setAcceptors(acceptors)
+    conn.setMaxIdleTime(maxIdleTimeMS)
+    conn.setLowResourcesConnections(lowResourcesConnections)
+    conn.setLowResourcesMaxIdleTime(lowResourcesMaxIdleTimeMS)
     conn
   }
 }

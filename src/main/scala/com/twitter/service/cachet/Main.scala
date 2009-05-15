@@ -14,28 +14,16 @@ object Main {
 
   def main(args: Array[String]) {
     runtime.load(args)
-    //Logger.get("").getHandlers().foreach(_.setLevel(Level.FINEST))
-    // FIXME: put this into a threadpool section.
     ThreadPool.init(Configgy.config)
 
-    val PROXY_PORT = Configgy.config.getInt("proxy_port", 1234)
-    val GRACEFUL_MS = Configgy.config.getInt("graceful-shutdown-ms", 1000)
-    val NUM_THREADS = Configgy.config.getInt("backend-numthreads", 100)
-    var SSL_PORT = Configgy.config.getInt("ssl_port", 8433)
-    var KEYSTORE_PASSWORD = Configgy.config.getString("keystore-password", "asdfasdf")
-    // The path to your ssl keystore file.
-    var KEYSTORE_LOCATION = Configgy.config.getString("keystore-location", "data/keystore")
-    var SSL_PASSWORD = Configgy.config.getString("ssl-password", "asdfasdf")
-    val server = new JettyServer(PROXY_PORT, GRACEFUL_MS, NUM_THREADS, SSL_PORT, KEYSTORE_PASSWORD,
-                                 KEYSTORE_LOCATION, SSL_PASSWORD)
-    log.info("Proxy Server listening on port: %s", PROXY_PORT)
+    val server = new JettyServer(Configgy.config)
     log.info(Stats.w3c.log_header)
-    //server.addFilter(new LimitingProxyServletFilter, "/")
+
     val initParams = new Properties()
     initParams.put("backend-host", Configgy.config.getString("backend-host", "localhost"))
     initParams.put("backend-port", Configgy.config.getString("backend-port", "80"))
     initParams.put("backend-timeout", Configgy.config.getString("backend-timeout", "4000"))
-    initParams.put("backend-numthreads", NUM_THREADS.toString)
+    initParams.put("backend-numthreads", Configgy.config.getInt("backend-num-threads", 100).toString)
     server.addServlet(classOf[ProxyServlet], "/", initParams)
     server.start()
     server.join()
@@ -55,17 +43,20 @@ object ThreadPool extends ConfiggyInit {
   var minThreads = 10
   var maxThreads = 250
   var maxIdleMS = 1000
+  var lowThreads = 100
 
   def init(config: Config) {
     log.info("initializing ThreadPool values from Configgy")
-    minThreads = Configgy.config.getInt("threadpool-min-threads", 10)
-    maxThreads = Configgy.config.getInt("threadpool-max-threads", 250)
-    maxIdleMS = Configgy.config.getInt("threadpool-min-threads", 10)
+    minThreads = Configgy.config.getInt("threadpool.min-threads", minThreads)
+    maxThreads = Configgy.config.getInt("threadpool.max-threads", maxThreads)
+    maxIdleMS = Configgy.config.getInt("threadpool.max-idle-ms", maxIdleMS)
+    lowThreads = Configgy.config.getInt("threadpool.low-threads", lowThreads)
   }
 
   def apply(numThreads: Int) = {
     val threadPool = new QueuedThreadPool(numThreads)
     threadPool.setMinThreads(minThreads)
+    threadPool.setLowThreads(lowThreads)
     threadPool.setMaxThreads(maxThreads)
     threadPool.setMaxIdleTimeMs(maxIdleMS)
     threadPool.setDaemon(true)

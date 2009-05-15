@@ -21,7 +21,7 @@ class BasicServlet extends HttpServlet {
 /**
  * Implementation of Server trait using OpenGSE.
  */
-class GSEServer(val port: Int, val gracefulShutdown: Int, val numThreads: Int) extends Server {
+class GSEServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: Int) extends Server {
   val engineFactory: ServletEngineFactory = new ServletEngineFactoryImpl()
   val config: ServletEngineConfiguration = ServletEngineConfigurationImpl.create(port, numThreads)
   val proxyFilter = new ProxyFilterChain()
