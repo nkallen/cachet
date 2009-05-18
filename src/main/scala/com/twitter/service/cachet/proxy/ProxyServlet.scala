@@ -17,16 +17,19 @@ class ProxyServlet extends HttpServlet {
   var numThreads: Int = 0
   private val log = Logger.get // FIXME: use a separate logfile
 
-  def init(backend_host: String, backend_port: Int, backend_timeout: Long , num_threads: Int) {
+  def init(backend_host: String, backend_port: Int, backend_timeout: Long , num_threads: Int, use_apache: Boolean) {
     this.host = backend_host
     this.port = backend_port
     this.timeout = backend_timeout
     this.numThreads = num_threads
 
-    //val client = new JettyHttpClient(timeout, numThreads)
-    val client = new ApacheHttpClient(timeout, numThreads)
-    log.info("Instantiating HttpClient (%s) with host = %s, port = %d, timeout = %d, threads = %d ", client,
-             host, port, timeout, numThreads)
+    val client = if (use_apache) {
+      new JettyHttpClient(timeout, numThreads)
+    } else {
+      new ApacheHttpClient(timeout, numThreads)
+    }
+    log.info("Instantiating HttpClient (%s) with apache = %s host = %s, port = %d, timeout = %d, threads = %d ", client,
+             use_apache, host, port, timeout, numThreads)
 
     forwardRequest = new ForwardRequest(client, host, port)
   }
@@ -53,7 +56,12 @@ class ProxyServlet extends HttpServlet {
       case x: String => x.toInt
     }
 
-    init(_host, _port, _timeout, _numThreads)
+    val _useApache: Boolean = config.getInitParameter("use-apache-client") match {
+      case null => true
+      case x: String => x.toBoolean
+    }
+
+    init(_host, _port, _timeout, _numThreads, _useApache)
   }
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
