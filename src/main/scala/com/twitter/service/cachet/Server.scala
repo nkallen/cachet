@@ -163,6 +163,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     conn.setPort(port)
     conn.setAcceptors(acceptors)
     conn.setMaxIdleTime(maxIdleTimeMS)
+    conn.setStatsOn(false)
     conn.setLowResourcesConnections(lowResourcesConnections)
     conn.setLowResourcesMaxIdleTime(lowResourcesMaxIdleTimeMS)
     conn
@@ -176,6 +177,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     conn.setPort(ssl_port)
     conn.setAcceptors(acceptors)
     conn.setMaxIdleTime(maxIdleTimeMS)
+    conn.setStatsOn(false)
     conn.setLowResourcesConnections(lowResourcesConnections)
     conn.setLowResourcesMaxIdleTime(lowResourcesMaxIdleTimeMS)
     conn
