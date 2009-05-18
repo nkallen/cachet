@@ -28,7 +28,7 @@ class ProxyServlet extends HttpServlet {
     } else {
       new ApacheHttpClient(timeout, numThreads)
     }
-    log.info("Instantiating HttpClient (%s) with apache = %s host = %s, port = %d, timeout = %d, threads = %d ", client,
+    log.info("Instantiating HttpClient (%s) use_apache = %s, host = %s, port = %d, timeout = %d, threads = %d ", client,
              use_apache, host, port, timeout, numThreads)
 
     forwardRequest = new ForwardRequest(client, host, port)
