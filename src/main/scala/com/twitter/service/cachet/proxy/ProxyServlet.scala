@@ -24,10 +24,11 @@ class ProxyServlet extends HttpServlet {
     this.numThreads = num_threads
 
     val client = if (use_apache) {
-      new JettyHttpClient(timeout, numThreads)
-    } else {
       new ApacheHttpClient(timeout, numThreads)
+    } else {
+      new JettyHttpClient(timeout, numThreads)
     }
+
     log.info("Instantiating HttpClient (%s) use_apache = %s, host = %s, port = %d, timeout = %d, threads = %d ", client,
              use_apache, host, port, timeout, numThreads)
 
