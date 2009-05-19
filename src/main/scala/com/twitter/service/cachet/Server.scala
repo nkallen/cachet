@@ -103,7 +103,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     log.info("initilizing JettyServer with the following: port:%s, gracefulShutdownMS:%s, numThreads:%s, ssl_port:%s, keystore_location:%s acceptors:%s maxIdleTimeMS:%s lowResourcesMaxIdleTimeMS:%s lowResourcesConnections:%s".format(port, gracefulShutdownMS, numThreads, ssl_port, keystore_location, acceptors, maxIdleTimeMS, lowResourcesMaxIdleTimeMS, lowResourcesConnections))
   }
 
-  protected val (server, context, connector, sslConnector) = configureServer()
+  val (server, context, connector, sslConnector) = configureServer()
 
   def addServlet(servlet: Class[_ <: HttpServlet], route: String, props: Properties) {
     val holder = new ServletHolder(servlet)
