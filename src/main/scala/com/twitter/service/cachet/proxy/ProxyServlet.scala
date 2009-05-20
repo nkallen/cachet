@@ -10,16 +10,19 @@ import java.util.Date
 
 class ProxyServlet extends HttpServlet {
   var config = null: ServletConfig
-  var forwardRequest = null: ForwardRequest
+  var httpForwardRequest = null: ForwardRequest
+  var httpsForwardRequest = null: ForwardRequest
   var host: String = ""
   var port: Int = 0
+  var sslPort: Int = 10433
   var timeout: Long = 0L
   var numThreads: Int = 0
   private val log = Logger.get // FIXME: use a separate logfile
 
-  def init(backend_host: String, backend_port: Int, backend_timeout: Long , num_threads: Int, use_apache: Boolean) {
+  def init(backend_host: String, backend_port: Int, backend_ssl_port: Int, backend_timeout: Long , num_threads: Int, use_apache: Boolean) {
     this.host = backend_host
     this.port = backend_port
+    this.sslPort = backend_ssl_port
     this.timeout = backend_timeout
     this.numThreads = num_threads
 
@@ -29,10 +32,11 @@ class ProxyServlet extends HttpServlet {
       new JettyHttpClient(timeout, numThreads)
     }
 
-    log.info("Instantiating HttpClient (%s) use_apache = %s, host = %s, port = %d, timeout = %d, threads = %d ", client,
-             use_apache, host, port, timeout, numThreads)
+    log.info("Instantiating HttpClients (%s) use_apache = %s, host = %s, port = %d, ssl_port=%s timeout = %d, threads = %d ", client,
+             use_apache, host, port, sslPort, timeout, numThreads)
 
-    forwardRequest = new ForwardRequest(client, host, port)
+    httpForwardRequest = new ForwardRequest(client, host, port)
+    httpsForwardRequest = new ForwardRequest(client, host, sslPort)
   }
 
   override def init(c: ServletConfig) {
@@ -44,6 +48,11 @@ class ProxyServlet extends HttpServlet {
 
     val _port = config.getInitParameter("backend-port") match {
       case null => 3000
+      case x: String => x.toInt
+    }
+
+    val _sslPort = config.getInitParameter("backend-ssl-port") match {
+      case null => 10443
       case x: String => x.toInt
     }
 
@@ -62,7 +71,7 @@ class ProxyServlet extends HttpServlet {
       case x: String => x.toBoolean
     }
 
-    init(_host, _port, _timeout, _numThreads, _useApache)
+    init(_host, _port, _sslPort, _timeout, _numThreads, _useApache)
   }
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
@@ -73,12 +82,18 @@ class ProxyServlet extends HttpServlet {
     try {
       Stats.w3c.time("rs-response-time") {
         try {
-          forwardRequest(request, response)
+          if (request.getScheme.equals("http")) {
+            httpForwardRequest(request, response)
+          } else {
+            httpsForwardRequest(request, response)
+          }
         } catch {
           case c: ConnectException => {
             log.error("unable to connect to backend")
           }
-          case e => log.error("unable to connect to backend with uncaught exception: %s with optional cause: %s".format(e, e.getCause))
+          case e => {
+            log.error(e, "unable to connect to backend with uncaught exception: %s with optional cause: %s".format(e, e.getCause))
+          }
         }
       }
     } finally {

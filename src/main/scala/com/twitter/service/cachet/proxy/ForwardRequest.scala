@@ -8,8 +8,11 @@ import scala.collection.jcl.Conversions._
 import java.util.Collections._
 
 object ForwardRequest {
-  // TODO: Find the RFC 2616 Section where these are defined.
-  val hopByHopHeaders = Array("Proxy-Connection", "Connection", "Keep-Alive", "Transfer-Encoding", "TE", "Trailer", "Proxy-Authorization", "Proxy-Authenticate", "Upgrade")
+  // TODO: Find the RFC 2616 Section where these are
+  // defined. Content-Length is not a hop-by-hop header, it is an
+  // end-to-end header but the Apache HTTP Client does NOT like having
+  // it set in advance.
+  val hopByHopHeaders = Array("Proxy-Connection", "Connection", "Keep-Alive", "Transfer-Encoding", "TE", "Trailer", "Proxy-Authorization", "Proxy-Authenticate", "Upgrade", "Content-Length")
 }
 
 /**
