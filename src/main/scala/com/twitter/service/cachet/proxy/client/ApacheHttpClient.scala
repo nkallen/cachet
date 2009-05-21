@@ -1,26 +1,28 @@
 package com.twitter.service.cachet.proxy.client
 
 import net.lag.logging.Logger
-import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
-//FIXME import java.io.IOException
 import java.io.InputStream
-import java.net.{SocketException, ConnectException, SocketTimeoutException, URI}
+import java.net.{InetAddress, Socket, SocketException, ConnectException, SocketTimeoutException, URI}
+import javax.net.ssl.SSLSocket
+import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
+import org.apache.http.{HttpResponse, HttpVersion}
+import org.apache.http.client.RedirectHandler
 import org.apache.http.client.methods.HttpUriRequest
-import org.apache.http.conn.scheme.{SchemeRegistry, Scheme}
-import org.apache.http.entity.InputStreamEntity
-import org.apache.http.params.{BasicHttpParams, CoreConnectionPNames, HttpProtocolParams}
 import org.apache.http.conn.params._
-import org.apache.http.HttpVersion
+import org.apache.http.conn.scheme.{PlainSocketFactory, LayeredSocketFactory, SchemeRegistry, Scheme}
+import org.apache.http.conn.ssl.{AllowAllHostnameVerifier, SSLSocketFactory}
+import org.apache.http.entity.InputStreamEntity
+import org.apache.http.message.BasicRequestLine
 import org.apache.http.impl.client.{DefaultHttpClient, RequestWrapper}
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager
-import org.apache.http.message.BasicRequestLine
-import org.apache.http.conn.scheme.PlainSocketFactory
-import org.apache.http.conn.ssl.SSLSocketFactory
+import org.apache.http.params.{BasicHttpParams, CoreConnectionPNames, CoreProtocolPNames, HttpParams, HttpProtocolParams}
+import org.apache.http.protocol.HttpContext
 
 
 class ApacheHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
   private val log = Logger.get
   private val params = new BasicHttpParams
+
   // The HTTP spec only allows 2 concurrent connections per host by default, this allows us to
   // make Integer.MAX_VALUE concurrent connections per host.
   val twitterRouter = new ConnPerRouteBean(Integer.MAX_VALUE)
@@ -29,16 +31,27 @@ class ApacheHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
   params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, timeout.toInt)
   params.setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true)
   params.setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout.toInt)
+  params.setBooleanParameter(CoreProtocolPNames.USE_EXPECT_CONTINUE, false)
+  params.setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false)
   //HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1)
 
+  val sslSocketFactory = SSLSocketFactory.getSocketFactory()
+  sslSocketFactory.setHostnameVerifier(new AllowAllHostnameVerifier)
+
   private val schemeRegistry = new SchemeRegistry
+  // FIXME: Do not hardcode these ports!! (REVIEWER DO NOT LET ME FORGET!)
   schemeRegistry.register(
-    new Scheme("http", PlainSocketFactory.getSocketFactory(), 80))
+    new Scheme("http", PlainSocketFactory.getSocketFactory(), 10000))
   schemeRegistry.register(
-    new Scheme("https", SSLSocketFactory.getSocketFactory(), 443))
+    new Scheme("https", sslSocketFactory, 10443))
 
   private val connectionManager = new ThreadSafeClientConnManager(params, schemeRegistry)
   private val client = new org.apache.http.impl.client.DefaultHttpClient(connectionManager, params)
+  // We do not wish to handle redirects automatically, pass them back to the user.
+  client.setRedirectHandler(new RedirectHandler() {
+    override def isRedirectRequested(response: HttpResponse,  context: HttpContext): Boolean = false
+    override def getLocationURI(response: HttpResponse, context: HttpContext): URI = null
+  })
 
   def apply(host: String, port: Int, requestSpecification: RequestSpecification, servletResponse: HttpServletResponse) {
     val log = Logger.get
@@ -72,13 +85,14 @@ class ApacheHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
 
         Stats.w3c.log("rs-content-type", contentType)
 
+        servletResponse.setStatus(statusLine.getStatusCode)
         entity.writeTo(servletResponse.getOutputStream)
         Stats.w3c.log("rs-content-length", entity.getContentLength())
       }
       Stats.w3c.log("rs-response-code", statusLine.getStatusCode())
     } catch {
       case e => {
-        log.warning("%s: backend timed out while connection (message='%s', cause='%s'), returning 504 to client.".format(e.toString, e.getMessage(), e.getCause()))
+        log.error(e, "%s: backend timed out while connection (message='%s', cause='%s'), returning 504 to client.".format(e.toString, e.getMessage(), e.getCause()))
         Stats.w3c.log("sc-response-code", HttpServletResponse.SC_GATEWAY_TIMEOUT)
         servletResponse.setStatus(HttpServletResponse.SC_GATEWAY_TIMEOUT)
       }
