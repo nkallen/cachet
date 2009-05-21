@@ -67,6 +67,8 @@ class ApacheHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
       for (header <- response.getAllHeaders)
         servletResponse.addHeader(header.getName, header.getValue)
 
+      client.getCookieStore().clear()
+
       val entity = response.getEntity()
       val statusLine = response.getStatusLine()
       if (entity != null) {
