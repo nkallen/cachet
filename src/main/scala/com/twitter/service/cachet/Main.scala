@@ -31,7 +31,7 @@ object Main {
 }
 
 object Stats {
-  val w3c = new W3CStats(Array("rs-response-time", "sc-response-code", "rs-response-code", "rs-response-method", "uri", "rs-content-type", "rs-content-length", "remote-ip", "request-date", "request-time"))
+  var w3c = new W3CStats(Array("rs-response-time", "sc-response-code", "rs-response-code", "rs-response-method", "uri", "rs-content-type", "rs-content-length", "remote-ip", "request-date", "request-time"))
 }
 
 trait ConfiggyInit {
@@ -46,11 +46,13 @@ object ThreadPool extends ConfiggyInit {
   var lowThreads = 100
 
   def init(config: Config) {
-    log.info("initializing ThreadPool values from Configgy")
     minThreads = Configgy.config.getInt("threadpool.min-threads", minThreads)
     maxThreads = Configgy.config.getInt("threadpool.max-threads", maxThreads)
     maxIdleMS = Configgy.config.getInt("threadpool.max-idle-ms", maxIdleMS)
     lowThreads = Configgy.config.getInt("threadpool.low-threads", lowThreads)
+    log.info("initializing ThreadPool values from Configgy: minThreads: %s, " +
+             "maxThreads: %s, maxIdleMS: %s, lowThreads: %s"
+             .format(minThreads, maxThreads, maxIdleMS, lowThreads))
   }
 
   def apply(numThreads: Int) = {
