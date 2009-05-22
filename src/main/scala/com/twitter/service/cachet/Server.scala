@@ -10,7 +10,7 @@ import org.mortbay.thread.QueuedThreadPool
 import java.util.Properties
 import javax.servlet.Filter
 import javax.servlet.http.HttpServlet
-import net.lag.configgy.Config
+import net.lag.configgy.ConfigMap
 import net.lag.logging.Logger
 
 /**
@@ -92,7 +92,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
   var lowResourcesMaxIdleTimeMS = 1000
   var lowResourcesConnections = 100
 
-  def this(config: Config) {
+  def this(config: ConfigMap) {
     this(config.getInt("port", 8080), config.getInt("gracefulShutdownMS", 10), config.getInt("backend-num-threads", 10),
          config.getInt("ssl-port", 433), config.getString("keystore-location", "notset"),
          config.getString("keystore-password", "notset"), config.getString("ssl-password", "notset"))
