@@ -14,7 +14,7 @@ class WaitingServlet extends HttpServlet {
   }
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
-    Thread.sleep(milliseconds)
+   Thread.sleep(milliseconds)
     response.setStatus(HttpServletResponse.SC_OK)
   }
 }

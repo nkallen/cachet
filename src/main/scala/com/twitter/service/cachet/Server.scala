@@ -150,7 +150,6 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     server.setGracefulShutdown(gracefulShutdownMS)
     val context = new Context(server, "/", Context.SESSIONS)
     val threadPool = new QueuedThreadPool
-    // FIXME: make into a Configgy deal.
     server.setThreadPool(ThreadPool(numThreads))
     val connector = newHttpConnector
     val sslConnector = newSslConnector

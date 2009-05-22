@@ -19,7 +19,7 @@ import org.apache.http.params.{BasicHttpParams, CoreConnectionPNames, CoreProtoc
 import org.apache.http.protocol.HttpContext
 
 
-class ApacheHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
+class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int) extends HttpClient {
   private val log = Logger.get
   private val params = new BasicHttpParams
 
@@ -39,11 +39,8 @@ class ApacheHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
   sslSocketFactory.setHostnameVerifier(new AllowAllHostnameVerifier)
 
   private val schemeRegistry = new SchemeRegistry
-  // FIXME: Do not hardcode these ports!! (REVIEWER DO NOT LET ME FORGET!)
-  schemeRegistry.register(
-    new Scheme("http", PlainSocketFactory.getSocketFactory(), 10000))
-  schemeRegistry.register(
-    new Scheme("https", sslSocketFactory, 10443))
+  schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), port))
+  schemeRegistry.register(new Scheme("https", sslSocketFactory, sslPort))
 
   private val connectionManager = new ThreadSafeClientConnManager(params, schemeRegistry)
   private val client = new org.apache.http.impl.client.DefaultHttpClient(connectionManager, params)

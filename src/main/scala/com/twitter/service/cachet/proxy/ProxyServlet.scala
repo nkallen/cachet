@@ -27,7 +27,7 @@ class ProxyServlet extends HttpServlet {
     this.numThreads = num_threads
 
     val client = if (use_apache) {
-      new ApacheHttpClient(timeout, numThreads)
+      new ApacheHttpClient(timeout, numThreads, port, sslPort)
     } else {
       new JettyHttpClient(timeout, numThreads)
     }
@@ -47,12 +47,12 @@ class ProxyServlet extends HttpServlet {
     }
 
     val _port = config.getInitParameter("backend-port") match {
-      case null => 3000
+      case null => 20080
       case x: String => x.toInt
     }
 
     val _sslPort = config.getInitParameter("backend-ssl-port") match {
-      case null => 10443
+      case null => 20443
       case x: String => x.toInt
     }
 
