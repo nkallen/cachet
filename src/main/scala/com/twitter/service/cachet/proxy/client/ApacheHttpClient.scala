@@ -107,6 +107,9 @@ class ApacheHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
 
     override def getMethod = method
 
+    /**
+     * The Entity is the Request Body.
+     */
     override def getEntity = new InputStreamEntity(inputStream, -1)
 
     setURI(URI.create(uri))
