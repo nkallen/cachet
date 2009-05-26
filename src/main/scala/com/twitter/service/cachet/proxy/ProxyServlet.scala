@@ -19,7 +19,7 @@ class ProxyServlet extends HttpServlet {
   var numThreads: Int = 0
   private val log = Logger.get // FIXME: use a separate logfile
 
-  def init(backend_host: String, backend_port: Int, backend_ssl_port: Int, backend_timeout: Long , num_threads: Int, use_apache: Boolean) {
+  def init(backend_host: String, backend_port: Int, backend_ssl_port: Int, backend_timeout: Long , num_threads: Int, use_apache: Boolean, soBufferSize: Int) {
     this.host = backend_host
     this.port = backend_port
     this.sslPort = backend_ssl_port
@@ -27,13 +27,13 @@ class ProxyServlet extends HttpServlet {
     this.numThreads = num_threads
 
     val client = if (use_apache) {
-      new ApacheHttpClient(timeout, numThreads, port, sslPort)
+      new ApacheHttpClient(timeout, numThreads, port, sslPort, soBufferSize)
     } else {
       new JettyHttpClient(timeout, numThreads)
     }
 
-    log.info("Instantiating HttpClients (%s) use_apache = %s, host = %s, port = %d, ssl_port=%s timeout = %d, threads = %d ", client,
-             use_apache, host, port, sslPort, timeout, numThreads)
+    log.info("Instantiating HttpClients (%s) use_apache = %s, host = %s, port = %d, ssl_port=%s timeout = %d, threads = %d soBufferSize = %d", client,
+             use_apache, host, port, sslPort, timeout, numThreads, soBufferSize)
 
     httpForwardRequest = new ForwardRequest(client, host, port)
     httpsForwardRequest = new ForwardRequest(client, host, sslPort)
@@ -71,7 +71,12 @@ class ProxyServlet extends HttpServlet {
       case x: String => x.toBoolean
     }
 
-    init(_host, _port, _sslPort, _timeout, _numThreads, _useApache)
+    val _soBufferSize: Int = config.getInitParameter("so-buffer-size") match {
+      case null => 8192
+      case x: String => x.toInt
+    }
+
+    init(_host, _port, _sslPort, _timeout, _numThreads, _useApache, _soBufferSize)
   }
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {

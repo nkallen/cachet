@@ -19,7 +19,7 @@ import org.apache.http.params.{BasicHttpParams, CoreConnectionPNames, CoreProtoc
 import org.apache.http.protocol.HttpContext
 
 
-class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int) extends HttpClient {
+class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, soBufferSize: Int) extends HttpClient {
   private val log = Logger.get
   private val params = new BasicHttpParams
 
@@ -33,6 +33,7 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int) 
   params.setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout.toInt)
   params.setBooleanParameter(CoreProtocolPNames.USE_EXPECT_CONTINUE, false)
   params.setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false)
+  params.setIntParameter(CoreConnectionPNames.SOCKET_BUFFER_SIZE, soBufferSize)
   //HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1)
 
   val sslSocketFactory = SSLSocketFactory.getSocketFactory()
@@ -85,9 +86,8 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int) 
         } else {
           null
         }
-
-        Stats.w3c.log("rs-content-type", contentType)
         Stats.w3c.log("rs-content-length", entity.getContentLength())
+        Stats.w3c.log("rs-content-type", contentType)
         entity.writeTo(servletResponse.getOutputStream)
       }
     } catch {
