@@ -31,7 +31,7 @@ object Main {
 }
 
 object Stats {
-  var w3c = new W3CStats(Array("rs-response-time", "sc-response-code", "rs-response-code", "rs-response-method", "uri", "rs-content-type", "rs-content-length", "remote-ip", "request-date", "request-time"))
+  var w3c = new W3CStats(Array("rs-response-time", "sc-response-code", "rs-response-code", "rs-response-method", "uri", "rs-content-type", "rs-content-length", "remote-ip", "request-date", "request-time", "rs-went-away"))
 }
 
 trait ConfiggyInit {

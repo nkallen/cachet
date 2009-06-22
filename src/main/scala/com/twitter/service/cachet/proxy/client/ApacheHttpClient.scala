@@ -17,7 +17,7 @@ import org.apache.http.impl.client.{DefaultHttpClient, RequestWrapper}
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager
 import org.apache.http.params.{BasicHttpParams, CoreConnectionPNames, CoreProtocolPNames, HttpParams, HttpProtocolParams}
 import org.apache.http.protocol.HttpContext
-
+import org.mortbay.jetty.EofException
 
 class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, soBufferSize: Int) extends HttpClient {
   private val log = Logger.get
@@ -88,7 +88,11 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, 
         }
         Stats.w3c.log("rs-content-length", entity.getContentLength())
         Stats.w3c.log("rs-content-type", contentType)
-        entity.writeTo(servletResponse.getOutputStream)
+        try {
+          entity.writeTo(servletResponse.getOutputStream)
+        } catch {
+          case e: EofException => Stats.w3c.log("rs-went-away", 1) // we ignore, it means the client went away.
+        }
       }
     } catch {
       case e => {
