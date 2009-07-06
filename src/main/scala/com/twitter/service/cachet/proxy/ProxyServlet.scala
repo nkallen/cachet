@@ -6,6 +6,7 @@ import net.lag.logging.Logger
 import javax.servlet.{Filter, FilterChain, FilterConfig, ServletConfig, ServletRequest, ServletResponse}
 import javax.servlet.http.{HttpServlet, HttpServletResponse, HttpServletRequest}
 import java.net.ConnectException
+import java.io.File
 import java.util.Date
 import java.util.logging.{FileHandler, Formatter, LogRecord}
 
@@ -47,7 +48,9 @@ class ProxyServlet extends HttpServlet {
    * Moves the w3c logger out of the standard java logger and into it's own file without any extra info.
    */
   def setLogger(path: String, filename: String) {
-    val fh = new FileHandler(path + filename, true)
+    val file = new File(path, filename)
+    log.info("going to write w3c log to %s", file.getCanonicalPath)
+    val fh = new FileHandler(file.getCanonicalPath, true)
     w3c.getHandlers.foreach { w3c.removeHandler(_) }
     fh.setFormatter(new BlankFormatter())
     w3c.addHandler(fh)
