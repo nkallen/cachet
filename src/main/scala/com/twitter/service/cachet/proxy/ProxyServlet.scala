@@ -7,6 +7,7 @@ import javax.servlet.{Filter, FilterChain, FilterConfig, ServletConfig, ServletR
 import javax.servlet.http.{HttpServlet, HttpServletResponse, HttpServletRequest}
 import java.net.ConnectException
 import java.util.Date
+import java.util.logging.{FileHandler, Formatter, LogRecord}
 
 class ProxyServlet extends HttpServlet {
   var config = null: ServletConfig
@@ -17,14 +18,16 @@ class ProxyServlet extends HttpServlet {
   var sslPort: Int = 10433
   var timeout: Long = 0L
   var numThreads: Int = 0
-  private val log = Logger.get // FIXME: use a separate logfile
+  private val w3c = Logger.get("w3c")
+  private val log = Logger.get
 
-  def init(backend_host: String, backend_port: Int, backend_ssl_port: Int, backend_timeout: Long , num_threads: Int, use_apache: Boolean, soBufferSize: Int) {
+  def init(backend_host: String, backend_port: Int, backend_ssl_port: Int, backend_timeout: Long , num_threads: Int, use_apache: Boolean, soBufferSize: Int, w3c_path: String, w3c_filename: String) {
     this.host = backend_host
     this.port = backend_port
     this.sslPort = backend_ssl_port
     this.timeout = backend_timeout
     this.numThreads = num_threads
+    setLogger(w3c_path, w3c_filename)
 
     val client = if (use_apache) {
       new ApacheHttpClient(timeout, numThreads, port, sslPort, soBufferSize)
@@ -32,11 +35,22 @@ class ProxyServlet extends HttpServlet {
       new JettyHttpClient(timeout, numThreads)
     }
 
-    log.info("Instantiating HttpClients (%s) use_apache = %s, host = %s, port = %d, ssl_port=%s timeout = %d, threads = %d soBufferSize = %d", client,
-             use_apache, host, port, sslPort, timeout, numThreads, soBufferSize)
+    log.info("Instantiating HttpClients (%s) use_apache = %s, host = %s, port = %d, ssl_port=%s timeout = %d, threads = %d" +
+             " soBufferSize = %d, w3c_path = %s, wc_filename = %s", client, use_apache, host, port, sslPort, timeout,
+             numThreads, soBufferSize, w3c_path, w3c_filename)
 
     httpForwardRequest = new ForwardRequest(client, host, port)
     httpsForwardRequest = new ForwardRequest(client, host, sslPort)
+  }
+
+  /**
+   * Moves the w3c logger out of the standard java logger and into it's own file without any extra info.
+   */
+  def setLogger(path: String, filename: String) {
+    val fh = new FileHandler(path + filename, true)
+    w3c.getHandlers.foreach { w3c.removeHandler(_) }
+    fh.setFormatter(new BlankFormatter())
+    w3c.addHandler(fh)
   }
 
   override def init(c: ServletConfig) {
@@ -76,7 +90,17 @@ class ProxyServlet extends HttpServlet {
       case x: String => x.toInt
     }
 
-    init(_host, _port, _sslPort, _timeout, _numThreads, _useApache, _soBufferSize)
+    val _w3cPath: String = config.getInitParameter("w3c-path") match {
+      case null => ""
+      case x: String => x
+    }
+
+    val _w3cFilename: String = config.getInitParameter("w3c-filename") match {
+      case null => "w3c.log"
+      case x: String => x
+    }
+
+    init(_host, _port, _sslPort, _timeout, _numThreads, _useApache, _soBufferSize, _w3cPath, _w3cFilename)
   }
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
@@ -102,8 +126,11 @@ class ProxyServlet extends HttpServlet {
         }
       }
     } finally {
-      log.info(Stats.w3c.log_entry)
-      Stats.w3c.clear
+      try {
+        w3c.info(Stats.w3c.log_entry)
+      } finally {
+        Stats.w3c.clear
+      }
     }
   }
 }
@@ -134,3 +161,9 @@ class BasicFilter extends Filter {
   def destroy() { /* nothing */ }
 }
 
+/**
+ * BlankFormatter only returns the message without any other extraneous information.
+ */
+class BlankFormatter extends Formatter {
+  override def format(record: LogRecord): String = record.getMessage
+}
