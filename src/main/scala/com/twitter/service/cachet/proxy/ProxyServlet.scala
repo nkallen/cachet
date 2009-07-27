@@ -130,7 +130,7 @@ class ProxyServlet extends HttpServlet {
       }
     } finally {
       try {
-        w3c.info(Stats.w3c.log_entry)
+        w3c.info(Stats.w3c.log_entry + "\n")
       } finally {
         Stats.w3c.clear
       }
