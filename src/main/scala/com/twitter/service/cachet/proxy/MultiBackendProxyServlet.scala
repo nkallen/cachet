@@ -23,12 +23,25 @@ object BackendsToProxyMap {
 
     hosts.foreach { host =>
       // create a ProxyServlet
-      val proxy = new ProxyServlet()
-      proxy.init(backendProps.get("%s.ip".format(host)).asInstanceOf[String],
-                 backendProps.get("%s.port".format(host)).asInstanceOf[String].toInt,
-                 backendProps.get("%s.ssl-port".format(host)).asInstanceOf[String].toInt,
-                 backendTimeoutMs, numThreads, true, soBufferSize, w3cPath, w3cFilename)
-      backendMap.put(host, proxy)
+      try {
+        val proxy = new ProxyServlet()
+
+        val ip = backendProps.get("%s.ip".format(host)).asInstanceOf[String]
+        val port = backendProps.get("%s.port".format(host)).asInstanceOf[String].toInt
+        val sslPort = try {
+          backendProps.get("%s.ssl-port".format(host)).asInstanceOf[String].toInt
+        } catch {
+          case e: NumberFormatException => {
+            log.warning("no ssl port for host %s on IP %s, using default port 10443", host, ip)
+            10443
+          }
+        }
+
+        proxy.init(ip, port, sslPort, backendTimeoutMs, numThreads, true, soBufferSize, w3cPath, w3cFilename)
+        backendMap.put(host, proxy)
+      } catch {
+        case e: NumberFormatException => log.error("unable to create backend for host %s", host)
+      }
     }
 
     backendMap
