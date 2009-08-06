@@ -22,10 +22,8 @@ object BackendsToProxyMap {
     }
 
     hosts.foreach { host =>
-      // create a ProxyServlet
       try {
         val proxy = new ProxyServlet()
-
         val ip = backendProps.get("%s.ip".format(host)).asInstanceOf[String]
         val port = backendProps.get("%s.port".format(host)).asInstanceOf[String].toInt
         val sslPort = try {
