@@ -1,7 +1,7 @@
 package com.twitter.service.cachet
 
 import limiter.LimitingProxyServletFilter
-import com.twitter.commons.W3CStats
+import com.twitter.service.W3CStats
 import net.lag.configgy.{Config, Configgy, RuntimeEnvironment}
 import net.lag.logging.Logger
 import org.mortbay.thread.QueuedThreadPool
@@ -31,7 +31,7 @@ object Main {
 }
 
 object Stats {
-  var w3c = new W3CStats(Array("rs-response-time", "sc-response-code", "rs-response-code", "rs-response-method", "uri", "rs-content-type", "rs-content-length", "remote-ip", "request-date", "request-time", "rs-went-away"))
+  var w3c = new W3CStats(Logger.get, Array("rs-response-time", "sc-response-code", "rs-response-code", "rs-response-method", "uri", "rs-content-type", "rs-content-length", "remote-ip", "request-date", "request-time", "rs-went-away"))
 }
 
 trait ConfiggyInit {

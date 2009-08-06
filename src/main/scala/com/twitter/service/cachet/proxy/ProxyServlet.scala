@@ -1,7 +1,7 @@
 package com.twitter.service.cachet
 
 import proxy.client.{ApacheHttpClient, ForwardRequest, JettyHttpClient}
-import com.twitter.commons.W3CStats
+import com.twitter.service.W3CStats
 import net.lag.logging.Logger
 import javax.servlet.{Filter, FilterChain, FilterConfig, ServletConfig, ServletRequest, ServletResponse}
 import javax.servlet.http.{HttpServlet, HttpServletResponse, HttpServletRequest}
@@ -19,7 +19,6 @@ class ProxyServlet extends HttpServlet {
   var sslPort: Int = 10433
   var timeout: Long = 0L
   var numThreads: Int = 0
-  private val w3c = Logger.get("w3c")
   private val log = Logger.get
 
   def init(backend_host: String, backend_port: Int, backend_ssl_port: Int, backend_timeout: Long , num_threads: Int, use_apache: Boolean, soBufferSize: Int, w3c_path: String, w3c_filename: String) {
@@ -28,7 +27,6 @@ class ProxyServlet extends HttpServlet {
     this.sslPort = backend_ssl_port
     this.timeout = backend_timeout
     this.numThreads = num_threads
-    setLogger(w3c_path, w3c_filename)
 
     val client = if (use_apache) {
       new ApacheHttpClient(timeout, numThreads, port, sslPort, soBufferSize)
@@ -42,18 +40,6 @@ class ProxyServlet extends HttpServlet {
 
     httpForwardRequest = new ForwardRequest(client, host, port)
     httpsForwardRequest = new ForwardRequest(client, host, sslPort)
-  }
-
-  /**
-   * Moves the w3c logger out of the standard java logger and into it's own file without any extra info.
-   */
-  def setLogger(path: String, filename: String) {
-    val file = new File(path, filename)
-    log.info("going to write w3c log to %s", file.getCanonicalPath)
-    val fh = new FileHandler(file.getCanonicalPath, true)
-    w3c.getHandlers.foreach { w3c.removeHandler(_) }
-    fh.setFormatter(new BlankFormatter())
-    w3c.addHandler(fh)
   }
 
   override def init(c: ServletConfig) {
@@ -107,32 +93,30 @@ class ProxyServlet extends HttpServlet {
   }
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
+    Stats.w3c.transaction {
+      _service(request, response)
+    }
+  }
+
+  def _service(request: HttpServletRequest, response: HttpServletResponse) {
     val datetime = Stats.w3c.datetime_format(new Date())
     Stats.w3c.log("request-date", datetime._1)
     Stats.w3c.log("request-time", datetime._2)
     Stats.w3c.log("remote-ip", request.getRemoteAddr())
-    try {
-      Stats.w3c.time("rs-response-time") {
-        try {
-          if (request.getScheme.equals("http")) {
-            httpForwardRequest(request, response)
-          } else {
-            httpsForwardRequest(request, response)
-          }
-        } catch {
-          case c: ConnectException => {
-            log.error("unable to connect to backend")
-          }
-          case e => {
-            log.error(e, "unable to connect to backend with uncaught exception: %s with optional cause: %s".format(e, e.getCause))
-          }
-        }
-      }
-    } finally {
+    Stats.w3c.time("rs-response-time") {
       try {
-        w3c.info(Stats.w3c.log_entry + "\n")
-      } finally {
-        Stats.w3c.clear
+        if (request.getScheme.equals("http")) {
+          httpForwardRequest(request, response)
+        } else {
+          httpsForwardRequest(request, response)
+        }
+      } catch {
+        case c: ConnectException => {
+          log.error("unable to connect to backend")
+        }
+        case e => {
+          log.error(e, "unable to connect to backend with uncaught exception: %s with optional cause: %s".format(e, e.getCause))
+        }
       }
     }
   }
