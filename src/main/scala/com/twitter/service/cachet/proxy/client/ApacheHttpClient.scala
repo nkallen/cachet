@@ -69,6 +69,7 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, 
 
       val statusLine = response.getStatusLine()
       val statusCode = statusLine.getStatusCode
+
       servletResponse.setStatus(statusCode)
       Stats.w3c.log("rs-response-code", statusCode)
 
@@ -90,9 +91,23 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, 
         Stats.w3c.log("rs-content-type", contentType)
         try {
           entity.writeTo(servletResponse.getOutputStream)
+          Stats.clientResponseSent()
         } catch {
-          case e: EofException => Stats.w3c.log("rs-went-away", 1) // we ignore, it means the client went away.
+          case e: EofException => {
+            Stats.w3c.log("rs-went-away", 1) // we ignore, it means the client went away.
+            Stats.clientLeftEarly()
+          }
         }
+      }
+
+      if (statusCode > 200 && statusCode < 299) {
+        Stats.returned2xx()
+      } else if (statusCode > 300 && statusCode < 399) {
+        Stats.returned3xx()
+      } else if (statusCode > 400 && statusCode < 499) {
+        Stats.returned4xx()
+      } else if (statusCode > 500 && statusCode < 599) {
+        Stats.returned5xx
       }
     } catch {
       case e => {

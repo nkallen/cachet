@@ -2,6 +2,7 @@ package com.twitter.service.cachet
 
 import limiter.LimitingProxyServletFilter
 import com.twitter.service.W3CStats
+import com.twitter.service.Stats._
 import net.lag.configgy.{Config, Configgy, RuntimeEnvironment}
 import net.lag.logging.Logger
 import org.mortbay.thread.QueuedThreadPool
@@ -27,11 +28,19 @@ object Main {
     server.addServlet(classOf[ProxyServlet], "/", initParams)
     server.start()
     server.join()
+    server.stop()
   }
 }
 
 object Stats {
   var w3c = new W3CStats(Logger.get, Array("rs-response-time", "sc-response-code", "rs-response-code", "rs-response-method", "uri", "rs-content-type", "rs-content-length", "remote-ip", "request-date", "request-time", "rs-went-away"))
+  val requestsHandled = buildIncr("requestsHandled")
+  val returned2xx = buildIncr("returned2xx")
+  val returned3xx = buildIncr("returned3xx")
+  val returned4xx = buildIncr("returned4xx")
+  val returned5xx = buildIncr("returned5xx")
+  val clientResponseSent = buildIncr("clientResponseSent")
+  val clientLeftEarly = buildIncr("clientLeftEarly")
 }
 
 trait ConfiggyInit {

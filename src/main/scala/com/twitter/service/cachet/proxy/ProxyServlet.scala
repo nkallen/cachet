@@ -1,7 +1,7 @@
 package com.twitter.service.cachet
 
 import proxy.client.{ApacheHttpClient, ForwardRequest, JettyHttpClient}
-import com.twitter.service.W3CStats
+import com.twitter.service.{Stats => TStats, W3CStats}
 import net.lag.logging.Logger
 import javax.servlet.{Filter, FilterChain, FilterConfig, ServletConfig, ServletRequest, ServletResponse}
 import javax.servlet.http.{HttpServlet, HttpServletResponse, HttpServletRequest}
@@ -93,6 +93,7 @@ class ProxyServlet extends HttpServlet {
   }
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
+    Stats.requestsHandled()
     Stats.w3c.transaction {
       _service(request, response)
     }
@@ -103,19 +104,21 @@ class ProxyServlet extends HttpServlet {
     Stats.w3c.log("request-date", datetime._1)
     Stats.w3c.log("request-time", datetime._2)
     Stats.w3c.log("remote-ip", request.getRemoteAddr())
-    Stats.w3c.time("rs-response-time") {
-      try {
-        if (request.getScheme.equals("http")) {
-          httpForwardRequest(request, response)
-        } else {
-          httpsForwardRequest(request, response)
-        }
-      } catch {
-        case c: ConnectException => {
-          log.error("unable to connect to backend")
-        }
-        case e => {
-          log.error(e, "unable to connect to backend with uncaught exception: %s with optional cause: %s".format(e, e.getCause))
+    TStats.time("rs-resonse-time") {
+      Stats.w3c.time("rs-response-time") {
+        try {
+          if (request.getScheme.equals("http")) {
+            httpForwardRequest(request, response)
+          } else {
+            httpsForwardRequest(request, response)
+          }
+        } catch {
+          case c: ConnectException => {
+            log.error("unable to connect to backend")
+          }
+          case e => {
+            log.error(e, "unable to connect to backend with uncaught exception: %s with optional cause: %s".format(e, e.getCause))
+          }
         }
       }
     }
@@ -146,11 +149,4 @@ class BasicFilter extends Filter {
   def init(filterConfig: FilterConfig) { /* nothing */ }
 
   def destroy() { /* nothing */ }
-}
-
-/**
- * BlankFormatter only returns the message without any other extraneous information.
- */
-class BlankFormatter extends Formatter {
-  override def format(record: LogRecord): String = record.getMessage
 }
