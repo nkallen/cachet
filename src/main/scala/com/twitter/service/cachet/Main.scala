@@ -33,6 +33,7 @@ object Main {
 }
 
 object Stats {
+  StatsMBean("com.twitter.cachet")
   var w3c = new W3CStats(Logger.get, Array("rs-response-time", "sc-response-code", "rs-response-code", "rs-response-method", "uri", "rs-content-type", "rs-content-length", "remote-ip", "request-date", "request-time", "rs-went-away"))
   val requestsHandled = buildIncr("requestsHandled")
   val returned2xx = buildIncr("returned2xx")
