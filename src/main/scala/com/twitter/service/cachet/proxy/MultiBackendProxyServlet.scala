@@ -52,6 +52,7 @@ object BackendsToProxyMap {
  */
 class MultiBackendProxyServlet(backendProps: Properties, backendTimeoutMs: Long, numThreads: Int, soBufferSize: Int,
                                w3cPath: String, w3cFilename: String) extends HttpServlet {
+  private val log = Logger.get
   val backendMap = BackendsToProxyMap(backendProps, backendTimeoutMs, numThreads, soBufferSize, w3cPath, w3cFilename)
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
