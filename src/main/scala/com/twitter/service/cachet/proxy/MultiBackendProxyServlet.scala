@@ -36,6 +36,7 @@ object BackendsToProxyMap {
         }
 
         proxy.init(ip, port, sslPort, backendTimeoutMs, numThreads, true, soBufferSize, w3cPath, w3cFilename)
+        log.info("adding proxy %s for host %s ", proxy, host)
         backendMap.put(host, proxy)
       } catch {
         case e: NumberFormatException => log.error("unable to create backend for host %s", host)
@@ -59,6 +60,7 @@ class MultiBackendProxyServlet(backendProps: Properties, backendTimeoutMs: Long,
     if (backend != null) {
       backend.service(request, response)
     } else {
+      log.error("Returning BAD_REQUEST: No backend found for Request for Host %s", host)
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No backend found for Request with Hostname %s".format(host))
     }
   }

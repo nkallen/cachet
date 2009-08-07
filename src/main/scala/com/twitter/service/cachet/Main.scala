@@ -28,7 +28,6 @@ object Main {
     server.addServlet(classOf[ProxyServlet], "/", initParams)
     server.start()
     server.join()
-    server.stop()
   }
 }
 
