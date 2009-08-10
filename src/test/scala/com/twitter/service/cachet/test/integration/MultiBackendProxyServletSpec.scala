@@ -30,8 +30,10 @@ object MultiBackendProxyServletSpec extends Specification {
     "handle wildcard subdomain support" >> {
       HostRouter.setHosts(BackendsToProxyMap(props, 0, 0, 0, "/tmp", "w3c.log"))
       HostRouter("host1.com") mustNot beNull
+      HostRouter.backendMap.containsKey("foo.host1.com") mustBe false
       HostRouter("foo.host1.com") mustNot beNull
       HostRouter("host1.com") mustEqual HostRouter("foo.host1.com")
+      HostRouter("host1.com:9000") mustEqual HostRouter("host1.com")
     }
   }
 }

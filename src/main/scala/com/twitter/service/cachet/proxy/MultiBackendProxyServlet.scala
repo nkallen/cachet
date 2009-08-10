@@ -62,7 +62,13 @@ object HostRouter {
   }
 
   def apply(host: String): ProxyServlet = {
-    backendMap.get(host) match {
+    val backend = if (host.contains(":")) {
+      host.split(":")(0)
+    } else {
+      host
+    }
+
+    backendMap.get(backend) match {
       // Wildcard matching. e.g. foo.twitter.com => twitter.com
       case null => BackendsToProxyMap.hosts.find(domain => host.endsWith(domain)) match {
         case Some(h) => backendMap.get(h)
