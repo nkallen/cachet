@@ -7,18 +7,25 @@ import scala.collection.mutable.ListBuffer
 
 object BackendsToProxyMap {
   val log = Logger.get
+  var hosts: List[String] = Nil
+
   def apply(backendProps: Properties, backendTimeoutMs: Long , numThreads: Int, soBufferSize: Int,
             w3cPath: String, w3cFilename: String): JMap[String, ProxyServlet] = {
     log.info("backendProps: %s", backendProps)
     val backendMap = new JHashMap[String, ProxyServlet]()
-    val hosts = new ListBuffer[String]()
     val names = backendProps.propertyNames
-    while (names.hasMoreElements) {
-      val key = names.nextElement.asInstanceOf[String]
-      if (key.endsWith(".ip")) {
-        // Removes the .ip portion to just single in on the hostname.
-        hosts += key.substring(0, key.length - 3)
+
+    hosts = {
+      val hosts = new ListBuffer[String]
+      while (names.hasMoreElements) {
+        val key = names.nextElement.asInstanceOf[String]
+        if (key.endsWith(".ip")) {
+          // Removes the .ip portion to just single in on the hostname.
+          hosts += key.substring(0, key.length - 3)
+        }
       }
+      // Sort by the longest hostname first for our wildcard matching.
+      hosts.toList.sort((a, b) => a.length > b.length)
     }
 
     hosts.foreach { host =>
@@ -47,17 +54,37 @@ object BackendsToProxyMap {
   }
 }
 
+object HostRouter {
+  val backendMap = new JHashMap[String, ProxyServlet]()
+
+  def setHosts(backends: JMap[String, ProxyServlet]) {
+    backendMap.putAll(backends)
+  }
+
+  def apply(host: String): ProxyServlet = {
+    backendMap.get(host) match {
+      // Wildcard matching. e.g. foo.twitter.com => twitter.com
+      case null => BackendsToProxyMap.hosts.find(domain => host.endsWith(domain)) match {
+        case Some(h) => backendMap.get(h)
+        case None => null
+      }
+      case servlet: ProxyServlet => servlet
+    }
+  }
+}
+
 /**
  * Supports multiple backends serving disjoint domains.
  */
 class MultiBackendProxyServlet(backendProps: Properties, backendTimeoutMs: Long, numThreads: Int, soBufferSize: Int,
                                w3cPath: String, w3cFilename: String) extends HttpServlet {
   private val log = Logger.get
-  val backendMap = BackendsToProxyMap(backendProps, backendTimeoutMs, numThreads, soBufferSize, w3cPath, w3cFilename)
+  HostRouter.setHosts(BackendsToProxyMap(backendProps, backendTimeoutMs, numThreads, soBufferSize, w3cPath, w3cFilename))
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
     val host = request.getHeader("Host")
-    val backend = backendMap.get(host)
+    val backend = HostRouter(host)
+
     if (backend != null) {
       backend.service(request, response)
     } else {

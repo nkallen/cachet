@@ -22,8 +22,16 @@ object MultiBackendProxyServletSpec extends Specification {
   "MultiBackendProxyServlet" should {
     "parse correctly formatted Properties file" >> {
       val backendMap = BackendsToProxyMap(props, 0, 0, 0, "/tmp", "w3c.log")
+      backendMap.keySet.size mustEqual 2
       backendMap.containsKey("host1.com") mustEqual true
       backendMap.containsKey("host2.com") mustEqual true
+    }
+
+    "handle wildcard subdomain support" >> {
+      HostRouter.setHosts(BackendsToProxyMap(props, 0, 0, 0, "/tmp", "w3c.log"))
+      HostRouter("host1.com") mustNot beNull
+      HostRouter("foo.host1.com") mustNot beNull
+      HostRouter("host1.com") mustEqual HostRouter("foo.host1.com")
     }
   }
 }
