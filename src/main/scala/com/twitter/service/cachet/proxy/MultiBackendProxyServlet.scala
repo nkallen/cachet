@@ -92,9 +92,11 @@ class MultiBackendProxyServlet(backendProps: Properties, backendTimeoutMs: Long,
     val backend = HostRouter(host)
 
     if (backend != null) {
+      Stats.countRequestsForHost(host)
       backend.service(request, response)
     } else {
       log.error("Returning BAD_REQUEST: No backend found for Request for Host %s", host)
+      Stats.noProxyFoundForHost()
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No backend found for Request with Hostname %s".format(host))
     }
   }

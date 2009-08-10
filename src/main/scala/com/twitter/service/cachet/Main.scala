@@ -41,6 +41,10 @@ object Stats {
   val returned5xx = buildIncr("returned5xx")
   val clientResponseSent = buildIncr("clientResponseSent")
   val clientLeftEarly = buildIncr("clientLeftEarly")
+  // We couldn't find a backend proxy for a Host
+  val noProxyFoundForHost = buildIncr("noProxyFoundForHost")
+
+  def countRequestsForHost(name: String) = incr("host_%s".format(name), 1)
 }
 
 trait ConfiggyInit {
