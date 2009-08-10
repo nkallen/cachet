@@ -157,7 +157,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     (server, context, connector, sslConnector)
   }
 
-  protected def newHttpConnector: Connector = {
+  def newHttpConnector: Connector = {
     val conn = new SelectChannelConnector
     conn.setPort(port)
     conn.setAcceptors(acceptors)
@@ -168,12 +168,12 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     conn
   }
 
-  protected def newSslConnector: Connector = {
+  def newSslConnector(port: Int): Connector = {
     val conn = new SslSelectChannelConnector
     conn.setKeystore(keystore_location)
     conn.setKeyPassword(keystore_password)
     conn.setPassword(ssl_password)
-    conn.setPort(ssl_port)
+    conn.setPort(port)
     conn.setAcceptors(acceptors)
     conn.setMaxIdleTime(maxIdleTimeMS)
     conn.setStatsOn(false)
@@ -181,6 +181,6 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     conn.setLowResourcesMaxIdleTime(lowResourcesMaxIdleTimeMS)
     conn
   }
+
+  def newSslConnector: Connector = newSslConnector(ssl_port)
 }
-
-
