@@ -3,7 +3,7 @@ package com.twitter.service.cachet
 import limiter.LimitingProxyServletFilter
 import com.twitter.service.W3CStats
 import com.twitter.service.Stats._
-import net.lag.configgy.{Config, Configgy, RuntimeEnvironment}
+import net.lag.configgy.{Config, ConfigMap, Configgy, RuntimeEnvironment}
 import net.lag.logging.Logger
 import org.mortbay.thread.QueuedThreadPool
 import java.util.Properties
@@ -15,7 +15,6 @@ object Main {
 
   def main(args: Array[String]) {
     runtime.load(args)
-    ThreadPool.init(Configgy.config)
 
     val server = new JettyServer(Configgy.config)
     log.info(Stats.w3c.log_header)
@@ -47,22 +46,18 @@ object Stats {
   def countRequestsForHost(name: String) = incr("host_%s".format(name), 1)
 }
 
-trait ConfiggyInit {
-  def init(config: Config)
-}
-
-object ThreadPool extends ConfiggyInit {
+object ThreadPool {
   val log = Logger.get
   var minThreads = 10
   var maxThreads = 250
   var maxIdleMS = 1000
   var lowThreads = 100
 
-  def init(config: Config) {
-    minThreads = Configgy.config.getInt("threadpool.min-threads", minThreads)
-    maxThreads = Configgy.config.getInt("threadpool.max-threads", maxThreads)
-    maxIdleMS = Configgy.config.getInt("threadpool.max-idle-ms", maxIdleMS)
-    lowThreads = Configgy.config.getInt("threadpool.low-threads", lowThreads)
+  def init(config: ConfigMap) {
+    minThreads = config.getInt("min-threads", minThreads)
+    maxThreads = config.getInt("max-threads", maxThreads)
+    maxIdleMS = config.getInt("max-idle-ms", maxIdleMS)
+    lowThreads = config.getInt("low-threads", lowThreads)
     log.info("initializing ThreadPool values from Configgy: minThreads: %s, " +
              "maxThreads: %s, maxIdleMS: %s, lowThreads: %s"
              .format(minThreads, maxThreads, maxIdleMS, lowThreads))

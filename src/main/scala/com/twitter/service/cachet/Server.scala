@@ -101,6 +101,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     lowResourcesMaxIdleTimeMS = config.getInt("connector.lowResourcesMaxIdleTimeMS", lowResourcesMaxIdleTimeMS)
     lowResourcesConnections = config.getInt("connector.lowResourcesConnections", lowResourcesConnections)
     log.info("initilizing JettyServer with the following: port:%s, gracefulShutdownMS:%s, numThreads:%s, ssl_port:%s, keystore_location:%s acceptors:%s maxIdleTimeMS:%s lowResourcesMaxIdleTimeMS:%s lowResourcesConnections:%s".format(port, gracefulShutdownMS, numThreads, ssl_port, keystore_location, acceptors, maxIdleTimeMS, lowResourcesMaxIdleTimeMS, lowResourcesConnections))
+    ThreadPool.init(config.configMap("threadpool"))
   }
 
   val (server, context, connector, sslConnector) = configureServer()
