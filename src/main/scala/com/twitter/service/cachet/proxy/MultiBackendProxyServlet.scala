@@ -55,6 +55,7 @@ object BackendsToProxyMap {
 }
 
 object HostRouter {
+  private val log = Logger.get
   val backendMap = new JHashMap[String, ProxyServlet]()
 
   def setHosts(backends: JMap[String, ProxyServlet]) {
@@ -68,9 +69,10 @@ object HostRouter {
       host
     }
 
+    log.debug("Didn't find backend with exact match for '%s'. Trying endsWith now.", host)
     backendMap.get(backend) match {
       // Wildcard matching. e.g. foo.twitter.com => twitter.com
-      case null => BackendsToProxyMap.hosts.find(domain => host.endsWith(domain)) match {
+      case null => BackendsToProxyMap.hosts.find(domain => backend.endsWith(domain)) match {
         case Some(h) => backendMap.get(h)
         case None => null
       }

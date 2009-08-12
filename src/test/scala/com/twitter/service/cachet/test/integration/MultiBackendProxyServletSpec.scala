@@ -34,6 +34,7 @@ object MultiBackendProxyServletSpec extends Specification {
       HostRouter("foo.host1.com") mustNot beNull
       HostRouter("host1.com") mustEqual HostRouter("foo.host1.com")
       HostRouter("host1.com:9000") mustEqual HostRouter("host1.com")
+      HostRouter("something.host1.com:9000") mustEqual HostRouter("host1.com")
     }
   }
 }
