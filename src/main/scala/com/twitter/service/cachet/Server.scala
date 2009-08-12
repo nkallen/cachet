@@ -119,7 +119,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
   }
 
   def addFilter(filter: Class[_ <: Filter], route: String) {
-    addFilter(filter, route)
+    addFilter(filter, route, new Properties())
   }
 
   def addServlet(servlet: Class[_ <: HttpServlet], route: String) {
