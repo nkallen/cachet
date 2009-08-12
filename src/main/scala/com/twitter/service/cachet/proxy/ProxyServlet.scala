@@ -123,7 +123,7 @@ class ProxyServlet extends HttpServlet {
  * At the end of each request, print the w3c log line and clear the w3c log store.
  */
 class LoggingFilter extends Filter {
-  private val log = Logger.get // FIXME: use a separate logfile
+  private val log = Logger.get
   log.info("Instantiating logging filter %s".format(this))
   override def doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
     Stats.w3c.transaction {
