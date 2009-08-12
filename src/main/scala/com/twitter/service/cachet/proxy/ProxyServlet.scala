@@ -16,7 +16,7 @@ class ProxyServlet extends HttpServlet {
   var httpsForwardRequest = null: ForwardRequest
   var host: String = ""
   var port: Int = 0
-  var sslPort: Int = 10433
+  var sslPort: Int = 10443
   var timeout: Long = 0L
   var numThreads: Int = 0
   private val log = Logger.get

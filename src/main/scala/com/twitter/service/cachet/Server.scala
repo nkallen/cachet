@@ -94,7 +94,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
 
   def this(config: ConfigMap) {
     this(config.getInt("port", 8080), config.getInt("gracefulShutdownMS", 10), config.getInt("backend-num-threads", 10),
-         config.getInt("ssl-port", 433), config.getString("keystore-location", "notset"),
+         config.getInt("ssl-port", 20443), config.getString("keystore-location", "notset"),
          config.getString("keystore-password", "notset"), config.getString("ssl-password", "notset"))
     acceptors = config.getInt("connector.acceptors", acceptors)
     maxIdleTimeMS = config.getInt("connector.maxIdleTimeMS", maxIdleTimeMS)
