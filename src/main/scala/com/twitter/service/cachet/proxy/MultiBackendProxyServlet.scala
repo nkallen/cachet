@@ -62,22 +62,28 @@ object HostRouter {
     backendMap.putAll(backends)
   }
 
-  def apply(host: String): ProxyServlet = {
-    val backend = if (host.contains(":")) {
-      host.split(":")(0)
+  def apply(requestHost: String): ProxyServlet = {
+    val host = if (requestHost.contains(":")) {
+      requestHost.split(":")(0)
     } else {
-      host
+      requestHost
     }
 
-    log.debug("Didn't find backend with exact match for '%s'. Trying endsWith now.", host)
-    backendMap.get(backend) match {
-      // Wildcard matching. e.g. foo.twitter.com => twitter.com
-      case null => BackendsToProxyMap.hosts.find(domain => backend.endsWith(domain)) match {
-        case Some(h) => backendMap.get(h)
-        case None => null
+    Stats.w3c.log("host", host)
+    val (backendHost, serv) = backendMap.get(host) match {
+      case null => {
+        // Wildcard matching. e.g. foo.twitter.com => twitter.com
+        log.debug("Didn't find backend with exact match for host '%s'. Trying wildcard matching now.", host)
+        BackendsToProxyMap.hosts.find(domain => host.endsWith(domain)) match {
+          case Some(h) => (h, backendMap.get(h))
+          case None => (null, null)
+        }
       }
-      case servlet: ProxyServlet => servlet
+      case servlet: ProxyServlet => (host, servlet)
     }
+    log.debug("requestHost = '%s' host = '%s' backendHost = '%s'", requestHost, host, backendHost)
+    if (backendHost != null) Stats.w3c.log("x-proxy-id", backendHost)
+    serv
   }
 }
 
@@ -90,6 +96,9 @@ class MultiBackendProxyServlet(backendProps: Properties, backendTimeoutMs: Long,
   HostRouter.setHosts(BackendsToProxyMap(backendProps, backendTimeoutMs, numThreads, soBufferSize, w3cPath, w3cFilename))
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
+    log.debug("Received request remoteAddr = %s URL = %s",
+      request.getRemoteAddr(),
+      request.getRequestURL())
     val host = request.getHeader("Host")
     val backend = HostRouter(host)
 
