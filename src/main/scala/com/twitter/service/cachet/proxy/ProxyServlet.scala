@@ -94,17 +94,11 @@ class ProxyServlet extends HttpServlet {
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
     Stats.requestsHandled()
-    Stats.w3c.transaction {
-      _service(request, response)
-    }
-  }
-
-  def _service(request: HttpServletRequest, response: HttpServletResponse) {
     val datetime = Stats.w3c.datetime_format(new Date())
     Stats.w3c.log("request-date", datetime._1)
     Stats.w3c.log("request-time", datetime._2)
     Stats.w3c.log("remote-ip", request.getRemoteAddr())
-    TStats.time("rs-resonse-time") {
+    TStats.time("rs-response-time") {
       Stats.w3c.time("rs-response-time") {
         try {
           if (request.getScheme.equals("http")) {
@@ -132,7 +126,9 @@ class LoggingFilter extends Filter {
   private val log = Logger.get // FIXME: use a separate logfile
   log.info("Instantiating logging filter %s".format(this))
   override def doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
-    chain.doFilter(request, response)
+    Stats.w3c.transaction {
+      chain.doFilter(request, response)
+    }
   }
 
   def init(filterConfig: FilterConfig) { /* nothing */ }
