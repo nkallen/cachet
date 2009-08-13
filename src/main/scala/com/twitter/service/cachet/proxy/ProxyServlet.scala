@@ -102,8 +102,10 @@ class ProxyServlet extends HttpServlet {
       Stats.w3c.time("rs-response-time") {
         try {
           if (request.getScheme.equals("http")) {
+            Stats.w3c.log("x-protocol", "http")
             httpForwardRequest(request, response)
           } else {
+            Stats.w3c.log("x-protocol", "https")
             httpsForwardRequest(request, response)
           }
         } catch {
