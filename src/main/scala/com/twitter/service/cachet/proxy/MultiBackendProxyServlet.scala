@@ -2,7 +2,7 @@ package com.twitter.service.cachet
 
 import net.lag.logging.Logger
 import javax.servlet.http.{HttpServlet, HttpServletResponse, HttpServletRequest}
-import java.util.{HashMap => JHashMap, Map => JMap, Properties}
+import java.util.{HashMap => JHashMap, Map => JMap, Properties, Set => JSet}
 import scala.collection.mutable.ListBuffer
 
 object BackendsToProxyMap {
@@ -94,6 +94,18 @@ object HostRouter {
     log.debug("requestHost = '%s' host = '%s' backendHost = '%s'", requestHost, host, backendHost)
     if (backendHost != null) Stats.w3c.log("x-proxy-id", serv.host)
     serv
+  }
+
+  override def toString(): String = {
+    val output = new ListBuffer[String]()
+    val backends: JSet[String] = backendMap.keySet
+    val iterator = backends.iterator
+    while(iterator.hasNext) {
+      val alias = iterator.next
+      val proxy = backendMap.get(alias)
+      output += "%s -> %s:%s[%s]".format(alias, proxy.host, proxy.port, proxy.sslPort)
+    }
+    output.mkString("\n")
   }
 }
 
