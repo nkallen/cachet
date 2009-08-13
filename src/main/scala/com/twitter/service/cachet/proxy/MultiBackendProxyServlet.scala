@@ -106,16 +106,13 @@ class MultiBackendProxyServlet(backendProps: Properties, backendTimeoutMs: Long,
   HostRouter.setHosts(BackendsToProxyMap(backendProps, backendTimeoutMs, numThreads, soBufferSize, w3cPath, w3cFilename))
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
-    log.debug("Received request remoteAddr = %s URL = %s",
-      request.getRemoteAddr(),
-      request.getRequestURL())
+    log.debug("Received request remoteAddr = %s URL = %s", request.getRemoteAddr(), request.getRequestURL())
     val host = request.getHeader("Host")
     if (host == null) {
       log.error("Returning BAD_REQUEST: No Host found in request from remoteAddr = %s URL = %s", request.getRemoteAddr(), request.getRequestURL())
       Stats.noHostFound()
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No host sent in request")
     } else {
-
       val backend = HostRouter(host)
 
       if (backend != null) {
