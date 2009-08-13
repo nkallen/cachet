@@ -15,13 +15,16 @@ class ProxyServlet extends HttpServlet {
   var httpForwardRequest = null: ForwardRequest
   var httpsForwardRequest = null: ForwardRequest
   var host: String = ""
+  // Human readable identifier for server being proxied
+  var id: String = ""
   var port: Int = 0
   var sslPort: Int = 10443
   var timeout: Long = 0L
   var numThreads: Int = 0
   private val log = Logger.get
 
-  def init(backend_host: String, backend_port: Int, backend_ssl_port: Int, backend_timeout: Long , num_threads: Int, use_apache: Boolean, soBufferSize: Int, w3c_path: String, w3c_filename: String) {
+  def init(id: String, backend_host: String, backend_port: Int, backend_ssl_port: Int, backend_timeout: Long , num_threads: Int, use_apache: Boolean, soBufferSize: Int, w3c_path: String, w3c_filename: String) {
+    this.id = id
     this.host = backend_host
     this.port = backend_port
     this.sslPort = backend_ssl_port
@@ -34,8 +37,8 @@ class ProxyServlet extends HttpServlet {
       new JettyHttpClient(timeout, numThreads)
     }
 
-    log.info("Instantiating HttpClients (%s) use_apache = %s, host = %s, port = %d, ssl_port=%s timeout = %d, threads = %d" +
-             " soBufferSize = %d, w3c_path = %s, wc_filename = %s", client, use_apache, host, port, sslPort, timeout,
+    log.info("Instantiating HttpClients (%s) id = %s, use_apache = %s, host = %s, port = %d, ssl_port=%s timeout = %d, threads = %d" +
+             " soBufferSize = %d, w3c_path = %s, wc_filename = %s", id, client, use_apache, host, port, sslPort, timeout,
              numThreads, soBufferSize, w3c_path, w3c_filename)
 
     httpForwardRequest = new ForwardRequest(client, host, port)
@@ -89,7 +92,12 @@ class ProxyServlet extends HttpServlet {
       case x: String => x
     }
 
-    init(_host, _port, _sslPort, _timeout, _numThreads, _useApache, _soBufferSize, _w3cPath, _w3cFilename)
+    val _id: String = config.getInitParameter("id") match {
+      case null => ""
+      case x: String => x
+    }
+
+    init(_id, _host, _port, _sslPort, _timeout, _numThreads, _useApache, _soBufferSize, _w3cPath, _w3cFilename)
   }
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {

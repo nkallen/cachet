@@ -42,8 +42,8 @@ object BackendsToProxyMap {
           }
         }
 
-        log.info("adding proxy %s for host %s with ip = %s port = %s sslPort = %s", proxy, host, ip, port, sslPort)
-        proxy.init(ip, port, sslPort, backendTimeoutMs, numThreads, true, soBufferSize, w3cPath, w3cFilename)
+        proxy.init(host, ip, port, sslPort, backendTimeoutMs, numThreads, true, soBufferSize, w3cPath, w3cFilename)
+        log.info("adding proxy %s for host %s with ip = %s port = %s sslPort = %s", proxy.id, host, ip, port, sslPort)
         backendMap.put(host, proxy)
       } catch {
         case e: NumberFormatException => log.error("unable to create backend for host %s", host)
@@ -92,7 +92,7 @@ object HostRouter {
       case servlet: ProxyServlet => (host, servlet)
     }
     log.debug("requestHost = '%s' host = '%s' backendHost = '%s'", requestHost, host, backendHost)
-    if (backendHost != null) Stats.w3c.log("x-proxy-id", serv.host)
+    if (backendHost != null) Stats.w3c.log("x-proxy-id", serv.id)
     serv
   }
 
