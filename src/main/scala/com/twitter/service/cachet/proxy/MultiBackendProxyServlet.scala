@@ -42,8 +42,8 @@ object BackendsToProxyMap {
           }
         }
 
+        log.info("adding proxy %s for host %s with ip = %s port = %s sslPort = %s", proxy, host, ip, port, sslPort)
         proxy.init(ip, port, sslPort, backendTimeoutMs, numThreads, true, soBufferSize, w3cPath, w3cFilename)
-        log.info("adding proxy %s for host %s ", proxy, host)
         backendMap.put(host, proxy)
       } catch {
         case e: NumberFormatException => log.error("unable to create backend for host %s", host)
@@ -100,15 +100,22 @@ class MultiBackendProxyServlet(backendProps: Properties, backendTimeoutMs: Long,
       request.getRemoteAddr(),
       request.getRequestURL())
     val host = request.getHeader("Host")
-    val backend = HostRouter(host)
-
-    if (backend != null) {
-      Stats.countRequestsForHost(host)
-      backend.service(request, response)
+    if (host == null) {
+      log.error("Returning BAD_REQUEST: No Host found in request from remoteAddr = %s URL = %s", request.getRemoteAddr(), request.getRequestURL())
+      Stats.noHostFound()
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No host sent in request")
     } else {
-      log.error("Returning BAD_REQUEST: No backend found for Request for Host %s", host)
-      Stats.noProxyFoundForHost()
-      response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No backend found for Request with Hostname %s".format(host))
+
+      val backend = HostRouter(host)
+
+      if (backend != null) {
+        Stats.countRequestsForHost(host)
+        backend.service(request, response)
+      } else {
+        log.error("Returning BAD_REQUEST: No backend found for Request for Host %s", host)
+        Stats.noProxyFoundForHost()
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No backend found for Request with Hostname %s".format(host))
+      }
     }
   }
 }

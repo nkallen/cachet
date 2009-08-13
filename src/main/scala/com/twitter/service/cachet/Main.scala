@@ -42,6 +42,9 @@ object Stats {
   val clientLeftEarly = buildIncr("clientLeftEarly")
   // We couldn't find a backend proxy for a Host
   val noProxyFoundForHost = buildIncr("noProxyFoundForHost")
+  // We couldn't find a Host header in the request
+  val noHostFound = buildIncr("noHostFound")
+
 
   def countRequestsForHost(name: String) = incr("host_%s".format(name), 1)
 }
