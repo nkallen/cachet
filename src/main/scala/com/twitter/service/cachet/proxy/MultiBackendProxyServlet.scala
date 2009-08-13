@@ -83,7 +83,7 @@ object HostRouter {
     val (backendHost, serv) = backendMap.get(host) match {
       case null => {
         // Wildcard matching. e.g. foo.twitter.com => twitter.com
-        log.debug("Didn't find backend with exact match for host '%s'. Trying wildcard matching now.", host)
+        log.warning("Didn't find backend with exact match for host '%s'. Trying wildcard matching now.", host)
         BackendsToProxyMap.hosts.find(domain => host.endsWith(domain)) match {
           case Some(h) => (h, backendMap.get(h))
           case None => (null, null)
@@ -105,7 +105,7 @@ object HostRouter {
       val proxy = backendMap.get(alias)
       output += "%s -> %s".format(alias, proxy.toString)
     }
-    output.mkString("\n")
+    output.toList.sort(_ < _).mkString("\n")
   }
 }
 
