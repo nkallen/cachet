@@ -103,7 +103,7 @@ object HostRouter {
     while(iterator.hasNext) {
       val alias = iterator.next
       val proxy = backendMap.get(alias)
-      output += "%s -> %s:%s[%s]".format(alias, proxy.host, proxy.port, proxy.sslPort)
+      output += "%s -> %s".format(alias, proxy.toString)
     }
     output.mkString("\n")
   }

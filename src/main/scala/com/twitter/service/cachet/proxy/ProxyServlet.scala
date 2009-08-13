@@ -14,6 +14,7 @@ class ProxyServlet extends HttpServlet {
   var config = null: ServletConfig
   var httpForwardRequest = null: ForwardRequest
   var httpsForwardRequest = null: ForwardRequest
+  // ip address of backend
   var host: String = ""
   // Human readable identifier for server being proxied
   var id: String = ""
@@ -22,6 +23,8 @@ class ProxyServlet extends HttpServlet {
   var timeout: Long = 0L
   var numThreads: Int = 0
   private val log = Logger.get
+
+  override def toString(): String = "%s %s %s %s".format(id, host, port, sslPort)
 
   def init(id: String, backend_host: String, backend_port: Int, backend_ssl_port: Int, backend_timeout: Long , num_threads: Int, use_apache: Boolean, soBufferSize: Int, w3c_path: String, w3c_filename: String) {
     this.id = id
