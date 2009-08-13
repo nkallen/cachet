@@ -62,6 +62,16 @@ object HostRouter {
     backendMap.putAll(backends)
   }
 
+  /**
+   * Adds an alias to the HostRouter for a given host.
+   */
+  def +=(alias_host: (String, String)) {
+    HostRouter.backendMap.get(alias_host._2) match {
+      case null => throw new IllegalStateException("no backend found for " + alias_host._2)
+      case p: ProxyServlet => backendMap.put(alias_host._1, p)
+    }
+  }
+
   def apply(requestHost: String): ProxyServlet = {
     val host = if (requestHost.contains(":")) {
       requestHost.split(":")(0)
@@ -82,7 +92,7 @@ object HostRouter {
       case servlet: ProxyServlet => (host, servlet)
     }
     log.debug("requestHost = '%s' host = '%s' backendHost = '%s'", requestHost, host, backendHost)
-    if (backendHost != null) Stats.w3c.log("x-proxy-id", backendHost)
+    if (backendHost != null) Stats.w3c.log("x-proxy-id", serv.host)
     serv
   }
 }
