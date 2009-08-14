@@ -123,10 +123,11 @@ class MultiBackendProxyServlet(defaultHost: String, backendProps: Properties, ba
     log.debug("Received request remoteAddr = %s URL = %s", request.getRemoteAddr(), request.getRequestURL())
     var host = request.getHeader("Host")
     if (host == null || host.length == 0) {
-      log.warning("Found null/empty host in request. Host = '%s' RemoteAddr = %s URL = %s Protocol = %s. Setting host to %s",  request.getRemoteAddr(), request.getRequestURL(), request.getProtocol(), defaultHost)
+      log.warning("Found null/empty host in request. Host = '%s' RemoteAddr = %s URL = %s Protocol = %s. Setting host to %s",
+                  request.getRemoteAddr(), request.getRequestURL(), request.getProtocol(), defaultHost)
       host = defaultHost
       Stats.noHostFound()
-    } 
+    }
     val backend = HostRouter(host)
 
     if (backend != null) {
