@@ -121,10 +121,10 @@ class MultiBackendProxyServlet(defaultHostWhenNotFoundInRequest: String, backend
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
     log.debug("Received request remoteAddr = %s URL = %s", request.getRemoteAddr(), request.getRequestURL())
     var host = request.getHeader("Host")
-    if (host == null) {
-      log.info("Found null host in request. RemoteAddr = %s URL = %s Protocol = %s",  request.getRemoteAddr(), request.getRequestURL(), request.getProtocol())
+    if (host == null || host.length == 0) {
+      log.info("Found null/empty host in request. Host = '%s' RemoteAddr = %s URL = %s Protocol = %s",  request.getRemoteAddr(), request.getRequestURL(), request.getProtocol())
       if (request.getProtocol() == "HTTP/1.0") {
-        log.info("Setting request to %s", defaultHost)
+        log.info("Setting host to %s", defaultHost)
         host = defaultHost
       }
       else {
