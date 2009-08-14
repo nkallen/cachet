@@ -124,7 +124,7 @@ class MultiBackendProxyServlet(defaultHost: String, backendProps: Properties, ba
     var host = request.getHeader("Host")
     if (host == null || host.length == 0) {
       log.warning("Found null/empty host in request. Host = '%s' RemoteAddr = %s URL = %s Protocol = %s. Setting host to %s",
-                  request.getRemoteAddr(), request.getRequestURL(), request.getProtocol(), defaultHost)
+                  host, request.getRemoteAddr(), request.getRequestURL(), request.getProtocol(), defaultHost)
       host = defaultHost
       Stats.noHostFound()
     }
