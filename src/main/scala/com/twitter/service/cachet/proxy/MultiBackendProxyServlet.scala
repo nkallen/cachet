@@ -111,11 +111,12 @@ object HostRouter {
 
 /**
  * Supports multiple backends serving disjoint domains.
+ *
+ * @param defaultHost - the hostname to pick if the request doesn't send one.
  */
-class MultiBackendProxyServlet(defaultHostWhenNotFoundInRequest: String, backendProps: Properties, backendTimeoutMs: Long, numThreads: Int, 
-  soBufferSize: Int, w3cPath: String, w3cFilename: String) extends HttpServlet {
+class MultiBackendProxyServlet(defaultHost: String, backendProps: Properties, backendTimeoutMs: Long, numThreads: Int,
+                               soBufferSize: Int, w3cPath: String, w3cFilename: String) extends HttpServlet {
   private val log = Logger.get
-  private val defaultHost = defaultHostWhenNotFoundInRequest
   HostRouter.setHosts(BackendsToProxyMap(backendProps, backendTimeoutMs, numThreads, soBufferSize, w3cPath, w3cFilename))
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
@@ -125,8 +126,7 @@ class MultiBackendProxyServlet(defaultHostWhenNotFoundInRequest: String, backend
       log.info("Found null host. Protocol = %s", request.getProtocol())
       if (request.getProtocol() == "HTTP/1.0") {
         host = defaultHost
-      }
-      else {
+      } else {
         log.error("Returning BAD_REQUEST: No Host found in request from remoteAddr = %s URL = %s", request.getRemoteAddr(), request.getRequestURL())
         Stats.noHostFound()
         response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No host sent in request")
