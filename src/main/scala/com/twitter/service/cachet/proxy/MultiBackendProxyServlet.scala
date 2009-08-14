@@ -111,19 +111,19 @@ object HostRouter {
 
 /**
  * Supports multiple backends serving disjoint domains.
+ *
+ * @param defaultHost - the hostname to pick if the request doesn't send one.
  */
-class MultiBackendProxyServlet(defaultHostWhenNotFoundInRequest: String, backendProps: Properties, backendTimeoutMs: Long, numThreads: Int, 
-  soBufferSize: Int, w3cPath: String, w3cFilename: String) extends HttpServlet {
+class MultiBackendProxyServlet(defaultHost: String, backendProps: Properties, backendTimeoutMs: Long, numThreads: Int,
+                               soBufferSize: Int, w3cPath: String, w3cFilename: String) extends HttpServlet {
   private val log = Logger.get
-  private val defaultHost = defaultHostWhenNotFoundInRequest
   HostRouter.setHosts(BackendsToProxyMap(backendProps, backendTimeoutMs, numThreads, soBufferSize, w3cPath, w3cFilename))
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
     log.debug("Received request remoteAddr = %s URL = %s", request.getRemoteAddr(), request.getRequestURL())
     var host = request.getHeader("Host")
     if (host == null || host.length == 0) {
-      log.info("Found null/empty host in request. Host = '%s' RemoteAddr = %s URL = %s Protocol = %s",  request.getRemoteAddr(), request.getRequestURL(), request.getProtocol())
-      log.info("Setting host to %s", defaultHost)
+      log.warning("Found null/empty host in request. Host = '%s' RemoteAddr = %s URL = %s Protocol = %s. Setting host to %s",  request.getRemoteAddr(), request.getRequestURL(), request.getProtocol(), defaultHost)
       host = defaultHost
       Stats.noHostFound()
     } 
