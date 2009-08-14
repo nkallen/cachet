@@ -128,7 +128,7 @@ class MultiBackendProxyServlet(defaultHostWhenNotFoundInRequest: String, backend
         host = defaultHost
       }
       else {
-        log.error("Returning BAD_REQUEST: No Host found in request from remoteAddr = %s URL = %s", request.getRemoteAddr(), request.getRequestURL())
+        log.error("Returning BAD_REQUEST: No Host found in request from remoteAddr = %s URL = %s (Host = %s, Protocol = %s)", request.getRemoteAddr(), request.getRequestURL(), host, request.getProtocol())
         Stats.noHostFound()
         response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No host sent in request")
         return
