@@ -123,16 +123,13 @@ class MultiBackendProxyServlet(defaultHostWhenNotFoundInRequest: String, backend
     var host = request.getHeader("Host")
     if (host == null || host.length == 0) {
       log.info("Found null/empty host in request. Host = '%s' RemoteAddr = %s URL = %s Protocol = %s",  request.getRemoteAddr(), request.getRequestURL(), request.getProtocol())
-      if (request.getProtocol() == "HTTP/1.0") {
-        log.info("Setting host to %s", defaultHost)
-        host = defaultHost
-      }
-      else {
-        log.error("Returning BAD_REQUEST: No Host found in request from remoteAddr = %s URL = %s (Host = %s, Protocol = %s)", request.getRemoteAddr(), request.getRequestURL(), host, request.getProtocol())
-        Stats.noHostFound()
-        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No host sent in request")
-        return
-      }
+      log.info("Setting host to %s", defaultHost)
+      host = defaultHost
+    } else {
+      log.error("Returning BAD_REQUEST: No Host found in request from remoteAddr = %s URL = %s (Host = %s, Protocol = %s)", request.getRemoteAddr(), request.getRequestURL(), host, request.getProtocol())
+      Stats.noHostFound()
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No host sent in request")
+      return
     }
     val backend = HostRouter(host)
 
