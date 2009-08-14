@@ -61,9 +61,7 @@ object ThreadPool {
     maxThreads = config.getInt("max-threads", maxThreads)
     maxIdleMS = config.getInt("max-idle-ms", maxIdleMS)
     lowThreads = config.getInt("low-threads", lowThreads)
-    log.info("initializing ThreadPool values from Configgy: minThreads: %s, " +
-             "maxThreads: %s, maxIdleMS: %s, lowThreads: %s"
-             .format(minThreads, maxThreads, maxIdleMS, lowThreads))
+    log.info("initializing ThreadPool values from Configgy: minThreads: %s, maxThreads: %s, maxIdleMS: %s, lowThreads: %s", minThreads, maxThreads, maxIdleMS, lowThreads)
   }
 
   def apply(numThreads: Int) = {
