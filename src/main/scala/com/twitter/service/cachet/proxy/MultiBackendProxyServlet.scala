@@ -122,6 +122,7 @@ class MultiBackendProxyServlet(defaultHostWhenNotFoundInRequest: String, backend
     log.debug("Received request remoteAddr = %s URL = %s", request.getRemoteAddr(), request.getRequestURL())
     var host = request.getHeader("Host")
     if (host == null) {
+      log.info("Found null host. Protocol = %s", request.getProtocol())
       if (request.getProtocol() == "HTTP/1.0") {
         host = defaultHost
       }
