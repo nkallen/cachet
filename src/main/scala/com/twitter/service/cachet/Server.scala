@@ -104,6 +104,17 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     lowResourcesMaxIdleTimeMS = config.getInt("connector.lowResourcesMaxIdleTimeMS", lowResourcesMaxIdleTimeMS)
     lowResourcesConnections = config.getInt("connector.lowResourcesConnections", lowResourcesConnections)
     log.info("initilizing JettyServer with the following: port:%s, gracefulShutdownMS:%s, numThreads:%s, sslPort:%s, keystore_location:%s acceptors:%s maxIdleTimeMS:%s lowResourcesMaxIdleTimeMS:%s lowResourcesConnections:%s".format(port, gracefulShutdownMS, numThreads, sslPorts, keystore_location, acceptors, maxIdleTimeMS, lowResourcesMaxIdleTimeMS, lowResourcesConnections))
+    config.getConfigMap("ssl") match {
+      case Some(ssl) => ssl.keys.foreach { domain =>
+        val props = ssl.getList(domain)
+        val port = props(0).toInt
+        val keystore = props(1)
+        log.info("adding SSL Connector on port %s for domain %s with keystore %s", port, domain, keystore)
+        server.addConnector(newSslConnector(port, keystore))
+      }
+      case None => log.info("No SSL connectors being installed")
+    }
+
     ThreadPool.init(config.configMap("threadpool"))
   }
 
@@ -170,9 +181,9 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     conn
   }
 
-  def newSslConnector(port: Int): Connector = {
+  def newSslConnector(port: Int, keystoreLocation: String): Connector = {
     val conn = new SslSelectChannelConnector
-    conn.setKeystore(keystore_location)
+    conn.setKeystore(keystoreLocation)
     conn.setKeyPassword(keystore_password)
     conn.setPassword(ssl_password)
     conn.setPort(port)
@@ -183,6 +194,8 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     conn.setLowResourcesMaxIdleTime(lowResourcesMaxIdleTimeMS)
     conn
   }
+
+  def newSslConnector(port: Int): Connector = newSslConnector(port, keystore_location)
 
   def configureSsl() = sslPorts.map { port =>
     log.info("adding SSL connector for port %s", port)
