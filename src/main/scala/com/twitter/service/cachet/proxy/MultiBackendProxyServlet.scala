@@ -42,8 +42,8 @@ object BackendsToProxyMap {
           }
         }
 
-        log.info("adding proxy %s for host %s with ip = %s port = %s sslPort = %s", proxy, host, ip, port, sslPort)
-        proxy.init(ip, port, sslPort, backendTimeoutMs, numThreads, true, soBufferSize, w3cPath, w3cFilename)
+        proxy.init(host, ip, port, sslPort, backendTimeoutMs, numThreads, true, soBufferSize, w3cPath, w3cFilename)
+        log.info("adding proxy %s for host %s with ip = %s port = %s sslPort = %s", proxy.id, host, ip, port, sslPort)
         backendMap.put(host, proxy)
       } catch {
         case e: NumberFormatException => log.error("unable to create backend for host %s", host)
@@ -83,7 +83,7 @@ object HostRouter {
     val (backendHost, serv) = backendMap.get(host) match {
       case null => {
         // Wildcard matching. e.g. foo.twitter.com => twitter.com
-        log.debug("Didn't find backend with exact match for host '%s'. Trying wildcard matching now.", host)
+        log.warning("Didn't find backend with exact match for host '%s'. Trying wildcard matching now.", host)
         BackendsToProxyMap.hosts.find(domain => host.endsWith(domain)) match {
           case Some(h) => (h, backendMap.get(h))
           case None => (null, null)
@@ -92,7 +92,7 @@ object HostRouter {
       case servlet: ProxyServlet => (host, servlet)
     }
     log.debug("requestHost = '%s' host = '%s' backendHost = '%s'", requestHost, host, backendHost)
-    if (backendHost != null) Stats.w3c.log("x-proxy-id", serv.host)
+    if (backendHost != null) Stats.w3c.log("x-proxy-id", serv.id)
     serv
   }
 
@@ -103,38 +103,44 @@ object HostRouter {
     while(iterator.hasNext) {
       val alias = iterator.next
       val proxy = backendMap.get(alias)
-      output += "%s -> %s:%s[%s]".format(alias, proxy.host, proxy.port, proxy.sslPort)
+      output += "%s -> %s".format(alias, proxy.toString)
     }
-    output.mkString("\n")
+    output.toList.sort(_ < _).mkString("\n")
   }
 }
 
 /**
  * Supports multiple backends serving disjoint domains.
  */
-class MultiBackendProxyServlet(backendProps: Properties, backendTimeoutMs: Long, numThreads: Int, soBufferSize: Int,
-                               w3cPath: String, w3cFilename: String) extends HttpServlet {
+class MultiBackendProxyServlet(defaultHostWhenNotFoundInRequest: String, backendProps: Properties, backendTimeoutMs: Long, numThreads: Int, 
+  soBufferSize: Int, w3cPath: String, w3cFilename: String) extends HttpServlet {
   private val log = Logger.get
+  private val defaultHost = defaultHostWhenNotFoundInRequest
   HostRouter.setHosts(BackendsToProxyMap(backendProps, backendTimeoutMs, numThreads, soBufferSize, w3cPath, w3cFilename))
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
     log.debug("Received request remoteAddr = %s URL = %s", request.getRemoteAddr(), request.getRequestURL())
-    val host = request.getHeader("Host")
+    var host = request.getHeader("Host")
     if (host == null) {
-      log.error("Returning BAD_REQUEST: No Host found in request from remoteAddr = %s URL = %s", request.getRemoteAddr(), request.getRequestURL())
-      Stats.noHostFound()
-      response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No host sent in request")
-    } else {
-      val backend = HostRouter(host)
-
-      if (backend != null) {
-        Stats.countRequestsForHost(host)
-        backend.service(request, response)
-      } else {
-        log.error("Returning BAD_REQUEST: No backend found for Request for Host %s", host)
-        Stats.noProxyFoundForHost()
-        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No backend found for Request with Hostname %s".format(host))
+      if (request.getProtocol() == "HTTP/1.0") {
+        host = defaultHost
       }
+      else {
+        log.error("Returning BAD_REQUEST: No Host found in request from remoteAddr = %s URL = %s", request.getRemoteAddr(), request.getRequestURL())
+        Stats.noHostFound()
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No host sent in request")
+        return
+      }
+    }
+    val backend = HostRouter(host)
+
+    if (backend != null) {
+      Stats.countRequestsForHost(host)
+      backend.service(request, response)
+    } else {
+      log.error("Returning BAD_REQUEST: No backend found for Request for Host %s", host)
+      Stats.noProxyFoundForHost()
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No backend found for Request with Hostname %s".format(host))
     }
   }
 }
