@@ -107,7 +107,7 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, 
       } else if (statusCode > 400 && statusCode < 499) {
         Stats.returned4xx()
       } else if (statusCode > 500 && statusCode < 599) {
-        Stats.returned5xx
+        Stats.returned5xx()
       }
     } catch {
       case e => {
