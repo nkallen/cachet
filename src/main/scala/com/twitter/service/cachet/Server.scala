@@ -169,10 +169,24 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     (server, context, connector)
   }
 
-  def newHttpConnector: Connector = {
+  def addListener(config: ListenConfig) = {
+    server.addConnector(newHttpConnector(config.port, Some(config.ip)))
+    config.sslPort match {
+      case Some(port) => server.addConnector(newSslConnector(port, config.sslKeystore, Some(config.ip)))
+      case None =>
+    }
+  }
+
+  def newHttpConnector: Connector = newHttpConnector(port, None)
+
+  def newHttpConnector(port: Int, host: Option[String]): Connector = {
     log.info("returning new HTTP Connector on port %s", port)
     val conn = new SelectChannelConnector
     conn.setPort(port)
+    host match {
+      case Some(host) => conn.setHost(host)
+      case _ =>
+    }
     conn.setAcceptors(acceptors)
     conn.setMaxIdleTime(maxIdleTimeMS)
     conn.setStatsOn(false)
@@ -181,12 +195,19 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     conn
   }
 
-  def newSslConnector(port: Int, keystoreLocation: String): Connector = {
+  def newSslConnector(port: Int, keystoreLocation: String): Connector =
+    newSslConnector(port, keystoreLocation, None)
+
+  def newSslConnector(port: Int, keystoreLocation: String, host: Option[String]): Connector = {
     val conn = new SslSelectChannelConnector
     conn.setKeystore(keystoreLocation)
     conn.setKeyPassword(keystore_password)
     conn.setPassword(ssl_password)
     conn.setPort(port)
+    host match {
+      case Some(host) => conn.setHost(host)
+      case None =>
+    }
     conn.setAcceptors(acceptors)
     conn.setMaxIdleTime(maxIdleTimeMS)
     conn.setStatsOn(false)
@@ -204,3 +225,5 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     ssl
   }
 }
+
+case class ListenConfig(domain: String, ip: String, port: Int, sslPort: Option[Int], sslKeystore: String)
