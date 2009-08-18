@@ -49,13 +49,15 @@ object HostRouter {
   }
 
   def apply(requestHost: String): ProxyServlet = {
+    if (requestHost == null) {
+      return null
+    }
     val host = if (requestHost.contains(":")) {
       requestHost.split(":")(0)
     } else {
       requestHost
     }
 
-    Stats.w3c.log("host", host)
     val (backendHost, serv) = backendMap.get(host) match {
       case null => {
         // Wildcard matching. e.g. foo.twitter.com => twitter.com
@@ -68,7 +70,6 @@ object HostRouter {
       case servlet: ProxyServlet => (host, servlet)
     }
     log.debug("requestHost = '%s' host = '%s' backendHost = '%s'", requestHost, host, backendHost)
-    if (backendHost != null) Stats.w3c.log("x-proxy-id", serv.id)
     serv
   }
 
@@ -94,25 +95,26 @@ class MultiBackendProxyServlet(defaultHost: String, backends: List[ProxyBackendC
                                soBufferSize: Int, w3cPath: String, w3cFilename: String) extends HttpServlet {
   private val log = Logger.get
   HostRouter.setHosts(BackendsToProxyMap(backends, backendTimeoutMs, numThreads, soBufferSize, w3cPath, w3cFilename))
+  private val defaultBackend = HostRouter(defaultHost)
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
-    log.debug("Received request remoteAddr = %s URL = %s", request.getRemoteAddr(), request.getRequestURL())
     var host = request.getHeader("Host")
-    if (host == null || host.length == 0) {
-      log.warning("Found null/empty host in request. Host = '%s' RemoteAddr = %s URL = %s Protocol = %s. Setting host to %s",
-                  host, request.getRemoteAddr(), request.getRequestURL(), request.getProtocol(), defaultHost)
-      host = defaultHost
-      Stats.noHostFound()
-    }
-    val backend = HostRouter(host)
-
-    if (backend != null) {
-      Stats.countRequestsForHost(host)
-      backend.service(request, response)
-    } else {
-      log.error("Returning BAD_REQUEST: No backend found for Request for Host %s", host)
+    log.debug("Received Request with protocol = %s method = %s remoteAddr = %s URL = %s Host = %s",
+                  request.getProtocol(), request.getMethod(), request.getRemoteAddr(), request.getRequestURL(), host)
+    Stats.w3c.log("host", host)
+    var backend = HostRouter(host)
+    if (backend == null) {
+      log.warning("Bad request: No backend found for Request: protocol = %s method = %s remoteAddr = %s URL = %s Host = %s",
+                  request.getProtocol(), request.getMethod(), request.getRemoteAddr(), request.getRequestURL(), host)
       Stats.noProxyFoundForHost()
-      response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No backend found for Request with Hostname %s".format(host))
+      Stats.w3c.log("x-default-backend", "1")
+      host = defaultHost
+      backend = defaultBackend
     }
+
+    // actually service the request now
+    Stats.w3c.log("x-proxy-id", backend.id) 
+    Stats.countRequestsForHost(host)
+    backend.service(request, response)
   }
 }
