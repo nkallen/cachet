@@ -26,7 +26,8 @@ class ProxyServlet extends HttpServlet {
 
   override def toString(): String = "%s %s %s %s".format(id, host, port, sslPort)
 
-  def init(id: String, backend_host: String, backend_port: Int, backend_ssl_port: Int, backend_timeout: Long , num_threads: Int, use_apache: Boolean, soBufferSize: Int, w3c_path: String, w3c_filename: String) {
+  def init(id: String, backend_host: String, backend_port: Int, backend_ssl_port: Int, backend_timeout: Long,
+           num_threads: Int, use_apache: Boolean, soBufferSize: Int, w3c_path: String, w3c_filename: String) {
     this.id = id
     this.host = backend_host
     this.port = backend_port
