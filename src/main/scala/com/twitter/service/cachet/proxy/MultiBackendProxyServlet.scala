@@ -9,50 +9,26 @@ object BackendsToProxyMap {
   val log = Logger.get
   var hosts: List[String] = Nil
 
-  def apply(backendProps: Properties, backendTimeoutMs: Long , numThreads: Int, soBufferSize: Int,
+  def apply(backends: List[ProxyBackendConfig], backendTimeoutMs: Long, numThreads: Int, soBufferSize: Int,
             w3cPath: String, w3cFilename: String): JMap[String, ProxyServlet] = {
-    log.info("backendProps: %s", backendProps)
     val backendMap = new JHashMap[String, ProxyServlet]()
-    val names = backendProps.propertyNames
 
-    hosts = {
-      val hosts = new ListBuffer[String]
-      while (names.hasMoreElements) {
-        val key = names.nextElement.asInstanceOf[String]
-        if (key.endsWith(".ip")) {
-          // Removes the .ip portion to just single in on the hostname.
-          hosts += key.substring(0, key.length - 3)
-        }
-      }
-      // Sort by the longest hostname first for our wildcard matching.
-      hosts.toList.sort((a, b) => a.length > b.length)
-    }
-
-    hosts.foreach { host =>
-      try {
-        val proxy = new ProxyServlet()
-        val ip = backendProps.get("%s.ip".format(host)).asInstanceOf[String]
-        val port = backendProps.get("%s.port".format(host)).asInstanceOf[String].toInt
-        val sslPort = try {
-          backendProps.get("%s.ssl-port".format(host)).asInstanceOf[String].toInt
-        } catch {
-          case e: NumberFormatException => {
-            log.warning("no ssl port for host %s on IP %s, using default port 10443", host, ip)
-            10443
-          }
-        }
-
-        proxy.init(host, ip, port, sslPort, backendTimeoutMs, numThreads, true, soBufferSize, w3cPath, w3cFilename)
-        log.info("adding proxy %s for host %s with ip = %s port = %s sslPort = %s", proxy.id, host, ip, port, sslPort)
-        backendMap.put(host, proxy)
-      } catch {
-        case e: NumberFormatException => log.error("unable to create backend for host %s", host)
-      }
-    }
+    hosts = backends.map { config =>
+      val proxy = new ProxyServlet()
+      val host = config.domain
+      proxy.init(host, config.ip, config.port, config.sslPort, backendTimeoutMs, numThreads, true, soBufferSize, w3cPath, w3cFilename)
+      log.info("adding proxy %s for host %s with ip = %s port = %s sslPort = %s", proxy.id,
+               host, config.ip, config.port, config.sslPort)
+      backendMap.put(host, proxy)
+      config.aliases.foreach { alias => HostRouter += alias -> host }
+      host
+    }.sort((a, b) => a.length > b.length)
 
     backendMap
   }
 }
+
+case class ProxyBackendConfig(domain: String, ip: String, port: Int, sslPort: Int, aliases: Seq[String])
 
 object HostRouter {
   private val log = Logger.get
@@ -114,10 +90,10 @@ object HostRouter {
  *
  * @param defaultHost - the hostname to pick if the request doesn't send one.
  */
-class MultiBackendProxyServlet(defaultHost: String, backendProps: Properties, backendTimeoutMs: Long, numThreads: Int,
+class MultiBackendProxyServlet(defaultHost: String, backends: List[ProxyBackendConfig], backendTimeoutMs: Long, numThreads: Int,
                                soBufferSize: Int, w3cPath: String, w3cFilename: String) extends HttpServlet {
   private val log = Logger.get
-  HostRouter.setHosts(BackendsToProxyMap(backendProps, backendTimeoutMs, numThreads, soBufferSize, w3cPath, w3cFilename))
+  HostRouter.setHosts(BackendsToProxyMap(backends, backendTimeoutMs, numThreads, soBufferSize, w3cPath, w3cFilename))
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
     log.debug("Received request remoteAddr = %s URL = %s", request.getRemoteAddr(), request.getRequestURL())
