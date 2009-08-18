@@ -113,7 +113,7 @@ class MultiBackendProxyServlet(defaultHost: String, backends: List[ProxyBackendC
     }
 
     // actually service the request now
-    Stats.w3c.log("x-proxy-id", backend.id) 
+    Stats.w3c.log("x-proxy-id", backend.id)
     Stats.countRequestsForHost(host)
     backend.service(request, response)
   }
