@@ -20,7 +20,7 @@ object BackendsToProxyMap {
       log.info("adding proxy %s for host %s with ip = %s port = %s sslPort = %s", proxy.id,
                host, config.ip, config.port, config.sslPort)
       backendMap.put(host, proxy)
-      config.aliases.foreach { alias => HostRouter += alias -> host }
+      config.aliases.foreach { alias => backendMap.put(alias, proxy) }
       host
     }.sort((a, b) => a.length > b.length)
 
