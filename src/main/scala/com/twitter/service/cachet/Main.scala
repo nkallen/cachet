@@ -31,7 +31,6 @@ object Main {
 }
 
 object Stats {
-  StatsMBean("com.twitter.cachet")
   var w3c = new W3CStats(Logger.get, Array("rs-response-time", "sc-response-code", "rs-response-code", "rs-response-method", "x-protocol", "host", "uri", "rs-content-type", "rs-content-length", "remote-ip", "request-date", "request-time", "rs-went-away", "x-proxy-id", "x-default-backend"))
   val requestsHandled = buildIncr("requestsHandled")
   val returned2xx = buildIncr("returned2xx")
@@ -44,6 +43,7 @@ object Stats {
   val noProxyFoundForHost = buildIncr("noProxyFoundForHost")
 
   def countRequestsForHost(name: String) = incr("host_%s".format(name), 1)
+  def initStatsMBean() { StatsMBean("com.twitter.cachet") }
 }
 
 object ThreadPool {
