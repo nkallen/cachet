@@ -21,10 +21,10 @@
           <exclude org="javax.transaction" />
           <exclude org="javax.security" />
         </dependency>
-        <dependency org="org.mortbay.jetty" name="jetty" rev="6.1.15"/>
-        <dependency org="org.mortbay.jetty" name="jetty-util" rev="6.1.15"/>
-        <dependency org="org.mortbay.jetty" name="jetty-client" rev="6.1.15"/>
-        <dependency org="org.mortbay.jetty" name="jetty-servlet-tester" rev="6.1.15"/>
+        <dependency org="org.mortbay.jetty" name="jetty" rev="6.1.19"/>
+        <dependency org="org.mortbay.jetty" name="jetty-util" rev="6.1.19"/>
+        <dependency org="org.mortbay.jetty" name="jetty-client" rev="6.1.19"/>
+        <dependency org="org.mortbay.jetty" name="jetty-servlet-tester" rev="6.1.19"/>
         <dependency org="javax.servlet" name="servlet-api" rev="2.5"/>
         <dependency org="net.lag" name="configgy" rev="1.2"/>
         <dependency org="org.specs" name="specs" rev="1.4.3" conf="bootstrap->*; test->*"/>
