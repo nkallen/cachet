@@ -4,7 +4,7 @@ import org.mortbay.jetty.LocalConnector
 
 class TestServer(port: Int, gracefulShutdown: Int, numThreads: Int, sslPorts: Seq[String],
                  keystore_location: String, keystore_password: String, ssl_password: String)
-    extends JettyServer(port, gracefulShutdown, numThreads, sslPorts, keystore_location, keystore_password, ssl_password) {
+    extends JettyServer(port, gracefulShutdown, numThreads, sslPorts, keystore_location, keystore_password, ssl_password, null) {
   def apply(request: String) = {
     val c = connector.asInstanceOf[LocalConnector]
     c.reopen()
