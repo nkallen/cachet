@@ -92,6 +92,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
   var lowResourcesMaxIdleTimeMS = 1000
   var lowResourcesConnections = 100
 
+  ThreadPool.init(config.configMap("threadpool"))
   val (server, context, connector) = configureHttp()
   val connectors = configureSsl()
 
@@ -115,7 +116,6 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
       case None => log.info("No SSL connectors being installed")
     }
 
-    ThreadPool.init(config.configMap("threadpool"))
   }
 
   def addServlet(servlet: Class[_ <: HttpServlet], route: String, props: Properties) {
@@ -162,7 +162,6 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     val server = new jetty.Server
     server.setGracefulShutdown(gracefulShutdownMS)
     val context = new Context(server, "/", Context.SESSIONS)
-    val threadPool = new QueuedThreadPool
     server.setThreadPool(ThreadPool(numThreads))
     val connector = newHttpConnector
     server.setConnectors(Array(connector))
