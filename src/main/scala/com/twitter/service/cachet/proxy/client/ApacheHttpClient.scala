@@ -2,7 +2,7 @@ package com.twitter.service.cachet.proxy.client
 
 import net.lag.logging.Logger
 import java.io.InputStream
-import java.net.{InetAddress, Socket, SocketException, ConnectException, SocketTimeoutException, URI}
+import java.net.{InetAddress, Socket, SocketException, ConnectException, SocketTimeoutException, URI, URISyntaxException}
 import javax.net.ssl.SSLSocket
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import org.apache.http.{HttpResponse, HttpVersion}
@@ -56,10 +56,10 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, 
 
     Stats.w3c.log("rs-response-method", requestSpecification.method)
     Stats.w3c.log("uri", requestSpecification.uri)
-    val request = new ApacheRequest(requestSpecification.method, requestSpecification.uri, requestSpecification.headers, requestSpecification.inputStream)
-    val httpHost = new org.apache.http.HttpHost(host, port, requestSpecification.scheme)
-
+    var statusCode = 0
     try {
+      val request = new ApacheRequest(requestSpecification.method, requestSpecification.uri, requestSpecification.headers, requestSpecification.inputStream)
+      val httpHost = new org.apache.http.HttpHost(host, port, requestSpecification.scheme)
       val response = client.execute(httpHost, request)
 
       for (header <- response.getAllHeaders)
@@ -68,10 +68,8 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, 
       client.getCookieStore().clear()
 
       val statusLine = response.getStatusLine()
-      val statusCode = statusLine.getStatusCode
-
+      statusCode = statusLine.getStatusCode
       servletResponse.setStatus(statusCode)
-      Stats.w3c.log("rs-response-code", statusCode)
 
       val entity = response.getEntity()
       if (entity != null) {
@@ -99,22 +97,32 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, 
           }
         }
       }
-
-      if (statusCode >= 200 && statusCode <= 299) {
-        Stats.returned2xx()
-      } else if (statusCode >= 300 && statusCode <= 399) {
-        Stats.returned3xx()
-      } else if (statusCode >= 400 && statusCode <= 499) {
-        Stats.returned4xx()
-      } else if (statusCode >= 500 && statusCode <= 599) {
-        Stats.returned5xx()
-      }
     } catch {
-      case e => {
-        log.error(e, "%s: backend timed out while connection (message='%s', cause='%s'), returning 504 to client.".format(e.toString, e.getMessage(), e.getCause()))
-        Stats.w3c.log("sc-response-code", HttpServletResponse.SC_GATEWAY_TIMEOUT)
-        servletResponse.setStatus(HttpServletResponse.SC_GATEWAY_TIMEOUT)
+      case u: URISyntaxException => {
+        statusCode = HttpServletResponse.SC_BAD_REQUEST
+        servletResponse.setStatus(statusCode)
+        log.error(u, "%s: URL %s has incorrect syntax (message='%s', cause='%s'), returning 400 to client.".format(u.toString, requestSpecification.uri, u.getMessage(), u.getCause()))
       }
+      case e: SocketTimeoutException => {
+        statusCode = HttpServletResponse.SC_GATEWAY_TIMEOUT
+        servletResponse.setStatus(statusCode)
+        log.error(e, "%s: backend timed out while connection (message='%s', cause='%s'), returning 504 to client.".format(e.toString, e.getMessage(), e.getCause()))
+      }
+      case e => {
+        statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR
+        servletResponse.setStatus(statusCode)
+        log.error(e, "%s: Exception (message='%s', cause='%s'), returning 500 to client.".format(e.toString, e.getMessage(), e.getCause()))
+      }
+    }
+    Stats.w3c.log("sc-response-code", statusCode)
+    if (statusCode >= 200 && statusCode <= 299) {
+      Stats.returned2xx()
+    } else if (statusCode >= 300 && statusCode <= 399) {
+      Stats.returned3xx()
+    } else if (statusCode >= 400 && statusCode <= 499) {
+      Stats.returned4xx()
+    } else if (statusCode >= 500 && statusCode <= 599) {
+      Stats.returned5xx()
     }
   }
 
