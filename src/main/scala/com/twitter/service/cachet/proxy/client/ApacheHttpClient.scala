@@ -57,10 +57,12 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, 
     Stats.w3c.log("rs-response-method", requestSpecification.method)
     Stats.w3c.log("uri", requestSpecification.uri)
     var statusCode = 0
+    var response: org.apache.http.HttpResponse = null
     try {
+      log.ifDebug(requestSpecification.toString)
       val request = new ApacheRequest(requestSpecification.method, requestSpecification.uri, requestSpecification.headers, requestSpecification.inputStream)
       val httpHost = new org.apache.http.HttpHost(host, port, requestSpecification.scheme)
-      val response = client.execute(httpHost, request)
+      response = client.execute(httpHost, request)
 
       for (header <- response.getAllHeaders)
         servletResponse.addHeader(header.getName, header.getValue)
@@ -95,6 +97,8 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, 
             Stats.w3c.log("rs-went-away", 1) // we ignore, it means the client went away.
             Stats.clientLeftEarly()
           }
+        } finally {
+          entity.consumeContent() // ensure connection release
         }
       }
     } catch {
@@ -115,6 +119,12 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, 
       }
     }
     Stats.w3c.log("sc-response-code", statusCode)
+    log.ifDebug {
+      "Response: statusCode = %s".format(statusCode) + (
+      if (response == null) "contentType = null, contentLength = null, headers = null"
+      else "contentType = %s, contentLength = %s, headers = %s" .format(response.getEntity().getContentType(), response.getEntity().getContentLength(), response.getAllHeaders().toList.toString)
+      )
+    }
     if (statusCode >= 200 && statusCode <= 299) {
       Stats.returned2xx()
     } else if (statusCode >= 300 && statusCode <= 399) {

@@ -142,6 +142,7 @@ class LoggingFilter extends Filter {
   override def doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
     Stats.w3c.transaction {
       chain.doFilter(request, response)
+      log.ifDebug(Stats.w3c.log_entry)
     }
   }
 
