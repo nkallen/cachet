@@ -98,8 +98,6 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, 
             Stats.clientLeftEarly()
           }
         } finally {
-          log.debug("Response: statusCode = %s contentType = null, contentLength = null".format(statusCode, contentType, entity.getContentLength()))
-          //FIXME: Does this lazy call-by-name evaluation work?
           log.ifDebug {
             "Response: statusCode = %s".format(statusCode) +
               " contentType = %s, contentLength = %s, headers = %s" .format(contentType, entity.getContentLength(), response.getAllHeaders().toList.toString)
