@@ -98,6 +98,12 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, 
             Stats.clientLeftEarly()
           }
         } finally {
+          log.debug("Response: statusCode = %s contentType = null, contentLength = null".format(statusCode, contentType, entity.getContentLength()))
+          //FIXME: Does this lazy call-by-name evaluation work?
+          log.ifDebug {
+            "Response: statusCode = %s".format(statusCode) +
+              " contentType = %s, contentLength = %s, headers = %s" .format(contentType, entity.getContentLength(), response.getAllHeaders().toList.toString)
+          }
           entity.consumeContent() // ensure connection release
         }
       }
@@ -118,13 +124,10 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, 
         log.error(e, "%s: Exception (message='%s', cause='%s'), returning 500 to client.".format(e.toString, e.getMessage(), e.getCause()))
       }
     }
-    Stats.w3c.log("sc-response-code", statusCode)
-    log.ifDebug {
-      "Response: statusCode = %s".format(statusCode) + (
-      if (response == null) "contentType = null, contentLength = null, headers = null"
-      else "contentType = %s, contentLength = %s, headers = %s" .format(response.getEntity().getContentType(), response.getEntity().getContentLength(), response.getAllHeaders().toList.toString)
-      )
+    if (response == null) {
+      log.debug("Response: statusCode = %s contentType = null, contentLength = null, headers = null".format(statusCode))
     }
+    Stats.w3c.log("sc-response-code", statusCode)
     if (statusCode >= 200 && statusCode <= 299) {
       Stats.returned2xx()
     } else if (statusCode >= 300 && statusCode <= 399) {
