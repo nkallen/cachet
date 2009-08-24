@@ -104,6 +104,8 @@ class MultiBackendProxyServlet(defaultHost: String, backends: List[ProxyBackendC
     Stats.w3c.log("host", host)
     var backend = HostRouter(host)
     if (backend == null) {
+      // Use default backend - But we don't explicitly set the Host to a defaulthost in the http request, letting
+      // the backend deal with the weird host.
       log.warning("Bad request: No backend found for Request: protocol = %s method = %s remoteAddr = %s URL = %s Host = %s",
                   request.getProtocol(), request.getMethod(), request.getRemoteAddr(), request.getRequestURL(), host)
       Stats.noProxyFoundForHost()

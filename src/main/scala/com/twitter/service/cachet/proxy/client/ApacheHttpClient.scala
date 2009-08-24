@@ -25,6 +25,7 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, 
 
   // The HTTP spec only allows 2 concurrent connections per host by default, this allows us to
   // make Integer.MAX_VALUE concurrent connections per host.
+  // FIXME: Do we want to read this by Config?
   val twitterRouter = new ConnPerRouteBean(Integer.MAX_VALUE)
 
   params.setParameter(ConnManagerPNames.MAX_CONNECTIONS_PER_ROUTE, twitterRouter)
