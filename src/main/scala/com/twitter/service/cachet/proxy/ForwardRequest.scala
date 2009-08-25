@@ -67,5 +67,5 @@ class RequestSpecification(request: HttpServletRequest) {
       request.getHeader("X-Forwarded-For") + ", " + request.getRemoteAddr
   }
 
-  override def toString = "Request: scheme = %s method = %s uri = %s headers = %s".format(scheme, method, uri, headers)
+  override def toString = "Request: ip = %s scheme = %s method = %s uri = %s headers = %s".format(request.getRemoteAddr(), scheme, method, uri, headers)
 }

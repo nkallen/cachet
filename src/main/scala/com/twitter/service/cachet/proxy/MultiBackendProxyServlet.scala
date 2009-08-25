@@ -99,7 +99,7 @@ class MultiBackendProxyServlet(defaultHost: String, backends: List[ProxyBackendC
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
     var host = request.getHeader("Host")
-    log.debug("Received Request with protocol = %s method = %s remoteAddr = %s URL = %s Host = %s",
+    log.debug("MultiBackendProxyServlet: Received New Request with protocol = %s method = %s remoteAddr = %s URL = %s Host = %s",
                   request.getProtocol(), request.getMethod(), request.getRemoteAddr(), request.getRequestURL(), host)
     Stats.w3c.log("host", host)
     var backend = HostRouter(host)

@@ -35,6 +35,7 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, 
   params.setBooleanParameter(CoreProtocolPNames.USE_EXPECT_CONTINUE, false)
   params.setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false)
   params.setIntParameter(CoreConnectionPNames.SOCKET_BUFFER_SIZE, soBufferSize)
+  //params.setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BEST_MATCH)
   //HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1)
 
   val sslSocketFactory = SSLSocketFactory.getSocketFactory()
@@ -45,12 +46,24 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, 
   schemeRegistry.register(new Scheme("https", sslSocketFactory, sslPort))
 
   private val connectionManager = new ThreadSafeClientConnManager(params, schemeRegistry)
+
+  // FIXME: Was hoping this would work to remove cookie processing completely, but it did not
+  // Create a basic context that is different from the one used in DefaultHttpClient because
+  // it does not do anything to the cookies
+  // private val context = new org.apache.http.protocol.BasicHttpContext()
+  // context.setAttribute(org.apache.http.client.protocol.ClientContext.SCHEME_REGISTRY, schemeRegistry)
+  // context.removeAttribute(org.apache.http.client.protocol.ClientContext.COOKIE_STORE)
+
   private val client = new org.apache.http.impl.client.DefaultHttpClient(connectionManager, params)
   // We do not wish to handle redirects automatically, pass them back to the user.
   client.setRedirectHandler(new RedirectHandler() {
     override def isRedirectRequested(response: HttpResponse,  context: HttpContext): Boolean = false
     override def getLocationURI(response: HttpResponse, context: HttpContext): URI = null
   })
+  // FIXME: Do this per-class removal!
+  // client.removeRequestInterceptorByClass(org.apache.http.client.protocol.RequestAddCookies.class)
+  // client.removeResponseInterceptorByClass(org.apache.http.client.protocol.ResponseProcessCookies.class)
+  client.clearResponseInterceptors()
 
   def apply(host: String, port: Int, requestSpecification: RequestSpecification, servletResponse: HttpServletResponse) {
     val log = Logger.get
