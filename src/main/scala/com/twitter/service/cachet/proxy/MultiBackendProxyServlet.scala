@@ -3,20 +3,20 @@ package com.twitter.service.cachet
 import net.lag.logging.Logger
 import javax.servlet.http.{HttpServlet, HttpServletResponse, HttpServletRequest}
 import java.util.{HashMap => JHashMap, Map => JMap, Properties, Set => JSet}
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable
 
 object BackendsToProxyMap {
   val log = Logger.get
   var hosts: List[String] = Nil
 
   def apply(backends: List[ProxyBackendConfig], backendTimeoutMs: Long, numThreads: Int, soBufferSize: Int,
-            w3cPath: String, w3cFilename: String): JMap[String, ProxyServlet] = {
+            w3cPath: String, w3cFilename: String, errorStrings: Map[Int, String]): JMap[String, ProxyServlet] = {
     val backendMap = new JHashMap[String, ProxyServlet]()
 
     hosts = backends.map { config =>
       val proxy = new ProxyServlet()
       val host = config.domain
-      proxy.init(host, config.ip, config.port, config.sslPort, backendTimeoutMs, numThreads, true, soBufferSize, w3cPath, w3cFilename)
+      proxy.init(host, config.ip, config.port, config.sslPort, backendTimeoutMs, numThreads, true, soBufferSize, w3cPath, w3cFilename, errorStrings)
       log.info("adding proxy %s for host %s with ip = %s port = %s sslPort = %s", proxy.id,
                host, config.ip, config.port, config.sslPort)
       backendMap.put(host, proxy)
@@ -74,7 +74,7 @@ object HostRouter {
   }
 
   override def toString(): String = {
-    val output = new ListBuffer[String]()
+    val output = new mutable.ListBuffer[String]()
     val backends: JSet[String] = backendMap.keySet
     val iterator = backends.iterator
     while(iterator.hasNext) {
@@ -92,9 +92,9 @@ object HostRouter {
  * @param defaultHost - the hostname to pick if the request doesn't send one.
  */
 class MultiBackendProxyServlet(defaultHost: String, backends: List[ProxyBackendConfig], backendTimeoutMs: Long, numThreads: Int,
-                               soBufferSize: Int, w3cPath: String, w3cFilename: String) extends HttpServlet {
+                               soBufferSize: Int, w3cPath: String, w3cFilename: String, errorStrings: Map[Int, String]) extends HttpServlet {
   private val log = Logger.get
-  HostRouter.setHosts(BackendsToProxyMap(backends, backendTimeoutMs, numThreads, soBufferSize, w3cPath, w3cFilename))
+  HostRouter.setHosts(BackendsToProxyMap(backends, backendTimeoutMs, numThreads, soBufferSize, w3cPath, w3cFilename, errorStrings))
   private val defaultBackend = HostRouter(defaultHost)
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {

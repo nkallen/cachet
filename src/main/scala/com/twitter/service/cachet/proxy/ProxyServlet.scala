@@ -27,7 +27,8 @@ class ProxyServlet extends HttpServlet {
   override def toString(): String = "%s %s %s %s".format(id, host, port, sslPort)
 
   def init(id: String, backend_host: String, backend_port: Int, backend_ssl_port: Int, backend_timeout: Long,
-           num_threads: Int, use_apache: Boolean, soBufferSize: Int, w3c_path: String, w3c_filename: String) {
+           num_threads: Int, use_apache: Boolean, soBufferSize: Int, w3c_path: String, w3c_filename: String,
+           errorStrings: Map[Int, String]) {
     this.id = id
     this.host = backend_host
     this.port = backend_port
@@ -36,7 +37,7 @@ class ProxyServlet extends HttpServlet {
     this.numThreads = num_threads
 
     val client = if (use_apache) {
-      new ApacheHttpClient(timeout, numThreads, port, sslPort, soBufferSize)
+      new ApacheHttpClient(timeout, numThreads, port, sslPort, soBufferSize, errorStrings)
     } else {
       new JettyHttpClient(timeout, numThreads)
     }
@@ -101,7 +102,7 @@ class ProxyServlet extends HttpServlet {
       case x: String => x
     }
 
-    init(_id, _host, _port, _sslPort, _timeout, _numThreads, _useApache, _soBufferSize, _w3cPath, _w3cFilename)
+    init(_id, _host, _port, _sslPort, _timeout, _numThreads, _useApache, _soBufferSize, _w3cPath, _w3cFilename, Map())
   }
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {

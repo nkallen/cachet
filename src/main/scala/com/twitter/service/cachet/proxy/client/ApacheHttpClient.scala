@@ -1,7 +1,7 @@
 package com.twitter.service.cachet.proxy.client
 
 import net.lag.logging.Logger
-import java.io.InputStream
+import java.io.{InputStream, IOException}
 import java.net.{InetAddress, Socket, SocketException, ConnectException, SocketTimeoutException, URI, URISyntaxException}
 import javax.net.ssl.SSLSocket
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
@@ -19,7 +19,7 @@ import org.apache.http.params.{BasicHttpParams, CoreConnectionPNames, CoreProtoc
 import org.apache.http.protocol.HttpContext
 import org.mortbay.jetty.EofException
 
-class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, soBufferSize: Int) extends HttpClient {
+class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, soBufferSize: Int, errorStrings: Map[Int, String]) extends HttpClient {
   private val log = Logger.get
   private val params = new BasicHttpParams
 
@@ -64,6 +64,8 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, 
   // client.removeRequestInterceptorByClass(org.apache.http.client.protocol.RequestAddCookies.class)
   // client.removeResponseInterceptorByClass(org.apache.http.client.protocol.ResponseProcessCookies.class)
   client.clearResponseInterceptors()
+
+  private val defaultErrorString = ""
 
   def apply(host: String, port: Int, requestSpecification: RequestSpecification, servletResponse: HttpServletResponse) {
     val log = Logger.get
@@ -122,21 +124,25 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, 
     } catch {
       case u: URISyntaxException => {
         statusCode = HttpServletResponse.SC_BAD_REQUEST
-        servletResponse.setStatus(statusCode)
         log.error(u, "%s: URL %s has incorrect syntax (message='%s', cause='%s'), returning 400 to client.".format(u.toString, requestSpecification.uri, u.getMessage(), u.getCause()))
       }
-      case e: SocketTimeoutException => {
+      case e: IOException => {
         statusCode = HttpServletResponse.SC_GATEWAY_TIMEOUT
-        servletResponse.setStatus(statusCode)
+        // setServletResponseErrorDoc(statusCode, servletResponse)
         log.error(e, "%s: backend timed out while connection (message='%s', cause='%s'), returning 504 to client.".format(e.toString, e.getMessage(), e.getCause()))
       }
       case e => {
         statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR
-        servletResponse.setStatus(statusCode)
+        // setServletResponseErrorDoc(statusCode, servletResponse)
         log.error(e, "%s: Exception (message='%s', cause='%s'), returning 500 to client.".format(e.toString, e.getMessage(), e.getCause()))
       }
     }
     if (response == null) {
+      // error condition
+      servletResponse.setStatus(statusCode)
+      if (requestSpecification.method != "HEAD") {
+        servletResponse.getOutputStream.print(errorStrings.getOrElse(statusCode, defaultErrorString))
+      }
       log.debug("Response: statusCode = %s contentType = null, contentLength = null, headers = null".format(statusCode))
     }
     Stats.w3c.log("sc-response-code", statusCode)

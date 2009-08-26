@@ -8,18 +8,21 @@ import javax.servlet.http.HttpServletResponse
 import org.specs.Specification
 
 object ProxyServletSpec extends Specification {
+  var i = 0
+
   def makeRequestThroughProxy(sleepTime: Long, method: String): HttpTester = {
-    val proxyServer = new TestServer(2345, 0, 1, Nil, "data/keystore", "asdfasdf", "asdfasdf")
+    val proxyServer = new TestServer(2345+i, 0, 1, Nil, "data/keystore", "asdfasdf", "asdfasdf")
     val proxyProps = new Properties()
-    proxyProps.put("backend-port", "3000")
+    proxyProps.put("backend-port", (3000+i).toString)
     proxyProps.put("backend-ssl-port", "8434")
     proxyServer.addServlet(classOf[ProxyServlet], "/", proxyProps)
     proxyServer.start()
 
-    val slowServer = new JettyServer(3000, 0, 1, Nil, "data/keystore", "asdfasdf", "asdfasdf", null)
+    val slowServer = new JettyServer(3000+i, 0, 1, Nil, "data/keystore", "asdfasdf", "asdfasdf", null)
     val waitingProps = new Properties()
     waitingProps.put("timeout", sleepTime.toString)
     slowServer.addServlet(classOf[WaitingServlet], "/", waitingProps)
+    i += 1 // to not run into address binding issues
     slowServer.start()
 
     val request = new HttpTester
@@ -56,7 +59,7 @@ object ProxyServletSpec extends Specification {
     }
 
     "when a HEAD request is made (slow version)" >> {
-      "it propagates the response" >> {
+      "it times out the response, returning HTTP 504" >> {
         val response = makeRequestThroughProxy(2000, "HEAD")
         response.getStatus mustEqual HttpServletResponse.SC_GATEWAY_TIMEOUT
       }
