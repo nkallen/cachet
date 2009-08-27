@@ -107,7 +107,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     maxIdleTimeMS = config.getInt("connector.maxIdleTimeMS", maxIdleTimeMS)
     lowResourcesMaxIdleTimeMS = config.getInt("connector.lowResourcesMaxIdleTimeMS", lowResourcesMaxIdleTimeMS)
     lowResourcesConnections = config.getInt("connector.lowResourcesConnections", lowResourcesConnections)
-    log.info("initilizing JettyServer with the following: port:%s, gracefulShutdownMS:%s, numThreads:%s, sslPort:%s, keystore_location:%s acceptors:%s maxIdleTimeMS:%s lowResourcesMaxIdleTimeMS:%s lowResourcesConnections:%s".format(port, gracefulShutdownMS, numThreads, sslPorts, keystore_location, acceptors, maxIdleTimeMS, lowResourcesMaxIdleTimeMS, lowResourcesConnections))
+    log.info("Initializing JettyServer with the following: port:%s, gracefulShutdownMS:%s, numThreads:%s, sslPort:%s, keystore_location:%s acceptors:%s maxIdleTimeMS:%s lowResourcesMaxIdleTimeMS:%s lowResourcesConnections:%s".format(port, gracefulShutdownMS, numThreads, sslPorts, keystore_location, acceptors, maxIdleTimeMS, lowResourcesMaxIdleTimeMS, lowResourcesConnections))
     config.getConfigMap("ssl") match {
       case Some(ssl) => ssl.keys.foreach { domain =>
         val props = ssl.getList(domain)

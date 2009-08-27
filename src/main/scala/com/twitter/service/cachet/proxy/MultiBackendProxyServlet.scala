@@ -28,7 +28,7 @@ object BackendsToProxyMap {
   }
 }
 
-case class ProxyBackendConfig(domain: String, ip: String, port: Int, sslPort: Int, aliases: Seq[String])
+case class ProxyBackendConfig(domain: String, ip: String, port: Int, sslPort: Option[Int], aliases: Seq[String])
 
 object HostRouter {
   private val log = Logger.get
@@ -117,6 +117,17 @@ class MultiBackendProxyServlet(defaultHost: String, backends: List[ProxyBackendC
     // actually service the request now
     Stats.w3c.log("x-proxy-id", backend.id)
     Stats.countRequestsForHost(host)
-    backend.service(request, response)
+    try {
+      backend.service(request, response)
+    } catch {
+      case e => {
+        log.error("Unable to service request for unknown reason (Exception = %s, message = %s, cause = %s)  Request: protocol = %s method = %s remoteAddr = %s URL = %s Host = %s", 
+          e.toString, e.getMessage(), e.getCause(), request.getProtocol(), request.getMethod(), request.getRemoteAddr(), request.getRequestURL(), host)
+        val statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR
+        response.setStatus(statusCode)
+        response.getOutputStream.print(errorStrings.getOrElse(statusCode, ""))
+        Stats.returned5xx()
+      }
+    }
   }
 }

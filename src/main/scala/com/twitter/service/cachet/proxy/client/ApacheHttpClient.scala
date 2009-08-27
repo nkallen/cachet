@@ -19,7 +19,9 @@ import org.apache.http.params.{BasicHttpParams, CoreConnectionPNames, CoreProtoc
 import org.apache.http.protocol.HttpContext
 import org.mortbay.jetty.EofException
 
-class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, soBufferSize: Int, errorStrings: Map[Int, String]) extends HttpClient {
+class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Option[Int],
+  soBufferSize: Int, errorStrings: Map[Int, String]) extends HttpClient {
+
   private val log = Logger.get
   private val params = new BasicHttpParams
 
@@ -38,12 +40,14 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Int, 
   //params.setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BEST_MATCH)
   //HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1)
 
-  val sslSocketFactory = SSLSocketFactory.getSocketFactory()
-  sslSocketFactory.setHostnameVerifier(new AllowAllHostnameVerifier)
-
   private val schemeRegistry = new SchemeRegistry
   schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), port))
-  schemeRegistry.register(new Scheme("https", sslSocketFactory, sslPort))
+
+  sslPort map { sp =>
+    val sslSocketFactory = SSLSocketFactory.getSocketFactory()
+    sslSocketFactory.setHostnameVerifier(new AllowAllHostnameVerifier)
+    schemeRegistry.register(new Scheme("https", sslSocketFactory, sp))
+  }
 
   private val connectionManager = new ThreadSafeClientConnManager(params, schemeRegistry)
 

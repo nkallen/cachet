@@ -19,16 +19,17 @@ class ProxyServlet extends HttpServlet {
   // Human readable identifier for server being proxied
   var id: String = ""
   var port: Int = 0
-  var sslPort: Int = 10443
+  var sslPort: Option[Int] = None
   var timeout: Long = 0L
   var numThreads: Int = 0
   private val log = Logger.get
 
   override def toString(): String = "%s %s %s %s".format(id, host, port, sslPort)
 
-  def init(id: String, backend_host: String, backend_port: Int, backend_ssl_port: Int, backend_timeout: Long,
-           num_threads: Int, use_apache: Boolean, soBufferSize: Int, w3c_path: String, w3c_filename: String,
-           errorStrings: Map[Int, String]) {
+  def init(id: String, backend_host: String, backend_port: Int, backend_ssl_port: Option[Int],
+    backend_timeout: Long, num_threads: Int, use_apache: Boolean, soBufferSize: Int,
+    w3c_path: String, w3c_filename: String, errorStrings: Map[Int, String]) {
+
     this.id = id
     this.host = backend_host
     this.port = backend_port
@@ -47,7 +48,7 @@ class ProxyServlet extends HttpServlet {
              numThreads, soBufferSize, w3c_path, w3c_filename)
 
     httpForwardRequest = new ForwardRequest(client, host, port)
-    httpsForwardRequest = new ForwardRequest(client, host, sslPort)
+    sslPort map { sp => httpsForwardRequest = new ForwardRequest(client, host, sp) }
   }
 
   override def init(c: ServletConfig) {
@@ -63,8 +64,8 @@ class ProxyServlet extends HttpServlet {
     }
 
     val _sslPort = config.getInitParameter("backend-ssl-port") match {
-      case null => 20443
-      case x: String => x.toInt
+      case null => None
+      case x: String => Some(x.toInt)
     }
 
     val _timeout = config.getInitParameter("backend-timeout") match {
@@ -114,12 +115,14 @@ class ProxyServlet extends HttpServlet {
     TStats.time("rs-response-time") {
       Stats.w3c.time("rs-response-time") {
         try {
-          if (request.getScheme.equals("http")) {
-            Stats.w3c.log("x-protocol", "http")
+          val scheme = request.getScheme
+          Stats.w3c.log("x-protocol", scheme)
+          if (scheme.equals("http")) {
             httpForwardRequest(request, response)
-          } else {
-            Stats.w3c.log("x-protocol", "https")
-            httpsForwardRequest(request, response)
+          } else if (scheme.equals("https")) {
+            if (httpsForwardRequest != null) {
+              httpsForwardRequest(request, response)
+            } else log.warning("scheme = https but no ForwardRequest set up!")
           }
         } catch {
           case c: ConnectException => {
