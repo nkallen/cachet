@@ -182,7 +182,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
   def newHttpConnector: Connector = newHttpConnector(port, None)
 
   def newHttpConnector(port: Int, host: Option[String]): Connector = {
-    log.info("returning new HTTP Connector on port %s", port)
+    log.info("returning new HTTP Connector on port %s for host %s", port, host)
     val conn = new SelectChannelConnector
     conn.setPort(port)
     host match {
