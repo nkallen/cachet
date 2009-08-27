@@ -115,10 +115,10 @@ class MultiBackendProxyServlet(defaultHost: String, backends: List[ProxyBackendC
     }
 
     // actually service the request now
-    Stats.w3c.log("x-proxy-id", backend.id)
     Stats.countRequestsForHost(host)
     try {
       backend.service(request, response)
+      Stats.w3c.log("x-proxy-id", backend.id)
     } catch {
       case e => {
         log.error("Unable to service request for unknown reason (Exception = %s, message = %s, cause = %s)  Request: protocol = %s method = %s remoteAddr = %s URL = %s Host = %s", 
