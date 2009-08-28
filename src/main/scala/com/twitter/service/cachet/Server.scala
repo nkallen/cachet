@@ -87,9 +87,9 @@ trait Server {
 class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: Int, val sslPorts: Seq[String],
                   val keystore_location: String, val keystore_password: String, val ssl_password: String, val threadConfig: ConfigMap) extends Server {
   private val log = Logger.get
-  var acceptors = 1
-  var maxIdleTimeMS = 100
-  var lowResourcesMaxIdleTimeMS = 1000
+  var acceptors = 2
+  var maxIdleTimeMS = 1000
+  var lowResourcesMaxIdleTimeMS = 300
   var lowResourcesConnections = 100
   if (threadConfig != null) {
     ThreadPool.init(threadConfig)

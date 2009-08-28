@@ -31,6 +31,8 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Optio
   val twitterRouter = new ConnPerRouteBean(Integer.MAX_VALUE)
 
   params.setParameter(ConnManagerPNames.MAX_CONNECTIONS_PER_ROUTE, twitterRouter)
+  // FIXME: Do we want this to be read by Config?
+  params.setParameter(ConnManagerPNames.MAX_TOTAL_CONNECTIONS, Integer.MAX_VALUE)
   params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, timeout.toInt)
   params.setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true)
   params.setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout.toInt)
@@ -74,6 +76,7 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Optio
   def apply(host: String, port: Int, requestSpecification: RequestSpecification, servletResponse: HttpServletResponse) {
     val log = Logger.get
 
+    //FIXME: remove this or move it somewhere else: log.ifDebug{ "Threadpool queueSize = %d , idleThreads = %d, threads = %d".format(ThreadPool.getQueueSize(), ThreadPool.getIdleThreads(), ThreadPool.getThreads()) }
     Stats.w3c.log("rs-response-method", requestSpecification.method)
     Stats.w3c.log("uri", requestSpecification.uri)
     var statusCode = 0
