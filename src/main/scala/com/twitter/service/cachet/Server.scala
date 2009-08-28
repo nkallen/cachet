@@ -90,7 +90,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
   var acceptors = 2
   var maxIdleTimeMS = 1000
   var lowResourcesMaxIdleTimeMS = 300
-  var lowResourcesConnections = 100
+  var lowResourcesConnections = 200
   if (threadConfig != null) {
     ThreadPool.init(threadConfig)
   }
@@ -193,7 +193,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     conn.setMaxIdleTime(maxIdleTimeMS)
     conn.setStatsOn(false)
     conn.setLowResourcesConnections(lowResourcesConnections)
-    conn.setLowResourcesMaxIdleTime(lowResourcesMaxIdleTimeMS)
+    conn.setLowResourceMaxIdleTime(lowResourcesMaxIdleTimeMS)
     conn
   }
 
@@ -214,7 +214,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     conn.setMaxIdleTime(maxIdleTimeMS)
     conn.setStatsOn(false)
     conn.setLowResourcesConnections(lowResourcesConnections)
-    conn.setLowResourcesMaxIdleTime(lowResourcesMaxIdleTimeMS)
+    conn.setLowResourceMaxIdleTime(lowResourcesMaxIdleTimeMS)
     conn
   }
 
