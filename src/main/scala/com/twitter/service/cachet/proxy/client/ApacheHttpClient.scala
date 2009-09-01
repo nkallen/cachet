@@ -8,6 +8,7 @@ import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import org.apache.http.{HttpResponse, HttpVersion}
 import org.apache.http.client.RedirectHandler
 import org.apache.http.client.methods.HttpUriRequest
+import org.apache.http.client.protocol.{RequestAddCookies, RequestProxyAuthentication}
 import org.apache.http.conn.params._
 import org.apache.http.conn.scheme.{PlainSocketFactory, LayeredSocketFactory, SchemeRegistry, Scheme}
 import org.apache.http.conn.ssl.{AllowAllHostnameVerifier, SSLSocketFactory}
@@ -67,8 +68,8 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Optio
     override def getLocationURI(response: HttpResponse, context: HttpContext): URI = null
   })
   // FIXME: Do this per-class removal!
-  // client.removeRequestInterceptorByClass(org.apache.http.client.protocol.RequestAddCookies.class)
-  // client.removeResponseInterceptorByClass(org.apache.http.client.protocol.ResponseProcessCookies.class)
+  client.removeRequestInterceptorByClass(classOf[RequestAddCookies])
+  client.removeRequestInterceptorByClass(classOf[RequestProxyAuthentication])
   client.clearResponseInterceptors()
 
   private val defaultErrorString = ""
