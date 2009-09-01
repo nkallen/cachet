@@ -91,6 +91,7 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Optio
       for (header <- response.getAllHeaders)
         servletResponse.addHeader(header.getName, header.getValue)
 
+      // FIXME: remove this line and test!
       client.getCookieStore().clear()
 
       val statusLine = response.getStatusLine()
