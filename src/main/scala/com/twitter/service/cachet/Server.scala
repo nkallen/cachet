@@ -169,10 +169,13 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     server.setGracefulShutdown(gracefulShutdownMS)
     val context = new Context(server, "/", Context.SESSIONS)
     server.setThreadPool(ThreadPool())
-    log.info("Jetty Server setup with the following: " + server.getThreadPool match {
-      case q: QueuedThreadPool => "name: %s, minThreads: %s, getThreads: %s".format(q.getName, q.getMinThreads, q.getThreads)
-      case _ => "whoops, we have no idea what our crazy deals are bangin'"
-    })
+    try {
+      val q = server.getThreadPool.asInstanceOf[QueuedThreadPool]
+      log.info("QueuedThreadPool in use: name: %s, minThreads: %s, getThreads: %s"
+               .format(q.getName, q.getMinThreads, q.getThreads))
+    } catch {
+      case e => log.debug("ThreadPool is not a QueuedThreadPool")
+    }
     val connector = newHttpConnector
     server.setConnectors(Array(connector))
     (server, context, connector)
