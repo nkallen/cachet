@@ -101,13 +101,16 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
   def this(config: ConfigMap) {
     this(config.getInt("port", 8080), config.getInt("gracefulShutdownMS", 10), config.getInt("backend-num-threads", 10),
          config.getList("ssl-ports"), config.getString("keystore-location", "notset"),
-         config.getString("keystore-password", "notset"), config.getString("ssl-password", "notset"), 
+         config.getString("keystore-password", "notset"), config.getString("ssl-password", "notset"),
          config.configMap("threadpool"))
     acceptors = config.getInt("connector.acceptors", acceptors)
     maxIdleTimeMS = config.getInt("connector.maxIdleTimeMS", maxIdleTimeMS)
     lowResourcesMaxIdleTimeMS = config.getInt("connector.lowResourcesMaxIdleTimeMS", lowResourcesMaxIdleTimeMS)
     lowResourcesConnections = config.getInt("connector.lowResourcesConnections", lowResourcesConnections)
-    log.info("Initializing JettyServer with the following: port:%s, gracefulShutdownMS:%s, numThreads:%s, sslPort:%s, keystore_location:%s acceptors:%s maxIdleTimeMS:%s lowResourcesMaxIdleTimeMS:%s lowResourcesConnections:%s".format(port, gracefulShutdownMS, numThreads, sslPorts, keystore_location, acceptors, maxIdleTimeMS, lowResourcesMaxIdleTimeMS, lowResourcesConnections))
+    log.info("Initializing JettyServer with options: port:%s, gracefulShutdownMS:%s, numThreads:%s, sslPort:%s, keystore_location:%s "
+             .format(port, gracefulShutdownMS, numThreads, sslPorts, keystore_location))
+    log.info("[more options] acceptors:%s maxIdleTimeMS:%s lowResourcesMaxIdleTimeMS:%s lowResourcesConnections:%s"
+             .format(acceptors, maxIdleTimeMS, lowResourcesMaxIdleTimeMS, lowResourcesConnections))
     config.getConfigMap("ssl") match {
       case Some(ssl) => ssl.keys.foreach { domain =>
         val props = ssl.getList(domain)
@@ -165,7 +168,11 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     val server = new jetty.Server
     server.setGracefulShutdown(gracefulShutdownMS)
     val context = new Context(server, "/", Context.SESSIONS)
-    server.setThreadPool(ThreadPool(numThreads))
+    server.setThreadPool(ThreadPool())
+    log.info("Jetty Server setup with the following: " + server.getThreadPool match {
+      case q: QueuedThreadPool => "name: %s, minThreads: %s, getThreads: %s".format(q.getName, q.getMinThreads, q.getThreads)
+      case _ => "whoops, we have no idea what our crazy deals are bangin'"
+    })
     val connector = newHttpConnector
     server.setConnectors(Array(connector))
     (server, context, connector)

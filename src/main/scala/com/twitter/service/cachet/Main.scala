@@ -5,7 +5,7 @@ import com.twitter.service.W3CStats
 import com.twitter.service.Stats._
 import net.lag.configgy.{Config, ConfigMap, Configgy, RuntimeEnvironment}
 import net.lag.logging.Logger
-import org.mortbay.thread.QueuedThreadPool
+import org.mortbay.thread.{QueuedThreadPool, ThreadPool => JThreadPool}
 import java.util.Properties
 import java.util.logging.Level
 
@@ -61,8 +61,8 @@ object ThreadPool {
     log.info("initializing ThreadPool values from Configgy: minThreads: %s, maxThreads: %s, maxIdleMS: %s, lowThreads: %s", minThreads, maxThreads, maxIdleMS, lowThreads)
   }
 
-  def apply(numThreads: Int) = {
-    val threadPool = new QueuedThreadPool(numThreads)
+  def apply(): JThreadPool = {
+    val threadPool = new QueuedThreadPool()
     threadPool.setMinThreads(minThreads)
     threadPool.setLowThreads(lowThreads)
     threadPool.setMaxThreads(maxThreads)
@@ -70,4 +70,6 @@ object ThreadPool {
     threadPool.setDaemon(true)
     threadPool
   }
+
+  override def toString() = "#<ThreadPool minThreads: %s, maxThreads: %s, maxIdleMS: %s, lowThreads: %s>".format(minThreads, maxThreads, maxIdleMS, lowThreads)
 }
