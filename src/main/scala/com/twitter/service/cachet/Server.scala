@@ -171,10 +171,15 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     server.setThreadPool(ThreadPool())
     try {
       val q = server.getThreadPool.asInstanceOf[QueuedThreadPool]
-      log.info("QueuedThreadPool in use: name: %s, minThreads: %s, getThreads: %s"
-               .format(q.getName, q.getMinThreads, q.getThreads))
+      val name = q.getName
+      val min = q.getMinThreads
+      val max = q.getMaxThreads
+      val low = q.getLowThreads
+      val idle = q.getIdleThreads
+      log.info("QueuedThreadPool in use: name: %s, min: %s, max: %s, low: %s idle: %s"
+               .format(name, min, max, low, idle))
     } catch {
-      case e => log.debug("ThreadPool is not a QueuedThreadPool")
+      case e => log.error(e, "ThreadPool is not a QueuedThreadPool")
     }
     val connector = newHttpConnector
     server.setConnectors(Array(connector))
