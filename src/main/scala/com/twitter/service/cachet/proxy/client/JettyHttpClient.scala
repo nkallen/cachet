@@ -15,13 +15,7 @@ class JettyHttpClient(timeout: Long, numThreads: Int) extends HttpClient {
   private val log = Logger.get
   val client = new MortbayHttpClient
   // In our testing, setting the threadPool below 3 caused significant problems.
-  val threadPool = if (numThreads < 3) {
-    log.warning("threadPool given size is below 3, setting it to 3 instead.")
-    ThreadPool(3)
-  } else {
-    ThreadPool(numThreads)
-  }
-
+  val threadPool = ThreadPool()
   client.setTimeout(timeout)
   client.setThreadPool(threadPool)
   client.start()
