@@ -28,20 +28,19 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Optio
 
   // The HTTP spec only allows 2 concurrent connections per host by default, this allows us to
   // make Integer.MAX_VALUE concurrent connections per host.
-  // FIXME: Do we want to read this by Config?
   val twitterRouter = new ConnPerRouteBean(Integer.MAX_VALUE)
 
   params.setParameter(ConnManagerPNames.MAX_CONNECTIONS_PER_ROUTE, twitterRouter)
-  // FIXME: Do we want this to be read by Config?
   params.setParameter(ConnManagerPNames.MAX_TOTAL_CONNECTIONS, Integer.MAX_VALUE)
+  // No check for maximum line length or for number of headers.
+  params.setParameter(CoreConnectionPNames.MAX_LINE_LENGTH, 0)
+  params.setParameter(CoreConnectionPNames.MAX_HEADER_COUNT, 0)
   params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, timeout.toInt)
   params.setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true)
   params.setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout.toInt)
   params.setBooleanParameter(CoreProtocolPNames.USE_EXPECT_CONTINUE, false)
   params.setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false)
   params.setIntParameter(CoreConnectionPNames.SOCKET_BUFFER_SIZE, soBufferSize)
-  //params.setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BEST_MATCH)
-  //HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1)
 
   private val schemeRegistry = new SchemeRegistry
   schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), port))
