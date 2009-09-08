@@ -31,7 +31,7 @@ object Main {
 }
 
 object Stats {
-  var w3c = new W3CStats(Logger.get, Array("rs-response-time", "sc-response-code", "rs-response-code", "rs-response-method", "x-protocol", "host", "uri", "rs-content-type", "rs-content-length", "remote-ip", "request-date", "request-time", "rs-went-away", "x-proxy-id", "x-default-backend"))
+  var w3c = new W3CStats(Logger.get, Array("rs-response-time", "sc-response-code", "rs-response-code", "rs-response-method", "x-protocol", "host", "uri", "rs-content-type", "rs-content-length", "remote-ip", "request-date", "request-time", "rs-went-away", "x-proxy-id", "x-default-backend", "x-httpclient-exception"))
   val requestsHandled = buildIncr("requestsHandled")
   val returned2xx = buildIncr("returned2xx")
   val returned3xx = buildIncr("returned3xx")
