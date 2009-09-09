@@ -18,7 +18,7 @@ object ProxyServletSpec extends Specification {
     proxyServer.addServlet(classOf[ProxyServlet], "/", proxyProps)
     proxyServer.start()
 
-    val slowServer = new JettyServer(3000+i, 0, 1, Nil, "data/keystore", "asdfasdf", "asdfasdf", null)
+    val slowServer = new JettyServer(3000+i, 0, 1, Nil, "data/keystore", "asdfasdf", "asdfasdf", 10, null)
     val waitingProps = new Properties()
     waitingProps.put("timeout", sleepTime.toString)
     slowServer.addServlet(classOf[WaitingServlet], "/", waitingProps)
