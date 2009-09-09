@@ -177,8 +177,10 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
       val max = q.getMaxThreads
       val low = q.getLowThreads
       val idle = q.getIdleThreads
-      log.info("QueuedThreadPool in use: name: %s, min: %s, max: %s, low: %s idle: %s"
-               .format(name, min, max, low, idle))
+      val maxIdle = q.getMaxIdleTimeMs
+      val queued = q.getMaxQueued
+      log.info("QueuedThreadPool in use: name: %s, min: %s, max: %s, low: %s idle: %s, max-idle: %s, max-queued: %s"
+               .format(name, min, max, low, idle, maxIdle, queued))
     } catch {
       case e => log.error(e, "ThreadPool is not a QueuedThreadPool")
     }
@@ -210,6 +212,12 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     conn.setStatsOn(false)
     conn.setLowResourcesConnections(lowResourcesConnections)
     conn.setLowResourceMaxIdleTime(lowResourcesMaxIdleTimeMS)
+
+    log.info("Jetty accept queue size: %s", conn.getAcceptQueueSize)
+    log.info("Jetty SO_LINGER time: %s", conn.getSoLingerTime)
+    log.info("Jetty connections open max: %s", conn.getConnectionsOpenMax)
+    log.info("Jetty max idle time: %s", conn.getMaxIdleTime)
+
     conn
   }
 
