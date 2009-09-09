@@ -9,6 +9,7 @@ import org.apache.http.{HttpResponse, HttpVersion}
 import org.apache.http.client.RedirectHandler
 import org.apache.http.client.methods.HttpUriRequest
 import org.apache.http.client.protocol.{RequestAddCookies, RequestProxyAuthentication}
+import org.apache.http.protocol.RequestExpectContinue
 import org.apache.http.conn.params._
 import org.apache.http.conn.scheme.{PlainSocketFactory, LayeredSocketFactory, SchemeRegistry, Scheme}
 import org.apache.http.conn.ssl.{AllowAllHostnameVerifier, SSLSocketFactory}
@@ -66,9 +67,9 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Optio
     override def isRedirectRequested(response: HttpResponse,  context: HttpContext): Boolean = false
     override def getLocationURI(response: HttpResponse, context: HttpContext): URI = null
   })
-  // FIXME: Do this per-class removal!
   client.removeRequestInterceptorByClass(classOf[RequestAddCookies])
   client.removeRequestInterceptorByClass(classOf[RequestProxyAuthentication])
+  client.removeRequestInterceptorByClass(classOf[RequestExpectContinue])
   client.clearResponseInterceptors()
 
   private val defaultErrorString = ""
@@ -80,12 +81,12 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Optio
     Stats.w3c.log("rs-response-method", requestSpecification.method)
     Stats.w3c.log("uri", requestSpecification.uri)
     var statusCode = 0
-    var response: org.apache.http.HttpResponse = null
+    var httpClientException = 0
     try {
       log.ifDebug(requestSpecification.toString)
       val request = new ApacheRequest(requestSpecification.method, requestSpecification.uri, requestSpecification.headers, requestSpecification.inputStream)
       val httpHost = new org.apache.http.HttpHost(host, port, requestSpecification.scheme)
-      response = client.execute(httpHost, request)
+      val response = client.execute(httpHost, request)
 
       for (header <- response.getAllHeaders)
         servletResponse.addHeader(header.getName, header.getValue)
@@ -132,28 +133,29 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Optio
     } catch {
       case u: URISyntaxException => {
         statusCode = HttpServletResponse.SC_BAD_REQUEST
+        httpClientException = 1
         log.error(u, "%s: URL %s has incorrect syntax (message='%s', cause='%s'), returning 400 to client.".format(u.toString, requestSpecification.uri, u.getMessage(), u.getCause()))
       }
       case e: IOException => {
         statusCode = HttpServletResponse.SC_GATEWAY_TIMEOUT
-        // setServletResponseErrorDoc(statusCode, servletResponse)
+        httpClientException = 1
         log.error(e, "%s: backend timed out while connection (message='%s', cause='%s'), returning 504 to client.".format(e.toString, e.getMessage(), e.getCause()))
       }
       case e => {
         statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR
-        // setServletResponseErrorDoc(statusCode, servletResponse)
+        httpClientException = 1
         log.error(e, "%s: Exception (message='%s', cause='%s'), returning 500 to client.".format(e.toString, e.getMessage(), e.getCause()))
       }
     } finally {
       servletResponse.flushBuffer()
     }
-    if (response == null) {
-      // error condition
+    if (httpClientException == 1) {
       servletResponse.setStatus(statusCode)
       if (requestSpecification.method != "HEAD") {
         servletResponse.getOutputStream.print(errorStrings.getOrElse(statusCode, defaultErrorString))
       }
-      log.debug("Response: statusCode = %s contentType = null, contentLength = null, headers = null".format(statusCode))
+      log.debug("Response: httpClientException = 1 statusCode = %s contentType = null, contentLength = null, headers = null".format(statusCode))
+      Stats.w3c.log("x-httpclient-exception", httpClientException)
     }
     Stats.w3c.log("sc-response-code", statusCode)
     if (statusCode >= 200 && statusCode <= 299) {
