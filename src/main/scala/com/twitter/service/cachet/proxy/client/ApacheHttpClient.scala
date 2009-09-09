@@ -144,6 +144,8 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Optio
         // setServletResponseErrorDoc(statusCode, servletResponse)
         log.error(e, "%s: Exception (message='%s', cause='%s'), returning 500 to client.".format(e.toString, e.getMessage(), e.getCause()))
       }
+    } finally {
+      servletResponse.flushBuffer()
     }
     if (response == null) {
       // error condition
