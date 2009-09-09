@@ -8,6 +8,7 @@ import org.mortbay.jetty.security.SslSelectChannelConnector
 import org.mortbay.jetty.servlet.{FilterHolder, ServletHolder, Context}
 import org.mortbay.thread.QueuedThreadPool
 import java.util.Properties
+import javax.net.ssl.SSLSocketFactory
 import javax.servlet.Filter
 import javax.servlet.http.HttpServlet
 import net.lag.configgy.ConfigMap
@@ -220,6 +221,13 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     conn.setKeystore(keystoreLocation)
     conn.setKeyPassword(keystore_password)
     conn.setPassword(ssl_password)
+    conn.setNeedClientAuth(false)
+    conn.setWantClientAuth(false)
+    if (conn.getExcludeCipherSuites != null) {
+      log.info("SSL Connector excluded cipher suites: " + conn.getExcludeCipherSuites().mkString("[", ",", "]"))
+    } else {
+      log.info("SSL Connector found no excluded cipher suites")
+    }
     conn.setPort(port)
     host match {
       case Some(host) => conn.setHost(host)
@@ -228,6 +236,19 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     conn.setAcceptors(acceptors)
     conn.setMaxIdleTime(maxIdleTimeMS)
     conn.setStatsOn(false)
+
+    try {
+      val suites = SSLSocketFactory.getDefault.asInstanceOf[SSLSocketFactory].getDefaultCipherSuites
+      log.info("We support the following SSL cipher suites: " + suites.mkString(","))
+    } catch {
+      case e: Exception => log.error(e, "Problem fetching cipher suites")
+    }
+    log.info("SSL Connector Protocol: " + conn.getProtocol())
+    // We exclude these ciphers as they cause issues.
+    conn.setExcludeCipherSuites(Array("SSL_RSA_WITH_DES_CBC_SHA", "SSL_DHE_RSA_WITH_DES_CBC_SHA", "SSL_DHE_DSS_WITH_DES_CBC_SHA",
+                                      "SSL_RSA_EXPORT_WITH_RC4_40_MD5", "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA",
+                                      "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA", "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA"))
+
     conn.setLowResourcesConnections(lowResourcesConnections)
     conn.setLowResourceMaxIdleTime(lowResourcesMaxIdleTimeMS)
     conn
