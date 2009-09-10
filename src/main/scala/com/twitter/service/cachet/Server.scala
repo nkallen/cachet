@@ -93,6 +93,9 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
   var maxIdleTimeMS = 1000
   var lowResourcesMaxIdleTimeMS = 300
   var lowResourcesConnections = 200
+  var connectorStats = false
+  var reuseAddress = true
+
   if (threadConfig != null) {
     ThreadPool.init(threadConfig)
   }
@@ -106,6 +109,8 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
          config.getString("keystore-password", "notset"), config.getString("ssl-password", "notset"), config.getInt("accept-queue-size", 512),
          config.configMap("threadpool"))
     acceptors = config.getInt("connector.acceptors", acceptors)
+    connectorStats = config.getBool("connector.stats", false)
+    reuseAddress = config.getBool("connector.reuseAddress", true)
     maxIdleTimeMS = config.getInt("connector.maxIdleTimeMS", maxIdleTimeMS)
     lowResourcesMaxIdleTimeMS = config.getInt("connector.lowResourcesMaxIdleTimeMS", lowResourcesMaxIdleTimeMS)
     lowResourcesConnections = config.getInt("connector.lowResourcesConnections", lowResourcesConnections)
@@ -204,16 +209,18 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     log.info("returning new HTTP Connector on port %s for host %s", port, host)
     val conn = new SelectChannelConnector
     conn.setPort(port)
-    host match {
-      case Some(host) => conn.setHost(host)
-      case _ =>
+    host.foreach { name =>
+      conn.setHost(name)
+      conn.setName(name + "-connector")
     }
     conn.setAcceptors(acceptors)
     conn.setMaxIdleTime(maxIdleTimeMS)
     conn.setAcceptQueueSize(acceptQueueSize)
-    conn.setStatsOn(false)
+    conn.setStatsOn(connectorStats)
     conn.setLowResourcesConnections(lowResourcesConnections)
     conn.setLowResourceMaxIdleTime(lowResourcesMaxIdleTimeMS)
+    conn.setResolveNames(false)
+    conn.setReuseAddress(reuseAddress)
 
     log.info("Jetty accept queue size: %s", conn.getAcceptQueueSize)
     log.info("Jetty SO_LINGER time: %s", conn.getSoLingerTime)
@@ -239,13 +246,15 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
       log.info("SSL Connector found no excluded cipher suites")
     }
     conn.setPort(port)
-    host match {
-      case Some(host) => conn.setHost(host)
-      case None =>
+    host.foreach { name =>
+      conn.setHost(name)
+      conn.setName(name + "-connector-ssl")
     }
     conn.setAcceptors(acceptors)
     conn.setMaxIdleTime(maxIdleTimeMS)
-    conn.setStatsOn(false)
+    conn.setStatsOn(connectorStats)
+    conn.setResolveNames(false)
+    conn.setReuseAddress(reuseAddress)
 
     try {
       val suites = SSLSocketFactory.getDefault.asInstanceOf[SSLSocketFactory].getDefaultCipherSuites
