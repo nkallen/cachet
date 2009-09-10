@@ -109,7 +109,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
          config.getString("keystore-password", "notset"), config.getString("ssl-password", "notset"), config.getInt("accept-queue-size", 512),
          config.configMap("threadpool"))
     acceptors = config.getInt("connector.acceptors", acceptors)
-    connectorStats = config.getBool("connector.stats", false)
+    connectorStats = config.getBool("connector.collectStats", false)
     reuseAddress = config.getBool("connector.reuseAddress", true)
     maxIdleTimeMS = config.getInt("connector.maxIdleTimeMS", maxIdleTimeMS)
     lowResourcesMaxIdleTimeMS = config.getInt("connector.lowResourcesMaxIdleTimeMS", lowResourcesMaxIdleTimeMS)
