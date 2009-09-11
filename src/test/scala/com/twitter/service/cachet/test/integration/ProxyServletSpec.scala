@@ -14,7 +14,7 @@ object ProxyServletSpec extends Specification {
     val proxyServer = new TestServer(2345+i, 0, 1, Nil, "data/keystore", "asdfasdf", "asdfasdf")
     val proxyProps = new Properties()
     proxyProps.put("backend-port", (3000+i).toString)
-    proxyProps.put("backend-ssl-port", "8434")
+    proxyProps.put("backend-ssl-port", "8443")
     proxyServer.addServlet(classOf[ProxyServlet], "/", proxyProps)
     proxyServer.start()
 
