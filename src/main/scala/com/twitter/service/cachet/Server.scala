@@ -226,6 +226,11 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     log.info("Jetty SO_LINGER time: %s", conn.getSoLingerTime)
     log.info("Jetty connections open max: %s", conn.getConnectionsOpenMax)
     log.info("Jetty max idle time: %s", conn.getMaxIdleTime)
+    log.info("Jetty low resources max idle time: %s", conn.getLowResourceMaxIdleTime)
+    log.info("Jetty header buffer size: %s", conn.getHeaderBufferSize)
+    log.info("Jetty response buffer size: %s", conn.getResponseBufferSize)
+    log.info("Jetty request buffer size: %s", conn.getRequestBufferSize)
+    log.info("Jetty acceptor priority offset: %s", conn.getAcceptorPriorityOffset)
 
     conn
   }
