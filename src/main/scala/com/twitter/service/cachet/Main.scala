@@ -6,6 +6,7 @@ import com.twitter.service.Stats._
 import net.lag.configgy.{Config, ConfigMap, Configgy, RuntimeEnvironment}
 import net.lag.logging.Logger
 import org.mortbay.thread.{QueuedThreadPool, ThreadPool => JThreadPool}
+import org.mortbay.jetty.{AbstractConnector, Server => JServer}
 import java.util.Properties
 import java.util.logging.Level
 
@@ -17,6 +18,7 @@ object Main {
     runtime.load(args)
 
     val server = new JettyServer(Configgy.config)
+    Stats.server = Some(server.server)
     log.info(Stats.w3c.log_header)
 
     val initParams = new Properties()
@@ -31,6 +33,9 @@ object Main {
 }
 
 object Stats {
+  // Set this if you want Jetty-specific stats to be collected.
+  var server: Option[JServer] = None
+
   var w3c = new W3CStats(Logger.get, Array("rs-response-time", "sc-response-code", "rs-response-code", "rs-response-method", "x-protocol", "host", "uri", "rs-content-type", "rs-content-length", "remote-ip", "request-date", "request-time", "rs-went-away", "x-proxy-id", "x-default-backend", "x-httpclient-exception"))
   val requestsHandled = buildIncr("requestsHandled")
   val returned2xx = buildIncr("returned2xx")
@@ -42,6 +47,30 @@ object Stats {
   // We couldn't find a backend proxy for a Host
   val noProxyFoundForHost = buildIncr("noProxyFoundForHost")
 
+  /**
+   * Registers a function for gathering Jetty's built-in Stats. Note: this will only work if server is set to non-None.
+   */
+  registerTimingStatsFn { reset =>
+    server match {
+      case Some(server) => {
+        val rv: Array[(String, TimingStat)] = server.getConnectors.flatMap { conn =>
+          val name = conn.getName
+          Array((name + "_connections" ->
+                 TimingStat(conn.getConnectionsOpen, conn.getConnectionsOpenMin, conn.getConnectionsOpenMax, conn.getConnectionsOpen)),
+                (name + "_connections_requests" ->
+                 TimingStat(conn.getConnectionsRequestsAve, conn.getConnectionsRequestsMin, conn.getConnectionsRequestsMax,
+                            conn.getConnectionsRequestsAve)),
+                // We can convert these to Ints safely as long as we reset the stats before they become Longs.
+                (name + "_connections_duration" ->
+                 TimingStat(conn.getConnectionsDurationAve.toInt, conn.getConnectionsDurationMin.toInt,
+                            conn.getConnectionsDurationMax.toInt, conn.getConnectionsDurationAve.toInt)))
+        }
+        if (reset) { server.getConnectors.foreach(_.statsReset) }
+        Map.empty ++ rv
+      }
+      case None => Map.empty
+    }
+  }
   def countRequestsForHost(name: String) = incr("host_%s".format(name), 1)
   def initStatsMBean() { StatsMBean("com.twitter.cachet") }
 }
