@@ -231,7 +231,8 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     log.info("Jetty response buffer size: %s", conn.getResponseBufferSize)
     log.info("Jetty request buffer size: %s", conn.getRequestBufferSize)
     log.info("Jetty acceptor priority offset: %s", conn.getAcceptorPriorityOffset)
-
+    log.info("Jetty stats are on: " + conn.getStatsOn)
+    log.info("Jetty stats (in Ms) are on: " + conn.getStatsOnMs)
     conn
   }
 
