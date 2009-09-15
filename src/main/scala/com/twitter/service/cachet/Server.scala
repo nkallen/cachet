@@ -87,13 +87,12 @@ trait Server {
  */
 class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: Int, val sslPorts: Seq[String],
                   val keystore_location: String, val keystore_password: String, val ssl_password: String, val acceptQueueSize: Int,
-                  val threadConfig: ConfigMap) extends Server {
+                  val threadConfig: ConfigMap, val connectorStats: Boolean) extends Server {
   private val log = Logger.get
   var acceptors = 2
   var maxIdleTimeMS = 1000
   var lowResourcesMaxIdleTimeMS = 300
   var lowResourcesConnections = 200
-  var connectorStats = false
   var reuseAddress = true
 
   if (threadConfig != null) {
@@ -107,9 +106,8 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     this(config.getInt("port", 8080), config.getInt("gracefulShutdownMS", 10), config.getInt("backend-num-threads", 10),
          config.getList("ssl-ports"), config.getString("keystore-location", "notset"),
          config.getString("keystore-password", "notset"), config.getString("ssl-password", "notset"), config.getInt("accept-queue-size", 512),
-         config.configMap("threadpool"))
+         config.configMap("threadpool"), config.getBool("connector.collectStats", false))
     acceptors = config.getInt("connector.acceptors", acceptors)
-    connectorStats = config.getBool("connector.collectStats", false)
     reuseAddress = config.getBool("connector.reuseAddress", true)
     maxIdleTimeMS = config.getInt("connector.maxIdleTimeMS", maxIdleTimeMS)
     lowResourcesMaxIdleTimeMS = config.getInt("connector.lowResourcesMaxIdleTimeMS", lowResourcesMaxIdleTimeMS)
