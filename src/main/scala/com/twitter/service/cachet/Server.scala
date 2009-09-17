@@ -103,7 +103,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
   val connectors = configureSsl()
 
   def this(config: ConfigMap) {
-    this(config.getInt("port", 8080), config.getInt("gracefulShutdownMS", 10), config.getInt("backend-num-threads", 10),
+    this(config.getInt("port", 8080), config.getInt("gracefulShutdownMS", 1000), config.getInt("backend-num-threads", 10),
          config.getList("ssl-ports"), config.getString("keystore-location", "notset"),
          config.getString("keystore-password", "notset"), config.getString("ssl-password", "notset"), config.getInt("accept-queue-size", 512),
          config.configMap("threadpool"), config.getBool("connector.collectStats", false))
