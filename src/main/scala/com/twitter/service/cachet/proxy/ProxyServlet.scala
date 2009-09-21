@@ -31,7 +31,7 @@ class ProxyServlet extends HttpServlet {
     w3c_path: String, w3c_filename: String, errorStrings: Map[Int, String]) {
 
     this.id = id
-    this.host = backend_host
+    this.host = backend_host //ip of host
     this.port = backend_port
     this.sslPort = backend_ssl_port
     this.timeout = backend_timeout

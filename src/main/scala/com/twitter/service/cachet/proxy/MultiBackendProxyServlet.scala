@@ -63,13 +63,13 @@ object HostRouter {
         // Wildcard matching. e.g. foo.twitter.com => twitter.com
         log.warning("Didn't find backend with exact match for host '%s'. Trying wildcard matching now.", host)
         BackendsToProxyMap.hosts.find(domain => host.endsWith(domain)) match {
-          case Some(h) => (h, backendMap.get(h))
+          case Some(h) => val proxy = backendMap.get(h) ; (proxy.id, proxy)
           case None => (null, null)
         }
       }
-      case servlet: ProxyServlet => (host, servlet)
+      case servlet: ProxyServlet => (servlet.id, servlet)
     }
-    log.debug("requestHost = '%s' host = '%s' backendHost = '%s'", requestHost, host, backendHost)
+    log.debug("requestHost = '%s' host(after removing ':') = '%s' backendHost = '%s'", requestHost, host, backendHost)
     serv
   }
 
@@ -121,7 +121,7 @@ class MultiBackendProxyServlet(defaultHost: String, backends: List[ProxyBackendC
       backend.service(request, response)
     } catch {
       case e => {
-        log.error("Unable to service request for unknown reason (Exception = %s, message = %s, cause = %s)  Request: protocol = %s method = %s remoteAddr = %s URL = %s Host = %s", 
+        log.error("Unable to service request for unknown reason (Exception = %s, message = %s, cause = %s)  Request: protocol = %s method = %s remoteAddr = %s URL = %s Host = %s",
           e.toString, e.getMessage(), e.getCause(), request.getProtocol(), request.getMethod(), request.getRemoteAddr(), request.getRequestURL(), host)
         val statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR
         response.setStatus(statusCode)
