@@ -26,6 +26,8 @@ object BackendsToProxyMap {
 
     backendMap
   }
+
+  def getAnyOneHost: String = hosts.head
 }
 
 case class ProxyBackendConfig(domain: String, ip: String, port: Int, sslPort: Option[Int], aliases: Seq[String])
@@ -95,7 +97,11 @@ class MultiBackendProxyServlet(defaultHost: String, backends: List[ProxyBackendC
                                soBufferSize: Int, w3cPath: String, w3cFilename: String, errorStrings: Map[Int, String]) extends HttpServlet {
   private val log = Logger.get
   HostRouter.setHosts(BackendsToProxyMap(backends, backendTimeoutMs, numThreads, soBufferSize, w3cPath, w3cFilename, errorStrings))
-  private val defaultBackend = HostRouter(defaultHost)
+  private val defaultBackend = HostRouter(defaultHost) match {
+    case null => HostRouter(BackendsToProxyMap.getAnyOneHost)
+    case b => b
+  }
+  log.info("defaultBackend = %s", defaultBackend.toString)
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
     var host = request.getHeader("Host")
