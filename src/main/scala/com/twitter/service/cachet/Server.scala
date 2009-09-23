@@ -94,6 +94,9 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
   var lowResourcesMaxIdleTimeMS = 300
   var lowResourcesConnections = 200
   var reuseAddress = true
+  var headerBufferSize = 4192
+  var requestBufferSize = 16 * 1024
+  var responseBufferSize = 16 * 1024
 
   if (threadConfig != null) {
     ThreadPool.init(threadConfig)
@@ -112,6 +115,10 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     maxIdleTimeMS = config.getInt("connector.maxIdleTimeMS", maxIdleTimeMS)
     lowResourcesMaxIdleTimeMS = config.getInt("connector.lowResourcesMaxIdleTimeMS", lowResourcesMaxIdleTimeMS)
     lowResourcesConnections = config.getInt("connector.lowResourcesConnections", lowResourcesConnections)
+    headerBufferSize = config.getInt("connector.headerBufferSize", headerBufferSize)
+    requestBufferSize = config.getInt("connector.requestBufferSize", requestBufferSize)
+    responseBufferSize = config.getInt("connector.responseBufferSize", responseBufferSize)
+
     log.info("Initializing JettyServer with options: port:%s, gracefulShutdownMS:%s, numThreads:%s, sslPort:%s, keystore_location:%s "
              .format(port, gracefulShutdownMS, numThreads, sslPorts, keystore_location))
     log.info("[more options] acceptors:%s maxIdleTimeMS:%s lowResourcesMaxIdleTimeMS:%s lowResourcesConnections:%s"
@@ -219,6 +226,9 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     conn.setLowResourceMaxIdleTime(lowResourcesMaxIdleTimeMS)
     conn.setResolveNames(false)
     conn.setReuseAddress(reuseAddress)
+    conn.setHeaderBufferSize(headerBufferSize)
+    conn.setRequestBufferSize(requestBufferSize)
+    conn.setResponseBufferSize(responseBufferSize)
 
     log.info("Jetty accept queue size: %s", conn.getAcceptQueueSize)
     log.info("Jetty SO_LINGER time: %s", conn.getSoLingerTime)
