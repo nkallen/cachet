@@ -54,6 +54,8 @@ class RequestSpecification(request: HttpServletRequest) {
 
   def method = request.getMethod
 
+  def getRemoteAddr = request.getRemoteAddr
+
   def headers: Seq[(String, String)] = {
     (for (headerName <- list(request.getHeaderNames).asInstanceOf[ArrayList[String]] if !ForwardRequest.hopByHopHeaders.contains(headerName) && headerName != "X-Forwarded-For";
           headerValue <- list(request.getHeaders(headerName)).asInstanceOf[ArrayList[String]])
