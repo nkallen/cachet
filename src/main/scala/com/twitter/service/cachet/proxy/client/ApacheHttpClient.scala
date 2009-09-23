@@ -124,7 +124,7 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Optio
           }
         } finally {
           log.ifDebug {
-            "Response: statusCode = %s".format(statusCode) +
+            "Response: remote-ip = %s uri = %s statusCode = %s".format(requestSpecification.getRemoteAddr, requestSpecification.uri, statusCode) +
               " contentType = %s, contentLength = %s, headers = %s" .format(contentType, entity.getContentLength(), response.getAllHeaders().toList.toString)
           }
           entity.consumeContent() // ensure connection release
