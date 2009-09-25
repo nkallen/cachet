@@ -13,8 +13,8 @@
         <conf name="test" visibility="private" description="build and run tests"/>
     </configurations>
     <dependencies>
-        <dependency org="org.scala-lang" name="scala-compiler" rev="2.7.3" conf="bootstrap->default; test->default"/>
-        <dependency org="org.scala-lang" name="scala-library" rev="2.7.3"/>
+        <dependency org="org.scala-lang" name="scala-compiler" rev="2.7.6" conf="bootstrap->default; test->default"/>
+        <dependency org="org.scala-lang" name="scala-library" rev="2.7.6"/>
         <dependency org="org.scala-tools" name="vscaladoc" rev="1.1" conf="bootstrap->default"/>
         <dependency org="backport-util-concurrent" name="backport-util-concurrent" rev="3.1" />
         <dependency org="net.sf.jsr107cache" name="jsr107cache" rev="1.0" />
