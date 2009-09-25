@@ -203,7 +203,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
   def addListener(config: ListenConfig) = {
     server.addConnector(newHttpConnector(config.port, config.domain, Some(config.ip)))
     config.sslPort match {
-      case Some(port) => server.addConnector(newSslConnector(port, config.sslKeystore, Some(config.ip)))
+      case Some(port) => server.addConnector(newSslConnector(port, config.sslKeystore, config.domain, Some(config.ip)))
       case None =>
     }
   }
@@ -245,9 +245,9 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
   }
 
   def newSslConnector(port: Int, keystoreLocation: String): Connector =
-    newSslConnector(port, keystoreLocation, None)
+    newSslConnector(port, keystoreLocation, "default", None)
 
-  def newSslConnector(port: Int, keystoreLocation: String, host: Option[String]): Connector = {
+  def newSslConnector(port: Int, keystoreLocation: String, name: String, host: Option[String]): Connector = {
     val conn = new SslSelectChannelConnector
     conn.setKeystore(keystoreLocation)
     conn.setKeyPassword(keystore_password)
@@ -260,8 +260,8 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
       log.info("SSL Connector found no excluded cipher suites")
     }
     conn.setPort(port)
-    host.foreach { name =>
-      conn.setHost(name)
+    host.foreach { ip =>
+      conn.setHost(ip)
       conn.setName(name + "-connector-ssl")
     }
     conn.setAcceptors(acceptors)
