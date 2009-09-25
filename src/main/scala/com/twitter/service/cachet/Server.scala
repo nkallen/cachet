@@ -201,21 +201,21 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
   }
 
   def addListener(config: ListenConfig) = {
-    server.addConnector(newHttpConnector(config.port, Some(config.ip)))
+    server.addConnector(newHttpConnector(config.port, config.domain, Some(config.ip)))
     config.sslPort match {
       case Some(port) => server.addConnector(newSslConnector(port, config.sslKeystore, Some(config.ip)))
       case None =>
     }
   }
 
-  def newHttpConnector: Connector = newHttpConnector(port, None)
+  def newHttpConnector: Connector = newHttpConnector(port, "default", None)
 
-  def newHttpConnector(port: Int, host: Option[String]): Connector = {
+  def newHttpConnector(port: Int, name: String, host: Option[String]): Connector = {
     log.info("returning new HTTP Connector on port %s for host %s", port, host)
     val conn = new SelectChannelConnector
     conn.setPort(port)
-    host.foreach { name =>
-      conn.setHost(name)
+    host.foreach { ip =>
+      conn.setHost(ip)
       conn.setName(name + "-connector")
     }
     conn.setAcceptors(acceptors)
