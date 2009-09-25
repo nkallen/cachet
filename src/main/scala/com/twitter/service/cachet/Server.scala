@@ -265,6 +265,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
       conn.setName(name + "-connector-ssl")
     }
     conn.setAcceptors(acceptors)
+    conn.setAcceptQueueSize(acceptQueueSize)
     conn.setMaxIdleTime(maxIdleTimeMS)
     conn.setStatsOn(connectorStats)
     conn.setResolveNames(false)
