@@ -97,6 +97,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
   var headerBufferSize = 4192
   var requestBufferSize = 16 * 1024
   var responseBufferSize = 16 * 1024
+  var soLingerMs = -1
 
   if (threadConfig != null) {
     ThreadPool.init(threadConfig)
@@ -118,6 +119,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     headerBufferSize = config.getInt("connector.headerBufferSize", headerBufferSize)
     requestBufferSize = config.getInt("connector.requestBufferSize", requestBufferSize)
     responseBufferSize = config.getInt("connector.responseBufferSize", responseBufferSize)
+    soLingerMs = config.getInt("connector.soLingerMs", -1)
 
     log.info("Initializing JettyServer with options: port:%s, gracefulShutdownMS:%s, numThreads:%s, sslPort:%s, keystore_location:%s "
              .format(port, gracefulShutdownMS, numThreads, sslPorts, keystore_location))
@@ -212,12 +214,16 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
 
   def newHttpConnector(port: Int, name: String, host: Option[String]): Connector = {
     log.info("returning new HTTP Connector on port %s for host %s", port, host)
-    val conn = new SelectChannelConnector
+    val conn = configureConnector(new SelectChannelConnector)
     conn.setPort(port)
     host.foreach { ip =>
       conn.setHost(ip)
       conn.setName(name + "-connector")
     }
+    conn
+  }
+
+  def configureConnector(conn: SelectChannelConnector): SelectChannelConnector = {
     conn.setAcceptors(acceptors)
     conn.setMaxIdleTime(maxIdleTimeMS)
     conn.setAcceptQueueSize(acceptQueueSize)
@@ -229,6 +235,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     conn.setHeaderBufferSize(headerBufferSize)
     conn.setRequestBufferSize(requestBufferSize)
     conn.setResponseBufferSize(responseBufferSize)
+    conn.setSoLingerTime(soLingerMs)
 
     log.info("Jetty accept queue size: %s", conn.getAcceptQueueSize)
     log.info("Jetty SO_LINGER time: %s", conn.getSoLingerTime)
@@ -248,7 +255,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     newSslConnector(port, keystoreLocation, "default", None)
 
   def newSslConnector(port: Int, keystoreLocation: String, name: String, host: Option[String]): Connector = {
-    val conn = new SslSelectChannelConnector
+    val conn = configureConnector(new SslSelectChannelConnector).asInstanceOf[SslSelectChannelConnector]
     conn.setKeystore(keystoreLocation)
     conn.setKeyPassword(keystore_password)
     conn.setPassword(ssl_password)
@@ -264,11 +271,6 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
       conn.setHost(ip)
       conn.setName(name + "-connector-ssl")
     }
-    conn.setAcceptors(acceptors)
-    conn.setMaxIdleTime(maxIdleTimeMS)
-    conn.setStatsOn(connectorStats)
-    conn.setResolveNames(false)
-    conn.setReuseAddress(reuseAddress)
 
     try {
       val suites = SSLSocketFactory.getDefault.asInstanceOf[SSLSocketFactory].getDefaultCipherSuites
