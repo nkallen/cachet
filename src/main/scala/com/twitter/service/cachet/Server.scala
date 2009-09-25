@@ -97,7 +97,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
   var headerBufferSize = 4192
   var requestBufferSize = 16 * 1024
   var responseBufferSize = 16 * 1024
-  var soLingerMs = -1
+  var soLingerSecs = -1
 
   if (threadConfig != null) {
     ThreadPool.init(threadConfig)
@@ -119,7 +119,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     headerBufferSize = config.getInt("connector.headerBufferSize", headerBufferSize)
     requestBufferSize = config.getInt("connector.requestBufferSize", requestBufferSize)
     responseBufferSize = config.getInt("connector.responseBufferSize", responseBufferSize)
-    soLingerMs = config.getInt("connector.soLingerMs", -1)
+    soLingerSecs = config.getInt("connector.soLingerSecs", -1)
 
     log.info("Initializing JettyServer with options: port:%s, gracefulShutdownMS:%s, numThreads:%s, sslPort:%s, keystore_location:%s "
              .format(port, gracefulShutdownMS, numThreads, sslPorts, keystore_location))
@@ -235,7 +235,7 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
     conn.setHeaderBufferSize(headerBufferSize)
     conn.setRequestBufferSize(requestBufferSize)
     conn.setResponseBufferSize(responseBufferSize)
-    conn.setSoLingerTime(soLingerMs)
+    conn.setSoLingerTime(soLingerSecs)
 
     log.info("Jetty accept queue size: %s", conn.getAcceptQueueSize)
     log.info("Jetty SO_LINGER time: %s", conn.getSoLingerTime)
