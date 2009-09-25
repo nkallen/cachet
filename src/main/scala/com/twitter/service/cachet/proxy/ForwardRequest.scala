@@ -13,6 +13,8 @@ object ForwardRequest {
   // end-to-end header but the Apache HTTP Client does NOT like having
   // it set in advance.
   val hopByHopHeaders = Array("Proxy-Connection", "Connection", "Keep-Alive", "Transfer-Encoding", "TE", "Trailer", "Proxy-Authorization", "Proxy-Authenticate", "Upgrade", "Content-Length")
+  // Set this to true if you want to disable HTTP Keep-Alives.
+  var forceConnectionClose = false
 }
 
 /**
@@ -23,6 +25,9 @@ class ForwardRequest(httpClient: HttpClient, host: String, port: Int) {
     httpClient(host, port, new RequestSpecification(request), new ResponseWrapper(response))
     // FIXME: add version via configgy.
     response.addHeader("Via", "Cachet/%s".format("0.10"))
+    if (ForwardRequest.forceConnectionClose) {
+      response.addHeader("Connection", "close")
+    }
   }
 }
 
