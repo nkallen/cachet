@@ -1,5 +1,6 @@
 package com.twitter.service.cachet.proxy
 
+import net.lag.logging.Logger
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import javax.servlet.ServletInputStream
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
@@ -10,9 +11,10 @@ import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
  * The main use is so that ServletFilters can read the InputStream without blocking Servlets from also reading it.
  */
 class BufferedRequestWrapper(req: HttpServletRequest) extends HttpServletRequestWrapper(req) {
+  private val log = Logger.get
   val is = req.getInputStream
   val baos = new ByteArrayOutputStream()
-  val buf = new Array[Byte](1024)
+  val buf = new Array[Byte](4 * 1024)
   var letti = is.read(buf)
 
   while (letti > 0) {
@@ -21,6 +23,7 @@ class BufferedRequestWrapper(req: HttpServletRequest) extends HttpServletRequest
   }
 
   val buffer = baos.toByteArray()
+  log.debug("BufferedRequestWrapper read %s bytes", buffer.size)
 
   override def getInputStream(): ServletInputStream = new BufferedServletInputStream(new ByteArrayInputStream(buffer))
 }
