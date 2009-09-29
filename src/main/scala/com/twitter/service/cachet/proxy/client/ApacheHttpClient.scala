@@ -112,7 +112,9 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Optio
         } else {
           null
         }
-        Stats.w3c.log("rs-content-length", entity.getContentLength())
+        val contentLen = entity.getContentLength.toInt
+        Stats.w3c.log("rs-content-length", contentLen)
+        servletResponse.setContentLength(contentLen)
         Stats.w3c.log("rs-content-type", contentType)
         try {
           entity.writeTo(servletResponse.getOutputStream)
@@ -127,7 +129,7 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Optio
             "Response: remote-ip = %s uri = %s statusCode = %s".format(requestSpecification.getRemoteAddr, requestSpecification.uri, statusCode) +
               " contentType = %s, contentLength = %s, headers = %s" .format(contentType, entity.getContentLength(), response.getAllHeaders().toList.toString)
           }
-          entity.consumeContent() // ensure connection release
+          //entity.consumeContent() // ensure connection release
         }
       }
     } catch {
