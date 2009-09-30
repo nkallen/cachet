@@ -12,7 +12,7 @@ object ForwardRequest {
   // defined. Content-Length is not a hop-by-hop header, it is an
   // end-to-end header but the Apache HTTP Client does NOT like having
   // it set in advance.
-  val hopByHopHeaders = Array("Proxy-Connection", "Keep-Alive", "Transfer-Encoding", "TE", "Trailer", "Proxy-Authorization", "Proxy-Authenticate", "Upgrade", "Content-Length")
+  val hopByHopHeaders = Array("Proxy-Connection", "Keep-Alive", "Transfer-Encoding", "TE", "Trailer", "Proxy-Authorization", "Proxy-Authenticate", "Upgrade", "Content-Length", "Connection")
   // Set this to true if you want to disable HTTP Keep-Alives.
   var forceConnectionClose = false
 }
