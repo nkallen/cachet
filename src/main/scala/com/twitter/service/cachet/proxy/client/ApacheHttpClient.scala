@@ -114,7 +114,7 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Optio
         }
         val contentLen = entity.getContentLength.toInt
         Stats.w3c.log("rs-content-length", contentLen)
-        //servletResponse.setContentLength(contentLen)
+        servletResponse.setContentLength(contentLen)
         Stats.w3c.log("rs-content-type", contentType)
         try {
           entity.writeTo(servletResponse.getOutputStream)
