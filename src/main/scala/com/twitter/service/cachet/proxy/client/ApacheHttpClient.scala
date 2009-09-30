@@ -22,7 +22,7 @@ import org.apache.http.protocol.HttpContext
 import org.mortbay.jetty.EofException
 
 class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Option[Int],
-  soBufferSize: Int, errorStrings: Map[Int, String]) extends HttpClient {
+  soBufferSize: Int, errorStrings: Map[Int, String], overWriteHosts: Array[String], overWriteHostWith: String) extends HttpClient {
 
   private val log = Logger.get
   private val params = new BasicHttpParams
@@ -114,7 +114,7 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Optio
         }
         val contentLen = entity.getContentLength.toInt
         Stats.w3c.log("rs-content-length", contentLen)
-        servletResponse.setContentLength(contentLen)
+        //servletResponse.setContentLength(contentLen)
         Stats.w3c.log("rs-content-type", contentType)
         try {
           entity.writeTo(servletResponse.getOutputStream)
@@ -170,8 +170,12 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Optio
   }
 
   private class ApacheRequest(method: String, uri: String, headers: Seq[(String, String)], inputStream: InputStream) extends org.apache.http.client.methods.HttpEntityEnclosingRequestBase with org.apache.http.HttpRequest {
-    for ((headerName, headerValue) <- headers)
-      addHeader(headerName, headerValue)
+    for ((headerName, headerValue) <- headers) {
+      val modifHeaderValue = if (headerName == "Host" && overWriteHosts.contains(headerValue)) {
+       overWriteHostWith 
+      } else headerValue
+      addHeader(headerName, modifHeaderValue)
+    }
 
     override def getMethod = method
 

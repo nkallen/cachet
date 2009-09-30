@@ -9,8 +9,8 @@ import org.specs.Specification
 
 object MultiBackendProxyServletSpec extends Specification {
 
-  val host1 = ProxyBackendConfig("host1.com", "127.0.0.1", 80, Some(443), List("api.host1.com"))
-  val host2 = ProxyBackendConfig("host2.com", "127.0.0.2", 8080, Some(8443), Nil)
+  val host1 = ProxyBackendConfig("host1.com", "127.0.0.1", 80, Some(443), List("api.host1.com"), Array("writeme"))
+  val host2 = ProxyBackendConfig("host2.com", "127.0.0.2", 8080, Some(8443), Nil, Array())
 
   "MultiBackendProxyServlet" should {
     "parse correctly formatted Properties file" >> {

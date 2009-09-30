@@ -16,9 +16,8 @@ object BackendsToProxyMap {
     hosts = backends.map { config =>
       val proxy = new ProxyServlet()
       val host = config.domain
-      proxy.init(host, config.ip, config.port, config.sslPort, backendTimeoutMs, numThreads, true, soBufferSize, w3cPath, w3cFilename, errorStrings)
-      log.info("adding proxy %s for host %s with ip = %s port = %s sslPort = %s", proxy.id,
-               host, config.ip, config.port, config.sslPort)
+      proxy.init(host, config.ip, config.port, config.sslPort, backendTimeoutMs, numThreads, true, soBufferSize, w3cPath, w3cFilename, errorStrings, config.overWriteHosts)
+      log.info("adding proxy %s for host %s with ip = %s port = %s sslPort = %s overWriteHostHeaders = %s", proxy.id, host, config.ip, config.port, config.sslPort, config.overWriteHosts.mkString(","))
       backendMap.put(host, proxy)
       config.aliases.foreach { alias => backendMap.put(alias, proxy) }
       host
@@ -30,7 +29,7 @@ object BackendsToProxyMap {
   def getAnyOneHost: String = hosts.head
 }
 
-case class ProxyBackendConfig(domain: String, ip: String, port: Int, sslPort: Option[Int], aliases: Seq[String])
+case class ProxyBackendConfig(domain: String, ip: String, port: Int, sslPort: Option[Int], aliases: Seq[String], overWriteHosts: Array[String])
 
 object HostRouter {
   private val log = Logger.get
