@@ -39,6 +39,8 @@ class ResponseWrapper(response: HttpServletResponse) extends javax.servlet.http.
 
 /**
  * Removes hopByHop Headers from the incoming request, adds an X-Forwarded-For header, for talking to a backend.
+ *
+ * Also handles any request rewriting that must occur.
  */
 class RequestSpecification(request: HttpServletRequest) {
   def scheme = request.getScheme
@@ -62,9 +64,12 @@ class RequestSpecification(request: HttpServletRequest) {
   def getRemoteAddr = request.getRemoteAddr
 
   def headers: Seq[(String, String)] = {
-    (for (headerName <- list(request.getHeaderNames).asInstanceOf[ArrayList[String]] if !ForwardRequest.hopByHopHeaders.contains(headerName) && headerName != "X-Forwarded-For";
+    val headers = (for (headerName <- list(request.getHeaderNames).asInstanceOf[ArrayList[String]] if !ForwardRequest.hopByHopHeaders.contains(headerName) && headerName != "X-Forwarded-For";
           headerValue <- list(request.getHeaders(headerName)).asInstanceOf[ArrayList[String]])
-    yield (headerName, headerValue)) ++ (Seq(("X-Forwarded-For", xForwardedFor)))
+                   yield (headerName, headerValue)) ++ (Seq(("X-Forwarded-For", xForwardedFor)))
+
+    // FIXME: header processing here.
+    headers
   }
 
   private def xForwardedFor = {

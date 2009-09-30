@@ -171,9 +171,12 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Optio
 
   private class ApacheRequest(method: String, uri: String, headers: Seq[(String, String)], inputStream: InputStream) extends org.apache.http.client.methods.HttpEntityEnclosingRequestBase with org.apache.http.HttpRequest {
     for ((headerName, headerValue) <- headers) {
+      // FIXME: make this generic and composable.
       val modifHeaderValue = if (headerName == "Host" && overWriteHosts.contains(headerValue)) {
-       overWriteHostWith 
-      } else headerValue
+       overWriteHostWith
+      } else {
+        headerValue
+      }
       addHeader(headerName, modifHeaderValue)
     }
 
