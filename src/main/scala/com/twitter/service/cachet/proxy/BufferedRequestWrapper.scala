@@ -2,8 +2,9 @@ package com.twitter.service.cachet.proxy
 
 import net.lag.logging.Logger
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
+import java.util.Hashtable
 import javax.servlet.ServletInputStream
-import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
+import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpUtils}
 
 /**
  * HttpServletRequestWrapper that encapsulates the underlying InputStream so that it can be read multiple times.
@@ -26,6 +27,22 @@ class BufferedRequestWrapper(req: HttpServletRequest) extends HttpServletRequest
   log.debug("BufferedRequestWrapper read %s bytes", buffer.size)
 
   override def getInputStream(): ServletInputStream = new BufferedServletInputStream(new ByteArrayInputStream(buffer))
+
+  var paramMap = if (buffer.size > 0) {
+    HttpUtils.parseQueryString(new String(buffer))
+  } else {
+    new Hashtable[String, Array[String]]()
+  }
+
+  override def getParameter(param: String): String = {
+    val valueArray = paramMap.get(param).asInstanceOf[Array[String]]
+    if (valueArray == null || valueArray.size == 0) {
+      null
+    } else {
+      valueArray(0)
+    }
+  }
+
 }
 
 /**

@@ -35,12 +35,25 @@ object ProxyServletFilterSpec extends Specification {
     }
   }
 
+  /**
+   * Instantiates a BufferedRequestWrapper only if it's a POST request so we can read the body multiple times.
+   */
   class ReadParameterServletFilter extends Filter {
     def init(c: FilterConfig) {}
 
     def doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
-      val bufferedRequest = new BufferedRequestWrapper(request.asInstanceOf[HttpServletRequest])
-      chain.doFilter(bufferedRequest, response)
+      val req = request.asInstanceOf[HttpServletRequest]
+      val servletRequest = if (req.getMethod == "POST") {
+        new BufferedRequestWrapper(req)
+      } else {
+        req
+      }
+
+      if (servletRequest.getParameter("hello") == null) {
+        response.asInstanceOf[HttpServletResponse].setStatus(HttpServletResponse.SC_BAD_REQUEST)
+      } else {
+        chain.doFilter(servletRequest, response)
+      }
     }
 
     def destroy {}
