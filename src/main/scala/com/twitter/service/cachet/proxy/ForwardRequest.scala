@@ -22,16 +22,17 @@ object ForwardRequest {
  */
 class ForwardRequest(httpClient: HttpClient, host: String, port: Int) {
   def apply(request: HttpServletRequest, response: HttpServletResponse) {
-    httpClient(host, port, new RequestSpecification(request), new ResponseWrapper(response))
     // FIXME: add version via configgy.
     response.addHeader("Via", "Cachet/%s".format("0.10"))
     if (ForwardRequest.forceConnectionClose) {
       response.addHeader("Connection", "close")
     }
+    httpClient(host, port, new RequestSpecification(request), new ResponseWrapper(response))
   }
 }
 
 class ResponseWrapper(response: HttpServletResponse) extends javax.servlet.http.HttpServletResponseWrapper(response) {
+  // FIXME: add generic Response header rewriting rules.
   override def addHeader(name: String, value: String) = {
     if (!ForwardRequest.hopByHopHeaders.contains(name)) super.addHeader(name, value)
   }
