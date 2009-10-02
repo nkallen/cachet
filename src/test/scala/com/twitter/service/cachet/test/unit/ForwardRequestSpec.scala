@@ -15,7 +15,7 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
   var httpClient = null: HttpClient
 
   "ForwardRequest" should {
-    doBefore{
+    doBefore {
       httpClient = mock[HttpClient]
       servletRequest = new FakeHttpServletRequest
       servletResponse = mock[HttpServletResponse]
@@ -25,7 +25,7 @@ object ForwardRequestSpec extends Specification with JMocker with ClassMocker {
 
     "apply" >> {
       "sets the request's method, url, headers, etc. on the client, and invokes the client" >> {
-        expect{
+        expect {
           one(httpClient).apply(a[String], an[Int], a[RequestSpecification], a[ResponseWrapper])
           one(servletResponse).addHeader("Via", "Cachet/0.10")
         }
