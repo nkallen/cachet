@@ -2,6 +2,8 @@ package com.twitter.service.cachet.proxy
 
 import net.lag.logging.Logger
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
+import java.util.Hashtable
+import java.net.URLDecoder
 import javax.servlet.ServletInputStream
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
 
@@ -26,6 +28,35 @@ class BufferedRequestWrapper(req: HttpServletRequest) extends HttpServletRequest
   log.debug("BufferedRequestWrapper read %s bytes", buffer.size)
 
   override def getInputStream(): ServletInputStream = new BufferedServletInputStream(new ByteArrayInputStream(buffer))
+
+  override def getParameter(param: String): String = {
+    val queryMap = parseQueryString(this.getQueryString)
+    if (queryMap.contains(param)) {
+      queryMap.getOrElse(param, null)
+    } else {
+      parseQueryString(new String(buffer)).getOrElse(param, null)
+    }
+  }
+
+  /**
+   * FIXME: multiple key-value pairs are not supported in this version.
+   */
+  def parseQueryString(queryString: String): Map[String, String] = {
+    if (queryString != null) {
+      val decoded = URLDecoder.decode(queryString)
+      val elements: Array[(String, String)] = if (decoded.contains("&")) {
+        decoded.split("&").map(_.split("=")).map(array => (array(0), array(1)))
+      } else if (decoded.contains("=")) {
+        val z = decoded.split("=")
+        Array(z(0) -> z(1))
+      } else {
+        Array()
+      }
+      Map.empty ++ elements
+    } else {
+      Map.empty
+    }
+  }
 }
 
 /**

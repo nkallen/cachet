@@ -88,8 +88,12 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Optio
       val httpHost = new org.apache.http.HttpHost(host, port, requestSpecification.scheme)
       val response = client.execute(httpHost, request)
 
-      for (header <- response.getAllHeaders)
+      for (header <- response.getAllHeaders) {
+        // FIXME: figure out how to rewrite headers (see also FIXME in ResponseWrapper)
+        // Option 1: Strip out headers here, add them before setting Content-Length
+        // Option 2: Right here, swap out header values.
         servletResponse.addHeader(header.getName, header.getValue)
+      }
 
       // FIXME: remove this line and test!
       client.getCookieStore().clear()

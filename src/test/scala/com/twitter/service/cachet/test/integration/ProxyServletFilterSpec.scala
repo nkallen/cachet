@@ -1,6 +1,7 @@
 package com.twitter.service.cachet.test.integration
 
 import com.twitter.service.cachet.proxy.BufferedRequestWrapper
+import com.twitter.service.cachet.test.mock.FakeHttpServletRequest
 import limiter.LimitingProxyServletFilter
 import mock.{WaitingServlet, TestServer}
 import org.mortbay.jetty.testing.HttpTester
@@ -35,18 +36,34 @@ object ProxyServletFilterSpec extends Specification {
     }
   }
 
+  /**
+   * Instantiates a BufferedRequestWrapper only if it's a POST request so we can read the body multiple times.
+   */
   class ReadParameterServletFilter extends Filter {
     def init(c: FilterConfig) {}
 
     def doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
-      val bufferedRequest = new BufferedRequestWrapper(request.asInstanceOf[HttpServletRequest])
-      chain.doFilter(bufferedRequest, response)
+      val req = request.asInstanceOf[HttpServletRequest]
+      val servletRequest = if (req.getMethod == "POST") {
+        new BufferedRequestWrapper(req)
+      } else {
+        req
+      }
+
+      if (servletRequest.getParameter("hello") == null) {
+        response.asInstanceOf[HttpServletResponse].setStatus(HttpServletResponse.SC_BAD_REQUEST)
+      } else {
+        chain.doFilter(servletRequest, response)
+      }
     }
 
     def destroy {}
   }
 
-  def makeRequestThroughProxy(method: String, queryString: String): HttpTester = {
+  def makeRequestThroughProxy(method: String, queryStringUrl: String): HttpTester =
+    makeRequestThroughProxy(method, queryStringUrl, None)
+
+  def makeRequestThroughProxy(method: String, queryStringUrl: String, queryStringBody: Option[String]): HttpTester = {
     var i = 0
     val proxyServer = new TestServer(2345+i, 0, 1, Nil, "data/keystore", "asdfasdf", "asdfasdf")
     val proxyProps = new Properties()
@@ -67,13 +84,13 @@ object ProxyServletFilterSpec extends Specification {
     val response = new HttpTester
     request.addHeader("X-Forwarded-For", "1.1.1.1")
     request.setMethod(method)
-    if (method == "POST") {
-      request.setURI("/")
-      request.setContent(queryString)
-      request.addHeader("Content-Type", "application/x-www-form-urlencoded")
-    } else {
-      request.setURI("/" + "?" + queryString)
+    queryStringUrl match {
+      case "" => request.setURI("/")
+      case q: String => request.setURI("/?" + q)
     }
+
+    queryStringBody.foreach { q => request.setContent(q) }
+    if (request.getMethod == "POST") request.addHeader("Content-Type", "application/x-www-form-urlencoded")
 
     request.setVersion("HTTP/1.0")
     response.parse(proxyServer(request.generate))
@@ -89,8 +106,21 @@ object ProxyServletFilterSpec extends Specification {
       makeRequestThroughProxy("GET", "hello=goodbye").getStatus mustEqual HttpServletResponse.SC_OK
       makeRequestThroughProxy("GET", "").getStatus mustEqual HttpServletResponse.SC_BAD_REQUEST
 
-      makeRequestThroughProxy("POST", "hello=goodbye").getStatus mustEqual HttpServletResponse.SC_OK
+      makeRequestThroughProxy("POST", "", Some("hello=goodbye")).getStatus mustEqual HttpServletResponse.SC_OK
       makeRequestThroughProxy("POST", "").getStatus mustEqual HttpServletResponse.SC_BAD_REQUEST
+
+      makeRequestThroughProxy("POST", "hello=goodbye", Some("hi=bye")).getStatus mustEqual HttpServletResponse.SC_OK
+      makeRequestThroughProxy("POST", "hi=bye", Some("hello=goodbye")).getStatus mustEqual HttpServletResponse.SC_OK
+      makeRequestThroughProxy("POST", "hello=goodbye").getStatus mustEqual HttpServletResponse.SC_OK
+    }
+
+    "can parse a query string" >> {
+      val request = new FakeHttpServletRequest()
+      val buf = new BufferedRequestWrapper(request)
+      buf.parseQueryString(null) mustEqual Map.empty
+      buf.parseQueryString("hello") mustEqual Map.empty
+      buf.parseQueryString("hello=goodbye") must containAll(Map("hello" -> "goodbye"))
+      buf.parseQueryString("hello=goodbye&hi=bye") must containAll(Map("hello" -> "goodbye", "hi" -> "bye"))
     }
   }
 }
