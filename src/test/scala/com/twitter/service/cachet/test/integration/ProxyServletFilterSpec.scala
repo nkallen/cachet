@@ -121,6 +121,9 @@ object ProxyServletFilterSpec extends Specification {
       buf.parseQueryString("hello") mustEqual Map.empty
       buf.parseQueryString("hello=goodbye") must containAll(Map("hello" -> "goodbye"))
       buf.parseQueryString("hello=goodbye&hi=bye") must containAll(Map("hello" -> "goodbye", "hi" -> "bye"))
+      buf.parseQueryString("&bye") mustEqual Map.empty
+      buf.parseQueryString("&b=2&x===") mustEqual Map("b" -> "2")
+      buf.parseQueryString("&===") mustEqual Map.empty
     }
   }
 }

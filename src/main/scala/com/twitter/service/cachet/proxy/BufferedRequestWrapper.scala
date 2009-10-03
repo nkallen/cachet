@@ -45,7 +45,8 @@ class BufferedRequestWrapper(req: HttpServletRequest) extends HttpServletRequest
     if (queryString != null) {
       val decoded = URLDecoder.decode(queryString)
       val elements: Array[(String, String)] = if (decoded.contains("&")) {
-        decoded.split("&").map(_.split("=")).map(array => (array(0), array(1)))
+        val y = decoded.split("&").map(_.split("="))
+        y.filter(_.size >= 2).map(array => (array(0), array(1)))
       } else if (decoded.contains("=")) {
         val z = decoded.split("=")
         Array(z(0) -> z(1))
