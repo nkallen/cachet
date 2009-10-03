@@ -125,12 +125,9 @@ class ProxyServlet extends HttpServlet {
             } else log.warning("scheme = https but no ForwardRequest set up!")
           }
         } catch {
-          case c: ConnectException => {
-            log.error("unable to connect to backend")
-          }
-          case e => {
-            log.error(e, "unable to connect to backend with uncaught exception: %s with optional cause: %s".format(e, e.getCause))
-          }
+          case c: ConnectException => log.error("unable to connect to backend")
+          case e => log.error(e, "unable to connect to backend with uncaught exception: %s " +
+                              "with optional cause: %s".format(e, e.getCause))
         }
       }
     }
