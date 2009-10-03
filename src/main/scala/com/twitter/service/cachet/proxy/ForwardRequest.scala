@@ -16,12 +16,15 @@ object ForwardRequest {
   val hopByHopHeaders = Array("Proxy-Connection", "Keep-Alive", "Transfer-Encoding", "TE", "Trailer", "Proxy-Authorization", "Proxy-Authenticate", "Upgrade", "Content-Length", "Connection")
   // Set this to true if you want to disable HTTP Keep-Alives.
   var forceConnectionClose = false
+  val CACHET_HEADER_STRING = "cachet.header."
+  val CACHET_HEADER_LEN = CACHET_HEADER_STRING.length
 }
 
 /**
  * Forwards Requests to the backend.
  */
 class ForwardRequest(httpClient: HttpClient, host: String, port: Int) {
+
   def apply(request: HttpServletRequest, response: HttpServletResponse) {
     // FIXME: add version via configgy.
     response.addHeader("Via", "Cachet/%s".format("0.10"))
@@ -38,12 +41,12 @@ class ForwardRequest(httpClient: HttpClient, host: String, port: Int) {
 
     while (enum.hasMoreElements) {
       val name = enum.nextElement.asInstanceOf[String]
-      if (name.startsWith("cachet.header.")) {
+      if (name.startsWith(ForwardRequest.CACHET_HEADER_STRING)) {
         names += name
       }
     }
 
-    Map.empty ++ names.map { name => (name.substring("cachet.header.".length, name.length) ->
+    Map.empty ++ names.map { name => (name.substring(ForwardRequest.CACHET_HEADER_LEN, name.length) ->
                                       request.getAttribute(name).asInstanceOf[String]) }
   }
 }
