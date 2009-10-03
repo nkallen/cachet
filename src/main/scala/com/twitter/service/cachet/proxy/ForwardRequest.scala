@@ -5,6 +5,7 @@ import java.util.{ArrayList, List, Vector}
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import scala.collection.jcl.Conversions._
+import scala.collection.mutable
 import java.util.Collections._
 
 object ForwardRequest {
@@ -27,14 +28,37 @@ class ForwardRequest(httpClient: HttpClient, host: String, port: Int) {
     if (ForwardRequest.forceConnectionClose) {
       response.addHeader("Connection", "close")
     }
-    httpClient(host, port, new RequestSpecification(request), new ResponseWrapper(response))
+    val headers = getNewHeaders(request)
+    httpClient(host, port, new RequestSpecification(request), new ResponseWrapper(response, headers))
+  }
+
+  def getNewHeaders(request: HttpServletRequest): Map[String, String] = {
+    val enum = request.getAttributeNames
+    val names = new mutable.ListBuffer[String]
+
+    while (enum.hasMoreElements) {
+      val name = enum.nextElement.asInstanceOf[String]
+      if (name.startsWith("cachet.header.")) {
+        names += name
+      }
+    }
+
+    Map.empty ++ names.map { name => (name.substring("cachet.header.".length, name.length) ->
+                                      request.getAttribute(name).asInstanceOf[String]) }
   }
 }
 
-class ResponseWrapper(response: HttpServletResponse) extends javax.servlet.http.HttpServletResponseWrapper(response) {
+/**
+ * @param headers the Headers we want to write over.
+ */
+class ResponseWrapper(response: HttpServletResponse, headers: Map[String, String]) extends javax.servlet.http.HttpServletResponseWrapper(response) {
+  headers.keySet.foreach {key => super.addHeader(key, headers.getOrElse(key, null))}
+
+  def this(response: HttpServletResponse) = this(response, Map.empty)
+
   // FIXME: add generic Response header rewriting rules.
   override def addHeader(name: String, value: String) = {
-    if (!ForwardRequest.hopByHopHeaders.contains(name)) super.addHeader(name, value)
+    if (!ForwardRequest.hopByHopHeaders.contains(name) && !headers.contains(name)) super.addHeader(name, value)
   }
 }
 
