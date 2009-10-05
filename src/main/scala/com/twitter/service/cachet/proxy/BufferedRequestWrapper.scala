@@ -49,7 +49,11 @@ class BufferedRequestWrapper(req: HttpServletRequest) extends HttpServletRequest
         y.filter(_.size >= 2).map(array => (array(0), array(1)))
       } else if (decoded.contains("=")) {
         val z = decoded.split("=")
-        Array(z(0) -> z(1))
+        if (z.size >= 2) {
+          Array(z(0) -> z(1))
+        } else {
+          Array()
+        }
       } else {
         Array()
       }
