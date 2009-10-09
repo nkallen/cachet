@@ -133,7 +133,7 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Optio
             "Response: remote-ip = %s uri = %s statusCode = %s".format(requestSpecification.getRemoteAddr, requestSpecification.uri, statusCode) +
               " contentType = %s, contentLength = %s, headers = %s" .format(contentType, entity.getContentLength(), response.getAllHeaders().toList.toString)
           }
-          //entity.consumeContent() // ensure connection release
+          entity.consumeContent() // ensure connection release to alleivate CLOSE_WAIT problems with dead backends.
         }
       }
     } catch {
