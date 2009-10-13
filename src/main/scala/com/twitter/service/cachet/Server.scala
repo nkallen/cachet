@@ -180,7 +180,11 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
 
   private def configureHttp() = {
     val server = new jetty.Server
-    server.setGracefulShutdown(gracefulShutdownMS)
+    if (gracefulShutdownMS > 0) {
+      log.info("Setting up graceful shutdown for %s milliseconds", gracefulShutdownMS)
+      server.setStopAtShutdown(true)
+      server.setGracefulShutdown(gracefulShutdownMS)
+    }
     val context = new Context(server, "/", Context.SESSIONS)
     server.setThreadPool(ThreadPool())
     try {
