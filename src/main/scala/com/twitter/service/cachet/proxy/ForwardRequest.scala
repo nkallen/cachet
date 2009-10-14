@@ -14,6 +14,9 @@ object ForwardRequest {
   // end-to-end header but the Apache HTTP Client does NOT like having
   // it set in advance.
   val hopByHopHeaders = Array("Proxy-Connection", "Keep-Alive", "Transfer-Encoding", "TE", "Trailer", "Proxy-Authorization", "Proxy-Authenticate", "Upgrade", "Content-Length", "Connection")
+
+  // A hashtable of HopByHop headers for quick lookup
+  val hopByHopHeadersMap = Map.empty ++ hopByHopHeaders.zip(hopByHopHeaders)
   // Set this to true if you want to disable HTTP Keep-Alives.
   var forceConnectionClose = false
   val CACHET_HEADER_STRING = "cachet.header."
@@ -61,7 +64,7 @@ class ResponseWrapper(response: HttpServletResponse, headers: Map[String, String
 
   // FIXME: add generic Response header rewriting rules.
   override def addHeader(name: String, value: String) = {
-    if (!ForwardRequest.hopByHopHeaders.contains(name) && !headers.contains(name)) super.addHeader(name, value)
+    if (!ForwardRequest.hopByHopHeadersMap.contains(name) && !headers.contains(name)) super.addHeader(name, value)
   }
 }
 
@@ -92,6 +95,26 @@ class RequestSpecification(request: HttpServletRequest) {
   def getRemoteAddr = request.getRemoteAddr
 
   def headers: Seq[(String, String)] = {
+    val headers = new mutable.ListBuffer[(String, String)]
+    headers += (X_FORWARDED_FOR, xForwardedFor)
+    val headerNames = request.getHeaderNames()
+    while (headerNames.hasMoreElements) {
+      val headerName = headerNames.nextElement().asInstanceOf[String]
+      if (headerName != X_FORWARDED_FOR && !ForwardRequest.hopByHopHeadersMap.contains(headerName)) {
+        val hdrs = request.getHeaders(headerName)
+        while(hdrs.hasMoreElements) {
+          headers += (headerName, hdrs.nextElement().asInstanceOf[String])
+        }
+      }
+    }
+
+    headers
+  }
+
+  def _headers: Seq[(String, String)] = {
+    // 1. Ensure test coverage
+    // 2. Convert this to an Enumerator over ArrayList
+    // Put them into a ListBuffer, conver to Seq??
     val headers = (for (headerName <- list(request.getHeaderNames).asInstanceOf[ArrayList[String]] if !ForwardRequest.hopByHopHeaders.contains(headerName) && headerName != "X-Forwarded-For";
           headerValue <- list(request.getHeaders(headerName)).asInstanceOf[ArrayList[String]])
                    yield (headerName, headerValue)) ++ (Seq(("X-Forwarded-For", xForwardedFor)))
@@ -100,11 +123,13 @@ class RequestSpecification(request: HttpServletRequest) {
     headers
   }
 
+  private val X_FORWARDED_FOR = "X-Forwarded-For"
+
   private def xForwardedFor = {
-    if (request.getHeader("X-Forwarded-For") == null)
+    if (request.getHeader(X_FORWARDED_FOR) == null)
       request.getRemoteAddr
     else
-      request.getHeader("X-Forwarded-For") + ", " + request.getRemoteAddr
+      request.getHeader(X_FORWARDED_FOR) + ", " + request.getRemoteAddr
   }
 
   override def toString = "Request: ip = %s scheme = %s method = %s uri = %s headers = %s".format(request.getRemoteAddr(), scheme, method, uri, headers)
