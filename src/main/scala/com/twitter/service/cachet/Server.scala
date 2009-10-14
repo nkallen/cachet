@@ -5,7 +5,7 @@ import org.mortbay.jetty.bio.SocketConnector
 import org.mortbay.jetty.Connector
 import org.mortbay.jetty.nio.SelectChannelConnector
 import org.mortbay.jetty.security.SslSelectChannelConnector
-import org.mortbay.jetty.servlet.{FilterHolder, ServletHolder, Context}
+import org.mortbay.jetty.servlet.{HashSessionManager, FilterHolder, ServletHolder, Context}
 import org.mortbay.thread.QueuedThreadPool
 import java.util.Properties
 import javax.net.ssl.SSLSocketFactory
@@ -186,6 +186,8 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
       server.setGracefulShutdown(gracefulShutdownMS)
     }
     val context = new Context(server, "/", Context.SESSIONS)
+    // We don't need a cookie manager as we proxy all headers including cookies.
+    context.getSessionHandler().getSessionManager().asInstanceOf[HashSessionManager].setUsingCookies(false)
     server.setThreadPool(ThreadPool())
     try {
       val q = server.getThreadPool.asInstanceOf[QueuedThreadPool]

@@ -96,7 +96,7 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Optio
       }
 
       // FIXME: remove this line and test!
-      client.getCookieStore().clear()
+      //client.getCookieStore().clear()
 
       val statusLine = response.getStatusLine()
       statusCode = statusLine.getStatusCode
