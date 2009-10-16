@@ -42,6 +42,10 @@ class ApacheHttpClient(timeout: Long, numThreads: Int, port: Int, sslPort: Optio
   params.setBooleanParameter(CoreProtocolPNames.USE_EXPECT_CONTINUE, false)
   params.setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false)
   params.setIntParameter(CoreConnectionPNames.SOCKET_BUFFER_SIZE, soBufferSize)
+  params.setBooleanParameter(ClientPNames.HANDLE_AUTHENTICATION, false)
+
+  // FIXME: in the future, we can force a route to take effect using the following.
+  // params.setBooleanParameter(ConnRoutePNames.FORCED_ROUTE, forcedRoute)
 
   private val schemeRegistry = new SchemeRegistry
   schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), port))
