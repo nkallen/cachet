@@ -30,7 +30,7 @@ class ForwardRequest(httpClient: HttpClient, host: String, port: Int) {
 
   def apply(request: HttpServletRequest, response: HttpServletResponse) {
     // FIXME: add version via configgy.
-    response.addHeader("Via", "Cachet/%s".format("0.10"))
+    response.addHeader("Via", "Cachet/%s".format("0.91"))
     if (ForwardRequest.forceConnectionClose) {
       response.addHeader("Connection", "close")
     }
