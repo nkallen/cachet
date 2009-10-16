@@ -60,10 +60,7 @@ object ProxyServletFilterSpec extends Specification {
     def destroy {}
   }
 
-  def makeRequestThroughProxy(method: String, queryStringUrl: String): HttpTester =
-    makeRequestThroughProxy(method, queryStringUrl, None)
-
-  def makeRequestThroughProxy(method: String, queryStringUrl: String, queryStringBody: Option[String]): HttpTester = {
+  def makeRequestThroughProxy(request: HttpTester): HttpTester = {
     var i = 0
     val proxyServer = new TestServer(2345+i, 0, 1, Nil, "data/keystore", "asdfasdf", "asdfasdf")
     val proxyProps = new Properties()
@@ -80,8 +77,19 @@ object ProxyServletFilterSpec extends Specification {
     i += 1 // to not run into address binding issues
     slowServer.start()
 
+    val response = new HttpTester()
+    response.parse(proxyServer(request.generate))
+
+    proxyServer.stop()
+    slowServer.stop()
+    response
+  }
+
+  def makeRequestThroughProxy(method: String, queryStringUrl: String): HttpTester =
+    makeRequestThroughProxy(method, queryStringUrl, None)
+
+  def makeRequestThroughProxy(method: String, queryStringUrl: String, queryStringBody: Option[String]): HttpTester = {
     val request = new HttpTester
-    val response = new HttpTester
     request.addHeader("X-Forwarded-For", "1.1.1.1")
     request.setMethod(method)
     queryStringUrl match {
@@ -93,11 +101,7 @@ object ProxyServletFilterSpec extends Specification {
     if (request.getMethod == "POST") request.addHeader("Content-Type", "application/x-www-form-urlencoded")
 
     request.setVersion("HTTP/1.0")
-    response.parse(proxyServer(request.generate))
-
-    proxyServer.stop()
-    slowServer.stop()
-    response
+    makeRequestThroughProxy(request)
   }
 
   "ProxyServletFilterSpec" >> {
@@ -124,6 +128,23 @@ object ProxyServletFilterSpec extends Specification {
       buf.parseQueryString("&bye") mustEqual Map.empty
       buf.parseQueryString("&b=2&x===") mustEqual Map("b" -> "2")
       buf.parseQueryString("&===") mustEqual Map.empty
+    }
+
+    "send a request with a Content-Type and a Content-Length of 0" >> {
+      val request = new HttpTester()
+      request.setMethod("POST")
+      request.setURI("/?hello=goodbye")
+      request.setVersion("HTTP/1.0")
+      request.addHeader("X-Forwarded-For", "1.1.1.1")
+      request.addHeader("Content-Length", "0")
+      request.addHeader("Content-Type", "application/x-www-form-urlencoded")
+      request.addHeader("Host", "twitter.com")
+      request.addHeader("Accept", "*/*")
+      request.addHeader("Authorization", "Basic BIGTIMEFOOBARXAXOqluavTYbmV0Mz==")
+
+      val response = makeRequestThroughProxy(request)
+
+      response.getStatus mustEqual HttpServletResponse.SC_OK
     }
   }
 }
