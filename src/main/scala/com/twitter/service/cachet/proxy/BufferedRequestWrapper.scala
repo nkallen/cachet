@@ -33,8 +33,10 @@ class BufferedRequestWrapper(req: HttpServletRequest) extends HttpServletRequest
     val queryMap = parseQueryString(this.getQueryString)
     if (queryMap.contains(param)) {
       queryMap.getOrElse(param, null)
-    } else {
+    } else if (req.getMethod == "POST" && req.getContentType != null && req.getContentType.startsWith("application/x-www-form-urlencoded")) {
       parseQueryString(new String(buffer)).getOrElse(param, null)
+    } else {
+      null
     }
   }
 
