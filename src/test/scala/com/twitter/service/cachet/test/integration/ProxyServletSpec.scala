@@ -85,6 +85,7 @@ object ProxyServletSpec extends Specification {
       request.setVersion("HTTP/1.0")
       request.addHeader("X-Forwarded-For", "1.1.1.1")
       request.addHeader("Content-Length", "0")
+      request.addHeader("Content-Type", "application/x-www-form-urlencoded")
       request.addHeader("Host", "twitter.com")
       request.addHeader("Accept", "*/*")
       request.addHeader("Authorization", "Basic BIGTIMEFOOBARXAXOqluavTYbmV0Mz==")
