@@ -8,6 +8,7 @@ import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import org.apache.http.{HttpResponse, HttpVersion}
 import org.apache.http.client.RedirectHandler
 import org.apache.http.client.methods.HttpUriRequest
+import org.apache.http.client.params.ClientPNames
 import org.apache.http.client.protocol.{RequestAddCookies, RequestProxyAuthentication}
 import org.apache.http.protocol.RequestExpectContinue
 import org.apache.http.conn.params._
