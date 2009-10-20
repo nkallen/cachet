@@ -185,9 +185,9 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
       server.setStopAtShutdown(true)
       server.setGracefulShutdown(gracefulShutdownMS)
     }
-    val context = new Context(server, "/", Context.SESSIONS)
+    val context = new Context(server, "/", Context.NO_SESSIONS)
     // We don't need a cookie manager as we proxy all headers including cookies.
-    context.getSessionHandler().getSessionManager().asInstanceOf[HashSessionManager].setUsingCookies(false)
+    // context.getSessionHandler().getSessionManager().asInstanceOf[HashSessionManager].setUsingCookies(false)
     server.setThreadPool(ThreadPool())
     try {
       val q = server.getThreadPool.asInstanceOf[QueuedThreadPool]
