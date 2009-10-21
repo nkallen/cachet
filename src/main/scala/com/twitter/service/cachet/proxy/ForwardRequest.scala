@@ -1,5 +1,6 @@
 package com.twitter.service.cachet.proxy.client
 
+import net.lag.logging.Logger
 import java.lang.String
 import java.util.{ArrayList, List, Vector}
 import javax.servlet.http.HttpServletRequest
@@ -27,6 +28,19 @@ object ForwardRequest {
  * Forwards Requests to the backend.
  */
 class ForwardRequest(httpClient: HttpClient, host: String, port: Int) {
+  private val log = Logger.get
+
+  // FIXME: make this not hard-coded!
+  def isBlacklisted(request: HttpServletRequest): Boolean = {
+    val srcip = request.getRemoteAddr
+    val uri = request.getRequestURI
+    if (srcip != "localhost" && srcip != "127.0.0.1" && (uri == "/server-status" || uri == "/balancer-manager")) {
+      log.warning("Blacklisting request with ip = %s URI = %s URL = %s", srcip, uri, request.getRequestURL)
+      true
+    } else {
+      false
+    }
+  }
 
   def apply(request: HttpServletRequest, response: HttpServletResponse) {
     // FIXME: add version via configgy.
@@ -34,8 +48,12 @@ class ForwardRequest(httpClient: HttpClient, host: String, port: Int) {
     if (ForwardRequest.forceConnectionClose) {
       response.addHeader("Connection", "close")
     }
-    val headers = getNewHeaders(request)
-    httpClient(host, port, new RequestSpecification(request), new ResponseWrapper(response, headers))
+    if (isBlacklisted(request)) {
+      response.sendError(HttpServletResponse.SC_NOT_FOUND)
+    } else {
+      val headers = getNewHeaders(request)
+      httpClient(host, port, new RequestSpecification(request), new ResponseWrapper(response, headers))
+    }
   }
 
   def getNewHeaders(request: HttpServletRequest): Map[String, String] = {
