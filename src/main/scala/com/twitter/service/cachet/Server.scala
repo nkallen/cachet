@@ -1,16 +1,18 @@
 package com.twitter.service.cachet
 
 import org.mortbay.jetty
-import org.mortbay.jetty.bio.SocketConnector
 import org.mortbay.jetty.Connector
+import org.mortbay.jetty.bio.SocketConnector
+import org.mortbay.jetty.handler.ErrorHandler
 import org.mortbay.jetty.nio.SelectChannelConnector
 import org.mortbay.jetty.security.SslSelectChannelConnector
 import org.mortbay.jetty.servlet.{HashSessionManager, FilterHolder, ServletHolder, Context}
 import org.mortbay.thread.QueuedThreadPool
+import java.io.Writer
 import java.util.Properties
 import javax.net.ssl.SSLSocketFactory
 import javax.servlet.Filter
-import javax.servlet.http.HttpServlet
+import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
 import net.lag.configgy.ConfigMap
 import net.lag.logging.Logger
 
@@ -135,7 +137,23 @@ class JettyServer(val port: Int, val gracefulShutdownMS: Int, val numThreads: In
       }
       case None => log.info("No SSL connectors being installed")
     }
+  }
 
+  def setErrorHandler(handler: ErrorHandler) {
+    context.setErrorHandler(handler)
+  }
+
+  /**
+   * Given a map of status code to Error page, install an ErrorHandler that serves that page.
+   * @param errorStrings: A Map of HTTP response code -> html document
+   */
+  def setErrorPages(errorStrings: Map[Int, String]) {
+    setErrorHandler(new ErrorHandler() {
+      override def handleErrorPage(request: HttpServletRequest, writer: Writer, code: Int, msg: String) {
+        writer.write(errorStrings.getOrElse(code, "Error code: %s".format(code)))
+        Stats.returned5xx()
+      }
+    })
   }
 
   def addServlet(servlet: Class[_ <: HttpServlet], route: String, props: Properties) {
