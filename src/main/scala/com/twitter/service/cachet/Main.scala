@@ -1,8 +1,8 @@
 package com.twitter.service.cachet
 
 import limiter.LimitingProxyServletFilter
-import com.twitter.service.W3CStats
-import com.twitter.service.Stats._
+import com.twitter.ostrich.W3CStats
+import com.twitter.ostrich.{Stats => TStats}
 import net.lag.configgy.{Config, ConfigMap, Configgy, RuntimeEnvironment}
 import net.lag.logging.Logger
 import org.mortbay.thread.{QueuedThreadPool, ThreadPool => JThreadPool}
@@ -19,7 +19,6 @@ object Main {
 
     val server = new JettyServer(Configgy.config)
     Stats.server = Some(server.server)
-    log.info(Stats.w3c.log_header)
 
     val initParams = new Properties()
     initParams.put("backend-host", Configgy.config.getString("backend-host", "localhost"))
@@ -37,41 +36,17 @@ object Stats {
   var server: Option[JServer] = None
 
   var w3c = new W3CStats(Logger.get, Array("rs-response-time", "sc-response-code", "rs-response-code", "rs-response-method", "x-protocol", "host", "uri", "rs-content-type", "rs-content-length", "remote-ip", "request-date", "request-time", "rs-went-away", "x-proxy-id", "x-default-backend", "x-httpclient-exception"))
-  val requestsHandled = buildIncr("requestsHandled")
-  val returned2xx = buildIncr("returned2xx")
-  val returned3xx = buildIncr("returned3xx")
-  val returned4xx = buildIncr("returned4xx")
-  val returned5xx = buildIncr("returned5xx")
-  val clientResponseSent = buildIncr("clientResponseSent")
-  val clientLeftEarly = buildIncr("clientLeftEarly")
+  val requestsHandled = TStats.getCounter("requestsHandled")
+  val returned2xx = TStats.getCounter("returned2xx")
+  val returned3xx = TStats.getCounter("returned3xx")
+  val returned4xx = TStats.getCounter("returned4xx")
+  val returned5xx = TStats.getCounter("returned5xx")
+  val clientResponseSent = TStats.getCounter("clientResponseSent")
+  val clientLeftEarly = TStats.getCounter("clientLeftEarly")
   // We couldn't find a backend proxy for a Host
-  val noProxyFoundForHost = buildIncr("noProxyFoundForHost")
+  val noProxyFoundForHost = TStats.getCounter("noProxyFoundForHost")
 
-  /**
-   * Registers a function for gathering Jetty's built-in Stats. Note: this will only work if server is set to non-None.
-   */
-  registerTimingStatsFn { reset =>
-    server match {
-      case Some(server) => {
-        val rv: Array[(String, TimingStat)] = server.getConnectors.flatMap { conn =>
-          val name = conn.getName
-          Array((name + "_connections" ->
-                 TimingStat(conn.getConnectionsOpen, conn.getConnectionsOpenMin, conn.getConnectionsOpenMax, conn.getConnectionsOpen)),
-                (name + "_connections_requests" ->
-                 TimingStat(conn.getConnectionsRequestsAve, conn.getConnectionsRequestsMin, conn.getConnectionsRequestsMax,
-                            conn.getConnectionsRequestsAve)),
-                // We can convert these to Ints safely as long as we reset the stats before they become Longs.
-                (name + "_connections_duration" ->
-                 TimingStat(conn.getConnectionsDurationAve.toInt, conn.getConnectionsDurationMin.toInt,
-                            conn.getConnectionsDurationMax.toInt, conn.getConnectionsDurationAve.toInt)))
-        }
-        if (reset) { server.getConnectors.foreach(_.statsReset) }
-        Map.empty ++ rv
-      }
-      case None => Map.empty
-    }
-  }
-  def countRequestsForHost(name: String) = incr("host_%s".format(name), 1)
+  def countRequestsForHost(name: String) = TStats.incr("host_%s".format(name), 1)
   def initStatsMBean() { StatsMBean("com.twitter.cachet") }
 }
 

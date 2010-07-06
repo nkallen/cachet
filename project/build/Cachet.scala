@@ -17,5 +17,6 @@ class CachetProject(info: ProjectInfo) extends StandardProject(info) {
   val hamcrest  = "org.hamcrest" % "hamcrest-all" % "1.1"
   val jmock     = "org.jmock" % "jmock" % "2.4.0"
   val objenesis = "org.objenesis" % "objenesis" % "1.1"
+  val ostrich = "com.twitter" % "ostrich" % "1.1.16"
 
 }

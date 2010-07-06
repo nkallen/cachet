@@ -1,7 +1,7 @@
 package com.twitter.service.cachet
 
 import proxy.client.{ApacheHttpClient, ForwardRequest, JettyHttpClient}
-import com.twitter.service.{Stats => TStats, W3CStats}
+import com.twitter.ostrich.{Stats => TStats, W3CStats}
 import net.lag.logging.Logger
 import javax.servlet.{Filter, FilterChain, FilterConfig, ServletConfig, ServletRequest, ServletResponse}
 import javax.servlet.http.{HttpServlet, HttpServletResponse, HttpServletRequest}
@@ -108,9 +108,6 @@ class ProxyServlet extends HttpServlet {
 
   override def service(request: HttpServletRequest, response: HttpServletResponse) {
     Stats.requestsHandled()
-    val datetime = Stats.w3c.datetime_format(new Date())
-    Stats.w3c.log("request-date", datetime._1)
-    Stats.w3c.log("request-time", datetime._2)
     Stats.w3c.log("remote-ip", request.getRemoteAddr())
     TStats.time("rs-response-time") {
       Stats.w3c.time("rs-response-time") {
