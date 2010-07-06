@@ -1,4 +1,10 @@
-cachet.ipr
-cachet.iws
-target/*
-dist/*
+*.log
+lib_managed
+src_managed
+target
+dist
+project/boot
+.DS_Store
+#*#
+.#*
+*.swp
