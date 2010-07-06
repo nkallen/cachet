@@ -63,7 +63,7 @@ object ServerConfigSpec extends Specification {
 
     "setErrorHandler" >> {
       "not install an ErrorHandler if None is passed" >> {
-        testServer.context.getErrorHandler mustEqual null
+        testServer.context.getErrorHandler mustBe null
       }
 
       "installs an ErrorHandler if Some(handler) is passed" >> {

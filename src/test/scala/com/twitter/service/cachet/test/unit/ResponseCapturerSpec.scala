@@ -156,6 +156,14 @@ object ResponseCapturerSpec extends Specification with JMocker with ClassMocker 
     "Freshness Information" >> {
       val dateInRFC1123 = "Sun, 06 Nov 1994 08:49:37 GMT"
 
+      doBefore {
+        response = mock[HttpServletResponse]
+        streamCapturer = mock[ServletOutputStreamCapturer]
+        expect{allowing(streamCapturer).writeTo(response)}
+        responseCapturer = new ResponseCapturer(response, streamCapturer)
+      }
+
+
       "maxAge" >> {
         "when there is a max-age control" >> {
           responseCapturer.setHeader("Cache-Control", "max-age=100")
@@ -214,6 +222,8 @@ object ResponseCapturerSpec extends Specification with JMocker with ClassMocker 
     }
 
     "not delegate buffering commands to the response" >> {
+      response = mock[HttpServletResponse]
+
       expect{
         never(response).flushBuffer
         never(response).reset
@@ -221,6 +231,8 @@ object ResponseCapturerSpec extends Specification with JMocker with ClassMocker 
         never(response).setBufferSize(an[Int])
       }
 
+
+      responseCapturer = new ResponseCapturer(response, streamCapturer)
       responseCapturer.flushBuffer
       responseCapturer.reset
       responseCapturer.resetBuffer

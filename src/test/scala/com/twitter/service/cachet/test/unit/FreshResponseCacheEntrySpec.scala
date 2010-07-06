@@ -3,7 +3,6 @@ package com.twitter.service.cachet.test.unit
 import com.twitter.service.cachet.cache.FreshResponseCacheEntry
 import com.twitter.service.cachet._
 import javax.servlet.http._
-import org.jmock.core.Stub
 import org.specs._
 import org.specs.mock._
 import org.specs.mock.JMocker._
