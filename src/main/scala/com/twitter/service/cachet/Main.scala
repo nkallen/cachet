@@ -47,7 +47,6 @@ object Stats {
   val noProxyFoundForHost = TStats.getCounter("noProxyFoundForHost")
 
   def countRequestsForHost(name: String) = TStats.incr("host_%s".format(name), 1)
-  def initStatsMBean() { StatsMBean("com.twitter.cachet") }
 }
 
 object ThreadPool {
